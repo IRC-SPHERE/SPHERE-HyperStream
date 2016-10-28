@@ -18,25 +18,29 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
-from hyperstream import Stream
-from hyperstream.utils import MIN_DATE, utcnow
+from hyperstream.tool import Tool, check_input_stream_count
+from hyperstream.stream import StreamInstance
 
-import unittest
-from helpers import *
+from plugins.sphere.channels.sphere_channel import SphereDataWindow
 
 
-class TestToolChannel(unittest.TestCase):
-    def test_tool_channel(self):
-        # Load in the objects and print them
-        clock_stream = T[clock]
-        assert(isinstance(clock_stream, Stream))
-        # assert(clock_stream.modifier == Last() + IData())
+def reformat(doc):
+    dt = doc['datetime']
+    del doc['datetime']
+    
+    return StreamInstance(dt, doc)
 
-        sphere_silhouette_stream = channels["sphere_tools"].streams[sphere_silhouette]
-        assert(sphere_silhouette_stream.channel.can_create is False)
 
-        agg = T[aggregate].window((MIN_DATE, utcnow())).items()
-        assert(len(agg) > 0)
-        assert(str(agg[0]) ==
-               "StreamInstance(timestamp=datetime.datetime(2016, 10, 26, 0, 0, tzinfo=<UTC>), "
-               "value=<class 'hyperstream_tools_aggregate_2016_10_26_v0_1_0.Aggregate'>)")
+class Sphere(Tool):
+    def __init__(self, modality, elements=None, filters=None, rename_keys=False):
+        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys)
+        self.modality = modality
+        self.elements = elements
+        self.filters = filters
+        self.rename_keys = rename_keys
+    
+    @check_input_stream_count(0)
+    def _execute(self, sources, alignment_stream, interval):
+        window = SphereDataWindow(interval)
+        source = window.modalities[self.modality]
+        yield map(reformat, source.get_data(self.elements, self.filters, self.rename_keys))
