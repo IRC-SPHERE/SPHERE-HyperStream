@@ -18,29 +18,30 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
-from hyperstream.stream import StreamInstance
-from hyperstream.tool import Tool, check_input_stream_count
-from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
+from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
+from dateutil.parser import parse
 
 
-def reformat(doc):
-    dt = doc['datetime']
-    del doc['datetime']
-    return StreamInstance(dt, doc)
+OLD = {
+    'start': parse("2016-07-08T12:00:00.000Z"),
+    'end': parse("2016-07-08T12:01:00.000Z")
+}
+
+NEW = {
+    'start': parse("2016-04-28T12:00:00.000Z"),
+    'end': parse("2016-04-28T12:01:00.000Z")
+}
 
 
-class Sphere(Tool):
-    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None):
-        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys,
-                                     annotators=annotators)
-        self.modality = modality
-        self.elements = elements
-        self.filters = filters
-        self.rename_keys = rename_keys
-        self.annotators = annotators
-    
-    @check_input_stream_count(0)
-    def _execute(self, sources, alignment_stream, interval):
-        window = SphereExperiment(interval, self.annotators) if self.annotators else SphereDataWindow(interval)
-        source = window.modalities[self.modality]
-        return map(reformat, source.get_data(self.elements, self.filters, self.rename_keys))
+if __name__ == '__main__':
+    sphere_connector = SphereConnector(config_filename='config_strauss.json', include_mongo=True, include_redcap=False)
+
+    windows = [DataWindow(sphere_connector, **d) for d in [OLD, NEW]]
+
+    for element in ["2Dbb", "silhouette"]:
+        for dw in windows:
+            data = dw.video.get_data(elements={element}, filters={'bt': {'$mod': [10, 0]}}, rename_keys=False)
+            print("")
+            print(data[0].keys())
+            print(data[0]['video-' + element])
+            print(len(data))
