@@ -45,4 +45,4 @@ class ExperimentsDataFrameBuilder(Tool):
         ), **(x.value['notes'])), data)
         df = pd.DataFrame(flattened)
         df['id'] = range(1, len(df) + 1)
-        yield StreamInstance(utcnow(), df)
+        yield StreamInstance(interval.end, df)
