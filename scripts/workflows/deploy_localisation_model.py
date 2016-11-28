@@ -61,7 +61,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="sphere",
-            parameters=dict(modality="wearable3")
+            parameters=dict(modality="wearable", elements={"rss"})
         ),
         source=None,
         splitting_node=None,
@@ -87,7 +87,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
         sources=None,
         sink=N["every_2s"])
 
-    def component_wise_max(init_value=None, id_field='aid', value_field='rss'):
+    def component_wise_max(init_value=None, id_field='aid', value_field='wearable-rss'):
         if init_value is None:
             init_value = {}
 

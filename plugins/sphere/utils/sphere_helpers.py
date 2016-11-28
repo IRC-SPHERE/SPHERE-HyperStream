@@ -168,7 +168,7 @@ class PredefinedTools(object):
         # WEARABLE
         self.wearable = channel_manager.get_tool(
             name="sphere",
-            parameters=dict(modality="wearable"))
+            parameters=dict(modality="wearable", elements={"rss"}))
 
         self.wearable_rss = channel_manager.get_tool(
             name="sphere",

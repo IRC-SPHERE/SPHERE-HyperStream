@@ -87,7 +87,7 @@ def create_workflow_rssi_distributions_per_room(hyperstream, house, experiment_i
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="sphere",
-            parameters=dict(modality="wearable3")
+            parameters=dict(modality="wearable", elements={"rss"})
         ),
         source=None,
         splitting_node=None,
@@ -147,7 +147,7 @@ def create_workflow_rssi_distributions_per_room(hyperstream, house, experiment_i
         sources=[N["annotation_state_location"]],
         sink=N["annotation_state_2s_windows"])
 
-    def component_wise_max(init_value=None, id_field='aid', value_field='rss'):
+    def component_wise_max(init_value=None, id_field='aid', value_field='wearable-rss'):
         if init_value is None:
             init_value = {}
 

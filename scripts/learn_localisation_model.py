@@ -92,6 +92,15 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
             hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id1)
 
+    # Put the experiments selected into an asset stream
+    from hyperstream import StreamInstance
+    from hyperstream.utils import utcnow
+
+    A.write_to_stream(
+        stream_id=StreamId(name="experiments_selected", meta_data=dict(house=house)),
+        data=StreamInstance(timestamp=utcnow(), value=list(experiment_ids))
+    )
+
     time_interval = TimeInterval.up_to_now()
     w1.execute(time_interval)
 

@@ -29,8 +29,7 @@ globs = {
     'sphere_connector': None,
     'wearables': 'ABCD',
     'house': 1,
-    # 'collection': 'wearable4'
-    'collection': 'wearable3'
+    'collection': 'wearable'
 }
 
 
