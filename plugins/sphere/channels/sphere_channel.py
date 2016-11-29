@@ -31,26 +31,17 @@ from hyperstream.utils import MIN_DATE, MAX_DATE
 
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
-# globs = {'sphere_connector': None}
-#
-#
-# def get_sphere_connector():
-#     if not globs['sphere_connector']:
-#         globs['sphere_connector'] = SphereConnector(
-#             config_filename=os.path.join(path, 'config.json'),
-#             include_mongo=True,
-#             include_redcap=False,
-#             sphere_logger=None)
-#     return globs['sphere_connector']
+globs = {'sphere_connector': None}
 
 
 def get_sphere_connector():
-    sphere_connector = SphereConnector(
-        config_filename=os.path.join(path, 'config.json'),
-        include_mongo=True,
-        include_redcap=False,
-        sphere_logger=None)
-    return sphere_connector
+    if not globs['sphere_connector']:
+        globs['sphere_connector'] = SphereConnector(
+            config_filename=os.path.join(path, 'config.json'),
+            include_mongo=True,
+            include_redcap=False,
+            sphere_logger=None)
+    return globs['sphere_connector']
 
 
 class SphereDataWindow(DataWindow):
