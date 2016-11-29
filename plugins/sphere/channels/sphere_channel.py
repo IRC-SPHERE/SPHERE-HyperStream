@@ -36,11 +36,20 @@ globs = {'sphere_connector': None}
 
 def get_sphere_connector():
     if not globs['sphere_connector']:
-        globs['sphere_connector'] = SphereConnector(
-            config_filename=os.path.join(path, 'config.json'),
-            include_mongo=True,
-            include_redcap=False,
-            sphere_logger=None)
+        try:
+            # First try current working directory
+            globs['sphere_connector'] = SphereConnector(
+                config_filename=os.path.join(os.getcwd(), 'config.json'),
+                include_mongo=True,
+                include_redcap=False,
+                sphere_logger=None)
+        except IOError:
+            # Next try default hyperstream directory
+            globs['sphere_connector'] = SphereConnector(
+                config_filename=os.path.join(path, 'config.json'),
+                include_mongo=True,
+                include_redcap=False,
+                sphere_logger=None)
     return globs['sphere_connector']
 
 
