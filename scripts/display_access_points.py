@@ -35,7 +35,7 @@ globs = {
 
 def display_access_points():
     from hyperstream.utils import utcnow
-    from sphere_connector_package.sphere_connector import SphereConnector
+    from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
 
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
@@ -44,11 +44,13 @@ def display_access_points():
             include_redcap=False,
             sphere_logger=None)
 
-    sphere_connector = globs['sphere_connector']
+    t2 = utcnow()
+    t1 = t2 - timedelta(seconds=5)
 
-    dtf = sphere_connector.basic_config.mongo['modalities'][globs['collection']]['date_time_field']
-    aids = sphere_connector.client.collections[globs['collection']] \
-        .find({dtf: {'$gt': utcnow() - timedelta(seconds=5)}}).distinct('aid')
+    sphere_connector = globs['sphere_connector']
+    window = DataWindow(sphere_connector, t1, t2)
+    docs = window.modalities[globs['collection']].get_data(elements={'rss'}, rename_keys=False)
+    aids = set(d['aid'] for d in docs)
 
     if aids:
         print("Access points: ")
@@ -61,8 +63,6 @@ def display_access_points():
 def run():
     display_access_points()
     print()
-    # db.getCollection('WEARABLE-ISO-TIME').distinct('aid',{wts:{$gt:ISODate("2016-11-17T16:40")})
-    # db.getCollection('WEAR').distinct('gw.uid', {'bt': {$gt: ISODate('2016-11-23T15:40.000Z')}})
 
 
 if __name__ == '__main__':
