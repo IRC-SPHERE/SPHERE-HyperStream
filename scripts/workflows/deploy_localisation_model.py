@@ -118,6 +118,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
         sources=[N['location_prediction']],
         sink=N["location_prediction_lda"])
 
+    # TODO: Mappings need to be loaded from assets channel
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="stream_broadcaster",
