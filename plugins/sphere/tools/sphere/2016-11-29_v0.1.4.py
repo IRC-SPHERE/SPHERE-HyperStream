@@ -43,29 +43,29 @@ class Sphere(MultiOutputTool):
         window = SphereExperiment(interval, self.annotators) if self.annotators else SphereDataWindow(interval)
         source = window.modalities[self.modality]
 
-        if not self.dedupe:
+        if self.dedupe:
+            previous = None
+            for instance in source.get_data(self.elements, self.filters, self.rename_keys):
+                if previous:
+                    current = reformat(instance)
+                    if current.stream_instance.timestamp == previous.stream_instance.timestamp:
+                        if current.meta_data != previous.meta_data:
+                            raise ValueError("Incompatible meta data")
+                        # Try to reconcile the two items
+                        for k, v in current.stream_instance.value.items():
+                            if k in previous.stream_instance.value:
+                                if v != previous.stream_instance.value[k]:
+                                    raise ValueError("De-duplication failed")
+                            else:
+                                previous.stream_instance.value[k] = v
+                    else:
+                        tmp = previous
+                        previous = current
+                        yield tmp
+                else:
+                    previous = reformat(instance)
+            if previous:
+                yield previous
+        else:
             for instance in source.get_data(self.elements, self.filters, self.rename_keys):
                 yield reformat(instance)
-
-        previous = None
-        for instance in source.get_data(self.elements, self.filters, self.rename_keys):
-            if previous:
-                current = reformat(instance)
-                if current.stream_instance.timestamp == previous.stream_instance.timestamp:
-                    if current.meta_data != previous.meta_data:
-                        raise ValueError("Incompatible meta data")
-                    # Try to reconcile the two items
-                    for k, v in current.stream_instance.value.items():
-                        if k in previous.stream_instance.value:
-                            if v != previous.stream_instance.value[k]:
-                                raise ValueError("De-duplication failed")
-                        else:
-                            previous.stream_instance.value[k] = v
-                else:
-                    tmp = previous
-                    previous = current
-                    yield tmp
-            else:
-                previous = reformat(instance)
-        if previous:
-            yield previous

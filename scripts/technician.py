@@ -75,6 +75,7 @@ if __name__ == '__main__':
     # print args.house
 
     loglevel = logging.CRITICAL
+    # loglevel = logging.DEBUG
     delete_existing_workflows = True
 
     display_experiments.run(args.house, delete_existing_workflows, loglevel)
