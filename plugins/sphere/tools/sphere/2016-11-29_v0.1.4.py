@@ -25,8 +25,8 @@ from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExper
 
 def reformat(doc):
     dt = doc.pop('datetime')
-    if 'house_id' in doc:
-        house_id = doc.pop('house_id')
+    if 'hid' in doc:
+        house_id = doc.pop('hid')
     else:
         house_id = '1'
     return StreamMetaInstance(stream_instance=StreamInstance(dt, doc), meta_data=('house', house_id))
