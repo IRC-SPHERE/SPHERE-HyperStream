@@ -17,7 +17,7 @@
 #  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
-from plugins.sphere.utils.sphere_helpers import mappings
+# from plugins.sphere.utils.sphere_helpers import mappings
 
 
 def create_workflow_localisation_predict(hyperstream, house, experiment_ids, safe=True):
@@ -30,6 +30,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
     S = hyperstream.channel_manager.sphere
     D = hyperstream.channel_manager.mongo
     M = hyperstream.channel_manager.memory
+    A = hyperstream.channel_manager.assets
 
     try:
         w = hyperstream.create_workflow(
@@ -53,6 +54,8 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
         ("rss_per_uid_2s",                          M, ["H.W"]),
         ("location_prediction_models_broadcasted",  M, ["H.W"]),
         ("predicted_locations_broadcasted",         D, ["H.W"]),
+        ("wearables_by_house",                      A, ["H"]),
+        ("access_points_by_house",                  A, ["H"])
     )
 
     # Create all of the nodes
@@ -69,14 +72,13 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter",
+            name="splitter_from_stream",
             parameters=dict(
-                element="uid",
-                mapping=mappings['uid']
+                element="uid"
             )
         ),
         source=N["rss_raw"],
-        splitting_node=None,
+        splitting_node=N["access_points_by_house"],
         sink=N["rss_per_uid"])
 
     w.create_factor(
@@ -118,14 +120,13 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
         sources=[N['location_prediction']],
         sink=N["location_prediction_lda"])
 
-    # TODO: Mappings need to be loaded from assets channel
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="stream_broadcaster",
-            parameters=dict(func=lambda x: x.last(), output_plate_values=mappings['uid'].values())
+            name="stream_broadcaster_from_stream",
+            parameters=dict(func=lambda x: x.last())
         ),
         source=N["location_prediction_lda"],
-        splitting_node=None,
+        splitting_node=N["access_points_by_house"],
         sink=N["location_prediction_models_broadcasted"])
 
     w.create_factor(

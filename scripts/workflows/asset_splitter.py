@@ -46,7 +46,8 @@ def create_asset_splitter(hyperstream, safe=True):
 
     D = hyperstream.channel_manager.mongo
     M = hyperstream.channel_manager.memory
-    A = hyperstream.channel_manager.sphere_assets
+    SA = hyperstream.channel_manager.sphere_assets
+    A = hyperstream.channel_manager.assets
 
     try:
         w = hyperstream.create_workflow(
@@ -62,10 +63,10 @@ def create_asset_splitter(hyperstream, safe=True):
             return hyperstream.workflow_manager.workflows[workflow_id]
 
     nodes = (
-        ("devices",                                 A, []),
+        ("devices",                                 SA, []),
         ("devices_by_house",                        M, ["H"]),
-        ("wearables_by_house",                      M, ["H.W"]),
-        ("access_points_by_location",               M, ["H.L"])
+        ("wearables_by_house",                      A, ["H"]),
+        ("access_points_by_house",                  A, ["H"])
     )
 
     # Create all of the nodes
@@ -85,7 +86,7 @@ def create_asset_splitter(hyperstream, safe=True):
             use_provided_values=False
         ),
         plate_manager=hyperstream.plate_manager
-    ).execute(TimeInterval.up_to_now())
+    )
 
     # Now populate the node
     w.create_multi_output_factor(
@@ -96,40 +97,27 @@ def create_asset_splitter(hyperstream, safe=True):
         source=N["devices"],
         splitting_node=None,
         sink=N["devices_by_house"]
-    ).execute(TimeInterval.up_to_now())
+    )
 
-    w.create_node_creation_factor(
+    w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element="locations")
+            name="component",
+            parameters=dict(key="access_points")
         ),
-        source=N["devices_by_house"],
-        output_plate=dict(
-            plate_id="H.L",
-            meta_data_id="location",
-            description="All devices in all houses",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    ).execute(TimeInterval.up_to_now())
+        sources=[N["devices_by_house"]],
+        alignment_node=None,
+        sink=N["access_points_by_house"]
+    )
 
-    # def func(instance):
-    #     return instance
-    #
-    # w.create_node_creation_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="meta_instance",
-    #         parameters=dict(func=func)
-    #     ),
-    #     source=N["experiments_list"],
-    #     output_plate=dict(
-    #         plate_id="H.LocalisationExperiment",
-    #         meta_data_id="localisation-experiment",
-    #         description="Technician localisation walk-around",
-    #         use_provided_values=False
-    #     ),
-    #     plate_manager=hyperstream.plate_manager
-    # )
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key="wearables")
+        ),
+        sources=[N["devices_by_house"]],
+        alignment_node=None,
+        sink=N["wearables_by_house"]
+    )
 
     return w
 

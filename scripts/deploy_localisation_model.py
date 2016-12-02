@@ -19,6 +19,7 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
+from datetime import timedelta
 
 globs = {
     'house': 1,
@@ -28,6 +29,7 @@ globs = {
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, TimeInterval
+    from workflows.asset_splitter import create_asset_splitter
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
 
     hyperstream = HyperStream(loglevel=loglevel)
@@ -38,25 +40,36 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
         TimeInterval.up_to_now()).last().value
 
     experiment_ids_str = '_'.join(experiment_ids)
-    workflow_id = "lda_localisation_model_predict_"+experiment_ids_str
+    workflow_id0 = "asset_splitter"
+    workflow_id1 = "lda_localisation_model_predict_"+experiment_ids_str
 
     if delete_existing_workflows:
-        hyperstream.workflow_manager.delete_workflow(workflow_id)
+        hyperstream.workflow_manager.delete_workflow(workflow_id0)
+        hyperstream.workflow_manager.delete_workflow(workflow_id1)
 
     try:
-        w = hyperstream.workflow_manager.workflows[workflow_id]
+        w0 = hyperstream.workflow_manager.workflows[workflow_id0]
     except KeyError:
-        w = create_workflow_localisation_predict(hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
-        hyperstream.workflow_manager.commit_workflow(workflow_id)
+        w0 = create_asset_splitter(hyperstream, safe=False)
+        hyperstream.workflow_manager.commit_workflow(workflow_id0)
 
-    time_interval = TimeInterval.now_minus(minutes=1)
-    w.execute(time_interval)
+    try:
+        w1 = hyperstream.workflow_manager.workflows[workflow_id1]
+    except KeyError:
+        w1 = create_workflow_localisation_predict(hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
+        hyperstream.workflow_manager.commit_workflow(workflow_id1)
+
+    ti0 = TimeInterval.up_to_now()
+    # ti1 = TimeInterval.now_minus(minutes=1)
+    ti1 = TimeInterval(start=ti0.end - timedelta(minutes=1), end=ti0.end)
+    w0.execute(ti0)
+    w1.execute(ti1)
 
     print('number of non_empty_streams: {}'.format(
         len(hyperstream.channel_manager.memory.non_empty_streams)))
 
     from display_localisation_predictions import display_predictions
-    display_predictions(hyperstream, time_interval, house, wearables=globs['wearables'])
+    display_predictions(hyperstream, ti1, house, wearables=globs['wearables'])
 
 
 if __name__ == '__main__':
