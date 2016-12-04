@@ -126,7 +126,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
             parameters=dict(func=lambda x: x.last())
         ),
         source=N["location_prediction_lda"],
-        splitting_node=N["access_points_by_house"],
+        splitting_node=N["wearables_by_house"],
         sink=N["location_prediction_models_broadcasted"])
 
     w.create_factor(
