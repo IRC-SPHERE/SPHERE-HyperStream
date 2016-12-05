@@ -118,8 +118,16 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="histogram_from_list",
-            parameters=dict(first_break=0,break_width=1,n_breaks=20,breaks=None)
+            name="sensor_field_histogram",
+            parameters=dict(field_specific_params=dict(
+                humidity   =dict(first_break=0,break_width=1,n_breaks=20,breaks=None),
+                pressure   =dict(first_break=0,break_width=1,n_breaks=10,breaks=None),
+                temperature=dict(first_break=0,break_width=1,n_breaks=5,breaks=None),
+                water      =dict(first_break=0,break_width=1,n_breaks=8,breaks=None),
+                light      =dict(first_break=0,break_width=1,n_breaks=6 ,breaks=None),
+                motion     =dict(first_break=0,break_width=1,n_breaks=9 ,breaks=None),
+                electricity=dict(first_break=0,break_width=1,n_breaks=4 ,breaks=None)
+            ))
         ),
         sources=[N["env_per_uid_field_agg"]],
         sink=N["env_per_uid_field_agg_hist"])
