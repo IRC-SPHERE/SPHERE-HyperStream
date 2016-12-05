@@ -15,7 +15,13 @@
                 "b827eb3f1106": "bedroom 2",
                 "b827ebea7bc4": "lounge",
                 "b827eb94cbd1": "kitchen",
-                "b827eb524fec": "study"
+                "b827eb524fec": "study",
+                "fd00::212:4b00:0:1": "study",
+                "fd00::212:4b00:0:2": "study",
+                "fd00::212:4b00:0:3": "study",
+                "fd00::212:4b00:0:4": "study",
+                "fd00::212:4b00:0:5": "study"
+
             },
             "wearables": {
                 "0aa05543a5c2": "A",

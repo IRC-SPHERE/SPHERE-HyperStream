@@ -20,20 +20,23 @@
 
 import logging
 from datetime import timedelta
+from dateutil.parser import parse
 
 globs = {
     'house': 1,
-    'wearables': 'ABCD'
+    'wearables': 'ABCD',
+    'loglevel': logging.DEBUG
 }
 
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
-    from hyperstream import HyperStream, TimeInterval
+    from hyperstream import HyperStream, TimeInterval, MIN_DATE, StreamId, StreamNotFoundError
     from workflows.asset_splitter import create_asset_splitter
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
 
     hyperstream = HyperStream(loglevel=loglevel)
     M = hyperstream.channel_manager.memory
+    D = hyperstream.channel_manager.mongo
     A = hyperstream.channel_manager.assets
 
     experiment_ids = A.find_streams(name="experiments_selected").values()[0].window(
@@ -59,9 +62,25 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
         w1 = create_workflow_localisation_predict(hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id1)
 
+    def safe_purge(channel, stream_id):
+        try:
+            channel.purge_stream(stream_id)
+        except StreamNotFoundError:
+            pass
+
+    for h in [1, 2, 1176, 1116]:
+        safe_purge(A, StreamId(name="wearables_by_house", meta_data=dict(house=h)))
+        safe_purge(A, StreamId(name="access_points_by_house", meta_data=dict(house=h)))
+        for w in "ABCD":
+            safe_purge(D, StreamId(name="predicted_locations_broadcasted",
+                                   meta_data=dict(house=h, wearable=w)))
+
     ti0 = TimeInterval.up_to_now()
-    # ti1 = TimeInterval.now_minus(minutes=1)
-    ti1 = TimeInterval(start=ti0.end - timedelta(minutes=1), end=ti0.end)
+    ti1 = TimeInterval.now_minus(minutes=1)
+
+    # ti0 = TimeInterval(MIN_DATE, parse("2016-12-02 17:14:25.075Z"))
+    # ti1 = TimeInterval(start=ti0.end - timedelta(minutes=1), end=ti0.end)
+
     w0.execute(ti0)
     w1.execute(ti1)
 
@@ -76,4 +95,4 @@ if __name__ == '__main__':
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    run(globs['house'])
+    run(globs['house'], loglevel=globs['loglevel'])

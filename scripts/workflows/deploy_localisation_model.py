@@ -78,7 +78,7 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
             )
         ),
         source=N["rss_raw"],
-        splitting_node=N["access_points_by_house"],
+        splitting_node=N["wearables_by_house"],
         sink=N["rss_per_uid"])
 
     w.create_factor(
