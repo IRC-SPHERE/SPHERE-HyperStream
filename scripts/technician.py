@@ -71,11 +71,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("house")
+    parser.add_argument("loglevel", nargs='?', default=logging.CRITICAL)
     args = parser.parse_args()
     # print args.house
 
-    loglevel = logging.CRITICAL
-    # loglevel = logging.DEBUG
+    # loglevel = logging.CRITICAL
+    loglevel = int(args.loglevel)
     delete_existing_workflows = True
 
     display_experiments.run(args.house, delete_existing_workflows, loglevel)

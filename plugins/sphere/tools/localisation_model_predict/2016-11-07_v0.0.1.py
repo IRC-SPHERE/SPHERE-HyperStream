@@ -21,17 +21,16 @@
 
 from hyperstream.stream import StreamInstance
 from hyperstream.tool import Tool, check_input_stream_count
+from hyperstream.time_interval import TimeInterval, MIN_DATE
+from plugins.sphere.utils import FillZeros
+from plugins.sphere.utils import deserialise_json_pipeline
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 
-from plugins.sphere.utils import FillZeros
-from hyperstream.time_interval import TimeInterval, MIN_DATE
-
-from plugins.sphere.utils import deserialise_json_pipeline
+import logging
 
 
 class LocalisationModelPredict(Tool):
@@ -47,6 +46,7 @@ class LocalisationModelPredict(Tool):
         time_interval = TimeInterval(MIN_DATE, interval.end)
         param_doc = sources[0].window(time_interval, force_calculation=True).last()
         if param_doc is None:
+            logging.debug("No model found in {} for time interval {}".format(sources[0].stream_id, time_interval))
             return
         
         steps = deserialise_json_pipeline({
