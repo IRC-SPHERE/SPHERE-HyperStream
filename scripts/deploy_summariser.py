@@ -20,7 +20,8 @@
 
 import logging
 from dateutil.parser import parse
-
+import json
+import os
 
 globs = {
     'house': 1,
@@ -43,10 +44,14 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             sphere_logger=None)
 
 
+    house_str = str(house)
+
     hyperstream = HyperStream(loglevel=loglevel)
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
     S = hyperstream.channel_manager.sphere
+
+    assets = json.load(open(os.path.join('data', 'assets.json')))
 
     if True: # find and insert meta-data about all environmental sensors (should come from assets instead)
         # MONGO: db.getCollection('ENV').distinct("uid")
@@ -87,6 +92,17 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
            sensor_uid_field_mappings[SENSOR_MAPPINGS[key]] = SENSOR_MAPPINGS[key]
         # sensor_uid_field_mappings = SENSOR_MAPPINGS
 
+        for ap in assets['houses'][house_str]['access_points']:
+            tag = 'access_point'
+            identifier = '{}.{}'.format(globs['house'], ap)
+            parent = str(globs['house'])
+            data = assets['houses'][house_str]['access_points'][ap]
+            try:
+                hyperstream.plate_manager.meta_data_manager.insert(tag=tag, identifier=identifier, parent=parent,
+                                                                   data=data)
+            except KeyError:
+                pass
+
         hyperstream.plate_manager.create_plate(
             plate_id="H.EnvSensors",
             description="Environmental sensors in each house",
@@ -103,10 +119,19 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             complement=True,
             parent_plate="H.EnvSensors"
         )
+        hyperstream.plate_manager.create_plate(
+            plate_id="H.APs",
+            description="Access points in each house",
+            meta_data_id="access_point",
+            values=[],
+            complement=True,
+            parent_plate="H"
+        )
         env_assets = dict(
             sensor_uid_mappings = sensor_uid_mappings,
             sensor_uid_field_mappings = sensor_uid_field_mappings
         )
+
 
 
 
@@ -123,6 +148,8 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     t1 = parse("2016-11-28T11:50Z")
     t2 = parse("2016-11-28T11:55Z")
+    t1 = parse("2016-12-06T09:00Z")
+    t2 = parse("2016-12-06T09:05Z")
     t_1_2 = TimeInterval(start=t1,end=t2)
     # w.factors[0].execute(t_1_2)
     w.execute(t_1_2)

@@ -18,16 +18,20 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 from plugins.sphere.utils.sphere_helpers import mappings
-
+import json
+import os
 
 def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
     from hyperstream import TimeInterval
 
+    house_str = str(house)
     workflow_id = "periodic_summaries"
 
     S = hyperstream.channel_manager.sphere
     D = hyperstream.channel_manager.mongo
     M = hyperstream.channel_manager.memory
+
+    assets = json.load(open(os.path.join('data', 'assets.json')))
 
     try:
         w = hyperstream.create_workflow(
@@ -50,9 +54,13 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
         ("env_per_uid_field_agg_perc",              S, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_hist",              S, ["H.EnvSensors.Fields"]),
         ("rss_raw",                                 S, ["H"]),
+        ("acc_raw",                                 S, ["H"]),
         ("every_hour",                              M, ["H.EnvSensors.Fields"]),
         # ("every_hour",                              M, ["H.W"]),
-        ("rss_per_uid",                             M, ["H.W"]),
+        ("rss_per_uid",                             S, ["H.W"]),
+        ("rss_per_uid_aid",                         S, ["H.W","H.APs"]),
+        ("acc_per_uid",                             S, ["H.W"]),
+        ("acc_per_uid_acclist",                        S, ["H.W"]),
         ("rss_per_uid_hour",                          M, ["H.W"]),
     )
 
@@ -120,28 +128,81 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sensor_field_histogram",
             parameters=dict(field_specific_params=dict(
-                humidity   =dict(first_break=0,break_width=1,n_breaks=20,breaks=None),
-                pressure   =dict(first_break=0,break_width=1,n_breaks=10,breaks=None),
-                temperature=dict(first_break=0,break_width=1,n_breaks=5,breaks=None),
-                water      =dict(first_break=0,break_width=1,n_breaks=8,breaks=None),
-                light      =dict(first_break=0,break_width=1,n_breaks=6 ,breaks=None),
-                motion     =dict(first_break=0,break_width=1,n_breaks=9 ,breaks=None),
-                electricity=dict(first_break=0,break_width=1,n_breaks=4 ,breaks=None)
+                humidity   =dict(first_break=0,break_width=1,n_breaks=101,breaks=None),
+                pressure   =dict(first_break=950,break_width=1,n_breaks=101,breaks=None),
+                temperature=dict(first_break=0,break_width=0.5,n_breaks=101,breaks=None),
+                water      =dict(first_break=0,break_width=1,n_breaks=11,breaks=None),
+                light      =dict(first_break=None,break_width=None,n_breaks=None,breaks=[0]+[2**i for i in range(-5,15)]),
+                motion     =dict(first_break=0,break_width=1,n_breaks=2 ,breaks=None),
+                electricity=dict(first_break=None,break_width=None,n_breaks=None,breaks=[0]+[2**i for i in range(15)])
             ))
         ),
         sources=[N["env_per_uid_field_agg"]],
         sink=N["env_per_uid_field_agg_hist"])
 
 
-    #  w.create_multi_output_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sphere",
-    #         parameters=dict(modality="wearable3")
-    #     ),
-    #     source=None,
-    #     splitting_node=None,
-    #     sink=N["rss_raw"])
-    #
+    w.create_multi_output_factor(
+       tool=hyperstream.channel_manager.get_tool(
+           name="sphere",
+           parameters=dict(modality="wearable",elements={"rss"})
+       ),
+       source=None,
+       splitting_node=None,
+       sink=N["rss_raw"])
+
+    w.create_multi_output_factor(
+       tool=hyperstream.channel_manager.get_tool(
+           name="sphere",
+           parameters=dict(modality="wearable",elements={"xl"})
+       ),
+       source=None,
+       splitting_node=None,
+       sink=N["acc_raw"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter",
+            parameters=dict(
+                element="uid",
+                mapping=assets['houses'][house_str]['wearables']['uid']
+            )
+        ),
+        source=N["rss_raw"],
+        splitting_node=None,
+        sink=N["rss_per_uid"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter",
+            parameters=dict(
+                element="uid",
+                mapping=assets['houses'][house_str]['wearables']['uid']
+            )
+        ),
+        source=N["acc_raw"],
+        splitting_node=None,
+        sink=N["acc_per_uid"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='wearable-xl1')
+        ),
+        sources=[N["acc_per_uid"]],
+        sink=N["acc_per_uid_acclist"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter",
+            parameters=dict(
+                element="aid",
+                mapping=assets['houses'][house_str]['access_points']
+            )
+        ),
+        source=N["rss_per_uid"],
+        splitting_node=None,
+        sink=N["rss_per_uid_aid"])
+
     # w.create_multi_output_factor(
     #     tool=hyperstream.channel_manager.get_tool(
     #         name="splitter",
@@ -152,9 +213,7 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
     #     ),
     #     source=N["rss_raw"],
     #     splitting_node=None,
-    #     sink=N["rss_per_uid"])
-    #
-
+    #     sink=N["rss_per_uid_aid"])
 
     # def component_wise_max(init_value=None, id_field='aid', value_field='rss'):
     #     if init_value is None:
