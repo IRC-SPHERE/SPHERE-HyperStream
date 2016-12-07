@@ -66,17 +66,17 @@ scripted_experiments = TimeIntervals(
     parse_time_tuple(*x) for x in json.load(open(os.path.join('data', 'scripted_experiments.json'))))
 
 
-assets = json.load(open(os.path.join('data', 'assets.json')))
+# assets = json.load(open(os.path.join('data', 'assets.json')))
+#
+# # TODO: Hard coded for SPHERE house at the moment
+# mappings = {
+#     "aid": assets["houses"]["1"]["access_points"],
+#     "uid": assets["houses"]["1"]["wearables"]
+# }
 
-# TODO: Hard coded for SPHERE house at the moment
-mappings = {
-    "aid": assets["houses"]["1116"]["access_points"],
-    "uid": assets["houses"]["1116"]["wearables"]
-}
-
-# Also include versions without colons
-for key in mappings['uid'].keys():
-    mappings['uid'][key.replace(':', '')] = mappings['uid'][key]
+# # Also include versions without colons
+# for key in mappings['uid'].keys():
+#     mappings['uid'][key.replace(':', '')] = mappings['uid'][key]
 
 
 def diff(x):
@@ -186,14 +186,24 @@ class PredefinedTools(object):
             parameters=dict(element="annotator", mapping=dict((x, x) for x in annotator_ids))
         )
 
+        # self.split_aid = channel_manager.get_tool(
+        #     name="splitter",
+        #     parameters=dict(element="aid", mapping=mappings["aid"])
+        # )
+        #
+        # self.split_uid = channel_manager.get_tool(
+        #     name="splitter",
+        #     parameters=dict(element="uid", mapping=mappings["uid"])
+        # )
+
         self.split_aid = channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(element="aid", mapping=mappings["aid"])
+            name="splitter_from_stream",
+            parameters=dict(element="aid")
         )
 
         self.split_uid = channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(element="uid", mapping=mappings["uid"])
+            name="splitter_from_stream",
+            parameters=dict(element="uid")
         )
 
         self.split_time = channel_manager.get_tool(
