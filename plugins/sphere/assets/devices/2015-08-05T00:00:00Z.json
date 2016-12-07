@@ -1,0 +1,97 @@
+{
+    "houses": {
+        "1": {
+            "notes": "SPHERE house",
+            "access_points": {
+                "b827eb26dbd6": "hallway",
+                "b827eb643ba7": "lounge",
+                "b827eb0654a9": "study",
+                "b827eb48a755": "kitchen",
+                "b827eb645a8e": "kitchen",
+                "b827eb62fe45": "hallway",
+                "b827eb036271": "lounge",
+                "b827ebfd0967": "bedroom 1",
+                "b827ebcb1413": "bedroom 1",
+                "b827eb3f1106": "bedroom 2",
+                "b827ebea7bc4": "lounge",
+                "b827eb94cbd1": "kitchen",
+                "b827eb524fec": "study",
+                "fd00::212:4b00:0:1": "study",
+                "fd00::212:4b00:0:2": "study",
+                "fd00::212:4b00:0:3": "study",
+                "fd00::212:4b00:0:4": "study",
+                "fd00::212:4b00:0:5": "study"
+
+            },
+            "wearables": {
+                "0aa05543a5c2": "A",
+                "00:12:4b:ad:8a:04": "A",
+                "00:12:4b:ad:83:85": "B",
+                "00:12:4b:ad:94:81": "C",
+                "00:12:4b:ad:87:84": "D",
+                "a0:e6:f8:ad:8a:04": "A",
+                "a0:e6:f8:ad:83:85": "B",
+                "a0:e6:f8:ad:94:81": "C",
+                "a0:e6:f8:ad:87:84": "D",
+                "a0:e6:f8:ad:85:04": "A",
+                "a0:e6:f8:00:00:c0": "A",
+                "00124bad8a04": "A",
+                "00124bad8385": "B",
+                "00124bad9481": "C",
+                "00124bad8784": "D",
+                "a0e6f8ad8a04": "A",
+                "a0e6f8ad8385": "B",
+                "a0e6f8ad9481": "C",
+                "a0e6f8ad8784": "D",
+                "a0e6f80000c0": "A",
+                "a0e6f8ad8504": "A",
+                "a0e6f8ad8600": "B"
+            }
+        },
+        "1176": {
+            "notes": "Woodland Road",
+            "access_points": {
+            },
+            "wearables": {
+                "0aa05543a5c2": "A",
+                "00:12:4b:ad:8a:04": "A",
+                "00:12:4b:ad:83:85": "B",
+                "00:12:4b:ad:94:81": "C",
+                "00:12:4b:ad:87:84": "D",
+                "a0:e6:f8:ad:8a:04": "A",
+                "a0:e6:f8:ad:83:85": "B",
+                "a0:e6:f8:ad:94:81": "C",
+                "a0:e6:f8:ad:87:84": "D",
+                "a0:e6:f8:ad:85:04": "A",
+                "a0:e6:f8:00:00:c0": "A",
+                "00124bad8a04": "A",
+                "00124bad8385": "B",
+                "00124bad9481": "C",
+                "00124bad8784": "D",
+                "a0e6f8ad8a04": "A",
+                "a0e6f8ad8385": "B",
+                "a0e6f8ad9481": "C",
+                "a0e6f8ad8784": "D",
+                "a0e6f80000c0": "A",
+                "a0e6f8ad8504": "A",
+                "a0e6f8ad8600": "B"
+            }
+        },
+        "1116": {
+            "notes": "Pilot house 1",
+            "access_points": {
+
+            },
+            "wearables": {
+
+            }
+        },
+        "2": {
+            "notes": "DEPRECATED ID",
+            "access_points": {
+            },
+            "wearables": {
+            }
+        }
+    }
+}
