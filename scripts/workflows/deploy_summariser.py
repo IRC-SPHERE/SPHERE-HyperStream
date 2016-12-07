@@ -20,6 +20,45 @@
 import json
 import os
 
+def create_workflow_coord_plate_creation(hyperstream, safe=True):
+    from hyperstream import TimeInterval
+
+    workflow_id = "coord3d_plate_creation"
+
+    try:
+        w = hyperstream.create_workflow(
+            workflow_id=workflow_id,
+            name="Coord3d plate creation",
+            owner="MK",
+            description="Coord3d plate creation",
+            online=False)
+    except KeyError as e:
+        if safe:
+            raise e
+        else:
+            return hyperstream.workflow_manager.workflows[workflow_id]
+
+    w.create_node_creation_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="meta_instance_from_list",
+            parameters=dict(values=['x','y','z'])
+        ),
+        source=None,
+        output_plate=dict(
+            plate_id="H.W.Coords3d",
+            meta_data_id="coord",
+            description="3d coordinates x y z",
+            use_provided_values=False,
+            parent_plate="H.W"
+        ),
+        plate_manager=hyperstream.plate_manager
+    )
+
+    return w
+
+
+
+
 def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
     from hyperstream import TimeInterval
 
@@ -29,6 +68,7 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
     S = hyperstream.channel_manager.sphere
     D = hyperstream.channel_manager.mongo
     M = hyperstream.channel_manager.memory
+#    SA = hyperstream.channel_manager.sphere_assets
 
     assets = json.load(open(os.path.join('data', 'assets.json')))
 
@@ -58,9 +98,11 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
         # ("every_hour",                              M, ["H.W"]),
         ("rss_per_uid",                             S, ["H.W"]),
         ("rss_per_uid_aid",                         S, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value",                   S, ["H.W","H.APs"]),
         ("acc_per_uid",                             S, ["H.W"]),
-        ("acc_per_uid_acclist",                        S, ["H.W"]),
-        ("rss_per_uid_hour",                          M, ["H.W"]),
+        ("acc_per_uid_acclist",                     S, ["H.W"]),
+        ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"]),
+        ("rss_per_uid_hour",                        M, ["H.W"]),
     )
 
     # Create all of the nodes
@@ -201,6 +243,23 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
         source=N["rss_per_uid"],
         splitting_node=None,
         sink=N["rss_per_uid_aid"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter_of_list",
+            parameters=dict(mapping=['x','y','z'])
+        ),
+        source=N["acc_per_uid_acclist"],
+        splitting_node=None,
+        sink=N["acc_per_uid_acclist_coord"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='wearable-rss')
+        ),
+        sources=[N["rss_per_uid_aid"]],
+        sink=N["rss_per_uid_aid_value"])
 
     # w.create_multi_output_factor(
     #     tool=hyperstream.channel_manager.get_tool(

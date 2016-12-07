@@ -32,7 +32,7 @@ globs = {
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, TimeInterval
-    from workflows.deploy_summariser import create_workflow_summariser
+    from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
     from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
     from sphere_connector_package.sphere_connector.modalities.environmental import SENSOR_MAPPINGS
 
@@ -102,6 +102,16 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
                                                                    data=data)
             except KeyError:
                 pass
+        # for coord in ['x','y','z']:
+        #     tag = 'coord'
+        #     identifier = tag
+        #     parent = "root"
+        #     data = tag
+        #     try:
+        #         hyperstream.plate_manager.meta_data_manager.insert(tag=tag, identifier=identifier, parent=parent,
+        #                                                            data=data)
+        #     except KeyError:
+        #         pass
 
         hyperstream.plate_manager.create_plate(
             plate_id="H.EnvSensors",
@@ -127,19 +137,34 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             complement=True,
             parent_plate="H"
         )
+        hyperstream.plate_manager.create_plate(
+            plate_id="H.W.Coords3d",
+            description="3-d coordinates",
+            meta_data_id="coord",
+            values=[],
+            complement=True,
+            parent_plate="H.W"
+        )
         env_assets = dict(
             sensor_uid_mappings = sensor_uid_mappings,
             sensor_uid_field_mappings = sensor_uid_field_mappings
         )
 
-
-
-
-    workflow_id = "periodic_summaries"
-
+    workflow_id = "coord3d_plate_creation"
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow(workflow_id)
+    try:
+        w = hyperstream.workflow_manager.workflows[workflow_id]
+    except KeyError:
+        w = create_workflow_coord_plate_creation(hyperstream, safe=False)
+        hyperstream.workflow_manager.commit_workflow(workflow_id)
 
+    time_interval = TimeInterval.now_minus(minutes=1)
+    w.execute(time_interval)
+
+    workflow_id = "periodic_summaries"
+    if delete_existing_workflows:
+        hyperstream.workflow_manager.delete_workflow(workflow_id)
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id]
     except KeyError:
