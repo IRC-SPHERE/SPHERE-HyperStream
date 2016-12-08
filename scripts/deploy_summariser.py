@@ -53,7 +53,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     assets = json.load(open(os.path.join('data', 'assets.json')))
 
-    if True: # find and insert meta-data about all environmental sensors (should come from assets instead)
+    if False: # find and insert meta-data about all environmental sensors (should come from assets instead)
         # MONGO: db.getCollection('ENV').distinct("uid")
         sphere_connector = globs['sphere_connector']
         t1 = parse("2016-11-28T11:50Z") # note that these are here just to get a handle on the collection

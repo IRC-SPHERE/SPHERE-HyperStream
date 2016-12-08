@@ -68,9 +68,7 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
     S = hyperstream.channel_manager.sphere
     D = hyperstream.channel_manager.mongo
     M = hyperstream.channel_manager.memory
-#    SA = hyperstream.channel_manager.sphere_assets
-
-    assets = json.load(open(os.path.join('data', 'assets.json')))
+    A = hyperstream.channel_manager.assets
 
     try:
         w = hyperstream.create_workflow(
@@ -101,8 +99,10 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
         ("rss_per_uid_aid_value",                   S, ["H.W","H.APs"]),
         ("acc_per_uid",                             S, ["H.W"]),
         ("acc_per_uid_acclist",                     S, ["H.W"]),
-        ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"]),
         ("rss_per_uid_hour",                        M, ["H.W"]),
+        ("wearables_by_house",                      A, ["H"]),
+        ("access_points_by_house",                  A, ["H"]),
+        ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"])
     )
 
     # Create all of the nodes
@@ -202,26 +202,20 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(
-                element="uid",
-                mapping=assets['houses'][house_str]['wearables']['uid']
-            )
+            name="splitter_from_stream",
+            parameters=dict(element="uid")
         ),
         source=N["rss_raw"],
-        splitting_node=None,
+        splitting_node=N["wearables_by_house"],
         sink=N["rss_per_uid"])
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(
-                element="uid",
-                mapping=assets['houses'][house_str]['wearables']['uid']
-            )
+            name="splitter_from_stream",
+            parameters=dict(element="uid")
         ),
         source=N["acc_raw"],
-        splitting_node=None,
+        splitting_node=N["wearables_by_house"],
         sink=N["acc_per_uid"])
 
     w.create_factor(
@@ -234,14 +228,11 @@ def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(
-                element="aid",
-                mapping=assets['houses'][house_str]['access_points']
-            )
+            name="splitter_from_stream",
+            parameters=dict(element="aid")
         ),
         source=N["rss_per_uid"],
-        splitting_node=None,
+        splitting_node=N["access_points_by_house"],
         sink=N["rss_per_uid_aid"])
 
     w.create_multi_output_factor(
