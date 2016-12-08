@@ -29,9 +29,12 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, StreamId, TimeInterval
     from hyperstream.utils import duration2str
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
+    from workflows.asset_splitter import create_asset_splitter
 
     hyperstream = HyperStream(loglevel=loglevel)
-    
+
+    create_asset_splitter(hyperstream, safe=False).execute(TimeInterval.up_to_now())
+
     # Various channels
     M = hyperstream.channel_manager.memory
     S = hyperstream.channel_manager.sphere
