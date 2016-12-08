@@ -39,7 +39,7 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def create_asset_splitter(hyperstream, safe=True):
+def create_asset_splitter(hyperstream, safe=True, purge=False):
     from hyperstream import TimeInterval
 
     workflow_id = "asset_splitter"
@@ -71,6 +71,11 @@ def create_asset_splitter(hyperstream, safe=True):
 
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    # TODO: Is this the right time to purge? Should probably be on execution!
+    if purge:
+        A.purge_node("wearables_by_house")
+        A.purge_node("access_points_by_house")
 
     # First create the plate values for the node
     w.create_node_creation_factor(

@@ -33,7 +33,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     hyperstream = HyperStream(loglevel=loglevel)
 
-    create_asset_splitter(hyperstream, safe=False).execute(TimeInterval.up_to_now())
+    create_asset_splitter(hyperstream, safe=False, purge=True).execute(TimeInterval.up_to_now())
 
     # Various channels
     M = hyperstream.channel_manager.memory
