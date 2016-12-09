@@ -46,7 +46,82 @@
                 "a0e6f80000c0": "A",
                 "a0e6f8ad8504": "A",
                 "a0e6f8ad8600": "B"
-            }
+            },
+	    "env_sensors": {
+	        "fd00::212:4b00:0:1" : [
+		   "temperature",
+		   "humidity",
+		   "pressure",
+		   "water",
+		   "light",
+		   "motion"
+		],
+	        "fd00::212:4b00:0:2" : [
+		   "temperature",
+		   "humidity",
+		   "pressure",
+		   "water",
+		   "light",
+		   "motion"
+		],
+	        "fd00::212:4b00:0:3" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:4" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:5" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:80": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:81": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:83": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+	        "fd00::212:4b00:0:84": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ]
+	    }
+
         },
         "1176": {
             "notes": "Woodland Road",

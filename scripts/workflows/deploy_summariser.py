@@ -59,10 +59,9 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
 
 
 
-def create_workflow_summariser(hyperstream, house, env_assets, safe=True):
+def create_workflow_summariser(hyperstream, env_assets, safe=True):
     from hyperstream import TimeInterval
 
-    house_str = str(house)
     workflow_id = "periodic_summaries"
 
     S = hyperstream.channel_manager.sphere
