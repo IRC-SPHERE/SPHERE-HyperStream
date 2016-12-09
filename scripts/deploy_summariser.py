@@ -31,6 +31,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
     from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
     from sphere_connector_package.sphere_connector.modalities.environmental import SENSOR_MAPPINGS
+    from workflows.asset_splitter import create_asset_splitter
 
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
@@ -39,16 +40,14 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             include_redcap=False,
             sphere_logger=None)
 
-
-    house_str = str(house)
-
     hyperstream = HyperStream(loglevel=loglevel)
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
     S = hyperstream.channel_manager.sphere
 
-    assets = json.load(open(os.path.join('data', 'assets.json')))
-
+    hyperstream.workflow_manager.delete_workflow("asset_splitter")
+    create_asset_splitter(hyperstream).execute(TimeInterval.up_to_now())
+    print('asset_splitter done')
     if False: # find and insert meta-data about all environmental sensors (should come from assets instead)
         # MONGO: db.getCollection('ENV').distinct("uid")
         sphere_connector = globs['sphere_connector']
