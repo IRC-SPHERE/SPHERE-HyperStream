@@ -21,19 +21,15 @@
 from __future__ import print_function
 
 import os
+import logging
 from datetime import timedelta
 from time import sleep
 import signal
 
-globs = {
-    'sphere_connector': None,
-    'wearables': 'ABCD',
-    'house': 1,
-    'collection': 'wearable'
-}
+globs = { 'sphere_connector': None }
 
 
-def display_access_points():
+def display_access_points(house):
     from hyperstream.utils import utcnow
     from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
 
@@ -49,8 +45,8 @@ def display_access_points():
 
     sphere_connector = globs['sphere_connector']
     window = DataWindow(sphere_connector, t1, t2)
-    docs = window.modalities[globs['collection']].get_data(elements={'rss'}, rename_keys=False)
-    aids = set(d['aid'] for d in docs)
+    docs = window.wearable.get_data(elements={'rss'}, rename_keys=False)
+    aids = set(d['aid'] for d in filter(lambda x: x['hid'] == house if 'hid' in x else True, docs))
 
     if aids:
         print("Access points: ")
@@ -60,8 +56,8 @@ def display_access_points():
         print("No access points found")
 
 
-def run():
-    display_access_points()
+def run(house):
+    display_access_points(house=house)
     print()
 
 
@@ -73,16 +69,13 @@ if __name__ == '__main__':
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     sys.path.append(path)
 
-    if len(sys.argv) > 1:
-        try:
-            globs['wearables'] = sys.argv[1]
-        except ValueError:
-            pass
-
     def signal_handler(signal, frame):
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
+    from plugins.sphere.utils import get_default_parser
+    args = get_default_parser(default_loglevel=logging.INFO)
+
     while True:
-        run()
+        run(args.house)
         sleep(1)

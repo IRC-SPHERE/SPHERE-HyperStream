@@ -127,16 +127,6 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    if len(sys.argv) < 3:
-        print("Expected at least two integer ids")
-        exit(0)
-
-    try:
-        technicians_selection = map(int, sys.argv[1:])
-    except ValueError:
-        print("Expected at least two integer ids")
-        technicians_selection = None  # just to keep lint happy
-        exit(0)
-
-    house = 1
-    run(house, technicians_selection)
+    from plugins.sphere.utils import get_technician_selection_parser
+    args = get_technician_selection_parser(default_loglevel=logging.INFO)
+    run(house=args.house, selection=map(int, args.technicians_selection), loglevel=args.loglevel)

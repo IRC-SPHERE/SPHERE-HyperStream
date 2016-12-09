@@ -22,7 +22,6 @@
 import sys
 from os import path
 import logging
-import argparse
 import signal
 
 import display_experiments
@@ -69,17 +68,12 @@ if __name__ == '__main__':
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("house")
-    parser.add_argument("loglevel", nargs='?', default=logging.CRITICAL)
-    args = parser.parse_args()
-    # print args.house
+    from plugins.sphere.utils import get_wearable_list_parser
+    args = get_wearable_list_parser(default_loglevel=logging.INFO)
 
-    # loglevel = logging.CRITICAL
-    loglevel = int(args.loglevel)
     delete_existing_workflows = True
 
-    display_experiments.run(args.house, delete_existing_workflows, loglevel)
+    display_experiments.run(args.house, delete_existing_workflows, args.loglevel)
     print("")
 
     deployed = False
@@ -95,8 +89,8 @@ if __name__ == '__main__':
             if not technicians_selection or len(technicians_selection) < 2:
                 print("Expected at least two integer ids")
 
-        learn_localisation_model.run(args.house, technicians_selection, delete_existing_workflows, loglevel)
+        learn_localisation_model.run(args.house, technicians_selection, delete_existing_workflows, args.loglevel)
 
         if query_yes_no("Deploy model?"):
-            deploy_localisation_model.run(args.house, delete_existing_workflows, loglevel)
+            deploy_localisation_model.run(args.house, args.wearables, delete_existing_workflows, args.loglevel)
             deployed = True

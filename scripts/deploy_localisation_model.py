@@ -19,23 +19,14 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
-from datetime import timedelta
-from dateutil.parser import parse
-
-globs = {
-    'house': 1,
-    'wearables': 'ABCD',
-    'loglevel': logging.DEBUG
-}
 
 
-def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
-    from hyperstream import HyperStream, TimeInterval, MIN_DATE, StreamId, StreamNotFoundError
+def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO):
+    from hyperstream import HyperStream, TimeInterval, StreamId, StreamNotFoundError
     from workflows.asset_splitter import create_asset_splitter
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
 
     hyperstream = HyperStream(loglevel=loglevel)
-    M = hyperstream.channel_manager.memory
     D = hyperstream.channel_manager.mongo
     A = hyperstream.channel_manager.assets
 
@@ -71,7 +62,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     for h in [1, 2, 1176, 1116]:
         safe_purge(A, StreamId(name="wearables_by_house", meta_data=dict(house=h)))
         safe_purge(A, StreamId(name="access_points_by_house", meta_data=dict(house=h)))
-        for w in "ABCD":
+        for w in wearables:
             safe_purge(D, StreamId(name="predicted_locations_broadcasted",
                                    meta_data=dict(house=h, wearable=w)))
 
@@ -88,11 +79,14 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
         len(hyperstream.channel_manager.memory.non_empty_streams)))
 
     from display_localisation_predictions import display_predictions
-    display_predictions(hyperstream, ti1, house, wearables=globs['wearables'])
+    display_predictions(hyperstream, ti1, house, wearables=wearables)
 
 
 if __name__ == '__main__':
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    run(globs['house'], loglevel=globs['loglevel'])
+
+    from plugins.sphere.utils import get_wearable_list_parser
+    args = get_wearable_list_parser(default_loglevel=logging.INFO)
+    run(args.house, args.wearables, delete_existing_workflows=True, loglevel=args.loglevel)

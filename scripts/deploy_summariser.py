@@ -23,11 +23,7 @@ from dateutil.parser import parse
 import json
 import os
 
-globs = {
-    'house': 1,
-    'wearables': 'ABCD',
-    'sphere_connector': None
-}
+globs = { 'sphere_connector': None }
 
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
@@ -190,4 +186,8 @@ if __name__ == '__main__':
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    run(globs['house'])
+
+    from plugins.sphere.utils import get_default_parser
+    args = get_default_parser(default_loglevel=logging.INFO)
+    run(args.house, delete_existing_workflows=True, loglevel=args.loglevel)
+

@@ -23,13 +23,12 @@ import sys
 import os
 
 
-def run(house, selection, delete_existing_workflows=True):
+def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, StreamId, TimeInterval
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
     from workflows.rssi_distributions_per_room import create_workflow_rssi_distributions_per_room
-    from hyperstream.utils import StreamNotFoundError
 
-    hyperstream = HyperStream(loglevel=logging.INFO)
+    hyperstream = HyperStream(loglevel=loglevel)
     M = hyperstream.channel_manager.memory
 
     workflow_id0 = "list_technicians_walkarounds"
@@ -59,13 +58,6 @@ def run(house, selection, delete_existing_workflows=True):
         parent_plate="H"
     )
 
-    # Ensure the model is overwritten if it's already there
-#    try:
-#        hyperstream.channel_manager.mongo.purge_stream(
-#            StreamId(name="location_prediction_lda", meta_data=dict(house=1)))
-#    except StreamNotFoundError:
-#        pass
-
     experiment_ids_str = '_'.join(experiment_ids)
     # Create a simple one step workflow for querying
     workflow_id1 = "rssi_distributions_per_room_"+experiment_ids_str
@@ -94,16 +86,6 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    # if len(sys.argv) < 3:
-    #     print("Expected at least two integer ids")
-    #     exit(0)
-
-    try:
-        technicians_selection = map(int, sys.argv[1:])
-    except ValueError:
-        print("Expected at least two integer ids")
-        technicians_selection = None  # just to keep lint happy
-        exit(0)
-
-    house = 1
-    run(house, technicians_selection)
+    from plugins.sphere.utils import get_technician_selection_parser
+    args = get_technician_selection_parser(default_loglevel=logging.INFO)
+    run(house=args.house, selection=map(int, args.technicians_selection), loglevel=args.loglevel)

@@ -31,7 +31,7 @@ from hyperstream.utils import MIN_DATE, MAX_DATE
 
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
-globs = {'sphere_connector': None}
+globs = {'sphere_connector': None }
 
 
 def get_sphere_connector():

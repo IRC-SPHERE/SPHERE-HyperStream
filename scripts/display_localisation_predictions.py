@@ -26,11 +26,7 @@ import logging
 from time import sleep
 import signal
 
-globs = {
-    'hyperstream': None,
-    'wearables': 'ABCD',
-    'house': 1
-}
+globs = { 'hyperstream': None }
 
 
 def display_predictions(hyperstream, time_interval, house, wearables):
@@ -51,11 +47,13 @@ def display_predictions(hyperstream, time_interval, house, wearables):
             print("No predictions in interval {} for wearable {}".format(time_interval, wearable))
 
 
-def run(loglevel=logging.CRITICAL):
+def run(house, wearables, loglevel=logging.CRITICAL):
     from hyperstream import HyperStream, TimeInterval
-    globs['hyperstream'] = HyperStream(loglevel=loglevel)
 
-    display_predictions(time_interval=TimeInterval.now_minus(minutes=1), **globs)
+    if not globs['hyperstream']:
+        globs['hyperstream'] = HyperStream(loglevel=loglevel)
+
+    display_predictions(globs['hyperstream'], TimeInterval.now_minus(minutes=1), house, wearables)
     print()
 
     from display_access_points import display_access_points
@@ -73,16 +71,13 @@ if __name__ == '__main__':
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     sys.path.append(path)
 
-    if len(sys.argv) > 1:
-        try:
-            globs['wearables'] = sys.argv[1]
-        except ValueError:
-            pass
+    from plugins.sphere.utils import get_wearable_list_parser
+    args = get_wearable_list_parser(wearables="ABCD", default_loglevel=logging.INFO)
 
     def signal_handler(signal, frame):
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
     while True:
-        run()
+        run(house=args.house, wearables=args.wearables, loglevel=args.loglevel)
         sleep(1)
