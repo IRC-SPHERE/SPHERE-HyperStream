@@ -33,13 +33,17 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     hyperstream = HyperStream(loglevel=loglevel)
 
-    create_asset_splitter(hyperstream, safe=False, purge=True).execute(TimeInterval.up_to_now())
-
     # Various channels
     M = hyperstream.channel_manager.memory
     S = hyperstream.channel_manager.sphere
-    T = hyperstream.channel_manager.tools
-    D = hyperstream.channel_manager.mongo
+    A = hyperstream.channel_manager.assets
+
+    if delete_existing_workflows:
+        hyperstream.workflow_manager.delete_workflow("asset_splitter")
+        A.purge_node("wearables_by_house")
+        A.purge_node("access_points_by_house")
+
+    create_asset_splitter(hyperstream, safe=False).execute(TimeInterval.up_to_now())
 
     hyperstream.plate_manager.delete_plate("H")
     hyperstream.plate_manager.create_plate(

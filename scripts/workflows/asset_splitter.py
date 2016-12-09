@@ -72,11 +72,6 @@ def create_asset_splitter(hyperstream, safe=True, purge=False):
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
 
-    # TODO: Is this the right time to purge? Should probably be on execution!
-    if purge:
-        A.purge_node("wearables_by_house")
-        A.purge_node("access_points_by_house")
-
     # First create the plate values for the node
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
