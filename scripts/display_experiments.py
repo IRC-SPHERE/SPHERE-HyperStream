@@ -29,14 +29,21 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, StreamId, TimeInterval
     from hyperstream.utils import duration2str
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
+    from workflows.asset_splitter import create_asset_splitter
 
     hyperstream = HyperStream(loglevel=loglevel)
-    
+
     # Various channels
     M = hyperstream.channel_manager.memory
     S = hyperstream.channel_manager.sphere
-    T = hyperstream.channel_manager.tools
-    D = hyperstream.channel_manager.mongo
+    A = hyperstream.channel_manager.assets
+
+    if delete_existing_workflows:
+        hyperstream.workflow_manager.delete_workflow("asset_splitter")
+        A.purge_node("wearables_by_house")
+        A.purge_node("access_points_by_house")
+
+    create_asset_splitter(hyperstream, safe=False).execute(TimeInterval.up_to_now())
 
     hyperstream.plate_manager.delete_plate("H")
     hyperstream.plate_manager.create_plate(
@@ -65,18 +72,22 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     print('number of memory non_empty_streams: {}'.format(len(M.non_empty_streams)))
     
     df = M[StreamId('experiments_dataframe', dict(house=house))].window().values()[0]
-    # arrow.get(x).humanize()
-    # df['start'] = df['start'].map('{:%Y-%m-%d %H:%M:%S}'.format)
-    df['duration'] = df['end'] - df['start']
-    df['start'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['start'])
-    df['end'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['end'])
-    # df['duration'] = map(lambda x:'{:%Mmin %Ssec}'.format(x),df['duration'])
-    
-    df['start_as_text'] = map(lambda x: arrow.get(x).humanize(), df['start'])
-    df['duration_as_text'] = map(lambda x: duration2str(x), df['duration'])
-    
-    pd.set_option('display.width', 1000)
-    print(df[['id', 'start_as_text', 'duration_as_text', 'start', 'end', 'annotator']].to_string(index=False))
+
+    if len(df) > 0:
+        # arrow.get(x).humanize()
+        # df['start'] = df['start'].map('{:%Y-%m-%d %H:%M:%S}'.format)
+        df['duration'] = df['end'] - df['start']
+        df['start'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['start'])
+        df['end'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['end'])
+        # df['duration'] = map(lambda x:'{:%Mmin %Ssec}'.format(x),df['duration'])
+
+        df['start_as_text'] = map(lambda x: arrow.get(x).humanize(), df['start'])
+        df['duration_as_text'] = map(lambda x: duration2str(x), df['duration'])
+
+        pd.set_option('display.width', 1000)
+        print(df[['id', 'start_as_text', 'duration_as_text', 'start', 'end', 'annotator']].to_string(index=False))
+    else:
+        print("DataFrame is empty")
 
 if __name__ == '__main__':
     import sys

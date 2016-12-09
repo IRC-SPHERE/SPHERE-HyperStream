@@ -39,7 +39,7 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def create_asset_splitter(hyperstream, safe=True):
+def create_asset_splitter(hyperstream, safe=True, purge=False):
     from hyperstream import TimeInterval
 
     workflow_id = "asset_splitter"

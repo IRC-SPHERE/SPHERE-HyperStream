@@ -155,10 +155,25 @@
         "1116": {
             "notes": "Pilot house 1",
             "access_points": {
-
+                "b8:ae:ed:7d:b9:49": "study",
+                "b8:ae:ed:7e:83:71": "hallway",
+                "b8:ae:ed:7e:86:8d": "lounge"
             },
             "wearables": {
-
+                "a0:e6:f8:00:01:c0": "A",
+                "a0:e6:f8:00:01:c1": "B"
+            }
+        },
+        "1167": {
+            "notes": "Woodland Road (erronious ID)",
+            "access_points": {
+                "b8:ae:ed:7d:b9:49": "study",
+                "b8:ae:ed:7e:83:71": "hallway",
+                "b8:ae:ed:7e:86:8d": "lounge"
+            },
+            "wearables": {
+                "a0:e6:f8:00:01:c0": "A",
+                "a0:e6:f8:00:01:c1": "B"
             }
         },
         "2": {
