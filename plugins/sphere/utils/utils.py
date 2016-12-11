@@ -21,6 +21,8 @@
 import argparse
 import logging
 
+CHOICES = (logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.CRITICAL)
+
 
 def get_default_parser(default_loglevel=logging.DEBUG):
     """
@@ -29,7 +31,7 @@ def get_default_parser(default_loglevel=logging.DEBUG):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("house")
-    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel)
+    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()
 
 
@@ -41,7 +43,7 @@ def get_technician_selection_parser(default_loglevel=logging.DEBUG):
     parser = argparse.ArgumentParser()
     parser.add_argument("house")
     parser.add_argument("technicians_selection", nargs=2)
-    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel)
+    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()
 
 
@@ -53,5 +55,5 @@ def get_wearable_list_parser(wearables="ABCDEF", default_loglevel=logging.DEBUG)
     parser = argparse.ArgumentParser()
     parser.add_argument("house")
     parser.add_argument("wearables", default=wearables)
-    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel)
+    parser.add_argument("loglevel", nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()
