@@ -30,11 +30,11 @@ globs = { 'hyperstream': None }
 
 
 def display_predictions(hyperstream, time_interval, house, wearables):
-    from hyperstream import StreamId
+    M = hyperstream.channel_manager.mongo
 
     for wearable in wearables:
-        stream_id = StreamId('predicted_locations_broadcasted', meta_data=dict(house=house, wearable=wearable))
-        predictions = hyperstream.channel_manager.mongo[stream_id].window(time_interval).last()
+        predictions = M.find_stream(name='predicted_locations_broadcasted', house=house, wearable=wearable)\
+            .window(time_interval).last()
 
         if predictions:
             print("Wearable {}:\t{}\t({})".format(
