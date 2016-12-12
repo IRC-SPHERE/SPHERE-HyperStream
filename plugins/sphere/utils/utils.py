@@ -30,7 +30,7 @@ def get_default_parser(default_loglevel=logging.DEBUG):
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house', default=None)
+    parser.add_argument('--house', dest='house')
     parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()
 
@@ -41,7 +41,7 @@ def get_technician_selection_parser(default_loglevel=logging.DEBUG):
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house', default=None)
+    parser.add_argument('--house', dest='house')
     parser.add_argument('--selection', dest='technicians_selection', nargs=2, type=int)
     parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()
@@ -53,7 +53,7 @@ def get_wearable_list_parser(wearables="ABCDEF", default_loglevel=logging.DEBUG)
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house', default=None)
+    parser.add_argument('--house', dest='house')
     parser.add_argument("--wearables", dest='wearables', default=wearables)
     parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
     return parser.parse_args()

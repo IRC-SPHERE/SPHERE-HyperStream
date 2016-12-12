@@ -22,10 +22,13 @@ from hyperstream.stream import StreamInstance, StreamMetaInstance
 from hyperstream.tool import MultiOutputTool
 from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
 
+from copy import deepcopy
+
 
 def reformat(doc):
+    doc = deepcopy(doc)
     dt = doc.pop('datetime')
-    if 'hid' in doc:
+    if 'hid' in doc and doc['hid'] is not None:
         house_id = doc.pop('hid')
     else:
         house_id = '1'

@@ -23,7 +23,7 @@ import logging
 
 def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, TimeInterval, StreamNotFoundError
-    from workflows.asset_splitter import create_asset_splitter
+    from workflows.asset_splitter import split_sphere_assets
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
 
     hyperstream = HyperStream(loglevel=loglevel)
@@ -41,16 +41,12 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
         hyperstream.workflow_manager.delete_workflow(workflow_id0)
         hyperstream.workflow_manager.delete_workflow(workflow_id1)
 
-    try:
-        w0 = hyperstream.workflow_manager.workflows[workflow_id0]
-    except KeyError:
-        w0 = create_asset_splitter(hyperstream, safe=False)
-        hyperstream.workflow_manager.commit_workflow(workflow_id0)
+    split_sphere_assets(hyperstream)
 
     try:
-        w1 = hyperstream.workflow_manager.workflows[workflow_id1]
+        w = hyperstream.workflow_manager.workflows[workflow_id1]
     except KeyError:
-        w1 = create_workflow_localisation_predict(hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
+        w = create_workflow_localisation_predict(hyperstream, house=house, experiment_ids=experiment_ids, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id1)
 
     # def safe_purge(channel, stream_id):
@@ -64,11 +60,10 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
     D.purge_node("predicted_locations_broadcasted")
 
     # for h in [1, 2, 1176, 1116]:
-    #     safe_purge(A, StreamId(name="wearables_by_house", meta_data=dict(house=h)))
-    #     safe_purge(A, StreamId(name="access_points_by_house", meta_data=dict(house=h)))
+    #     safe_purge(A, StreamId(name="wearables_by_house", meta_data=(('house', h),)))
+    #     safe_purge(A, StreamId(name="access_points_by_house", meta_data=(('house', h),)))
     #     for w in wearables:
-    #         safe_purge(D, StreamId(name="predicted_locations_broadcasted",
-    #                                meta_data=dict(house=h, wearable=w)))
+    #         safe_purge(D, StreamId(name="predicted_locations_broadcasted", meta_data=(('house', h), ('wearable', w))))
 
     ti0 = TimeInterval.up_to_now()
     ti1 = TimeInterval.now_minus(minutes=1)
@@ -76,8 +71,7 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
     # ti0 = TimeInterval(MIN_DATE, parse("2016-12-02 17:14:25.075Z"))
     # ti1 = TimeInterval(start=ti0.end - timedelta(minutes=1), end=ti0.end)
 
-    w0.execute(ti0)
-    w1.execute(ti1)
+    w.execute(ti1)
 
     print('number of non_empty_streams: {}'.format(
         len(hyperstream.channel_manager.memory.non_empty_streams)))
