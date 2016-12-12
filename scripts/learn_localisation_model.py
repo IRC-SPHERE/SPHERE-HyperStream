@@ -73,7 +73,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     # Ensure the model is overwritten if it's already there
     model_id = StreamId(
         name="location_prediction",
-        meta_data=dict(house=1, localisation_model="lda"))
+        meta_data=dict(house=house, localisation_model="lda"))
 
     try:
         hyperstream.channel_manager.mongo.purge_stream(model_id)

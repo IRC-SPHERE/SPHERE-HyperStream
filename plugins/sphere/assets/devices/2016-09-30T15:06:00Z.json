@@ -157,11 +157,18 @@
             "access_points": {
                 "b8:ae:ed:7d:b9:49": "study",
                 "b8:ae:ed:7e:83:71": "hallway",
-                "b8:ae:ed:7e:86:8d": "lounge"
+                "b8:ae:ed:7e:86:8d": "lounge",
+                "fd00::212:4b00:0:101": "study",
+                "fd00::212:4b00:0:102": "hallway",
+                "fd00::212:4b00:0:103": "lounge",
+                "fd00::212:4b00:0:104": "kitchen",
+                "fd00::212:4b00:0:105": "bedroom 1",
+                "fd00::212:4b00:0:106": "bedroom 2"
             },
             "wearables": {
                 "a0:e6:f8:00:01:c0": "A",
-                "a0:e6:f8:00:01:c1": "B"
+                "a0:e6:f8:00:01:c1": "B",
+                "a0:e6:f8:00:01:c2": "C"
             }
         },
         "1167": {
@@ -169,11 +176,18 @@
             "access_points": {
                 "b8:ae:ed:7d:b9:49": "study",
                 "b8:ae:ed:7e:83:71": "hallway",
-                "b8:ae:ed:7e:86:8d": "lounge"
+                "b8:ae:ed:7e:86:8d": "lounge",
+                "fd00::212:4b00:0:101": "study",
+                "fd00::212:4b00:0:102": "hallway",
+                "fd00::212:4b00:0:103": "lounge",
+                "fd00::212:4b00:0:104": "kitchen",
+                "fd00::212:4b00:0:105": "bedroom 1",
+                "fd00::212:4b00:0:106": "bedroom 2"
             },
             "wearables": {
                 "a0:e6:f8:00:01:c0": "A",
-                "a0:e6:f8:00:01:c1": "B"
+                "a0:e6:f8:00:01:c1": "B",
+                "a0:e6:f8:00:01:c2": "C"
             }
         },
         "2": {

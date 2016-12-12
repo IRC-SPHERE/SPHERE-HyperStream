@@ -31,7 +31,7 @@ from hyperstream.utils import MIN_DATE, MAX_DATE
 
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
-globs = {'sphere_connector': None }
+globs = {'sphere_connector': None}
 
 
 def get_sphere_connector():
@@ -119,7 +119,7 @@ class SphereChannel(MemoryChannel):
                     self.data[stream.stream_id].append(document_collection)
                 except KeyError as e:
                     # Deal with the duplicate error by adding microseconds to the time until we succeed
-                    logging.debug(e.message)
+                    # logging.debug(e.message)
                     doc = StreamInstance(
                         timestamp=document_collection.timestamp + timedelta(microseconds=1),
                         value=document_collection.value)

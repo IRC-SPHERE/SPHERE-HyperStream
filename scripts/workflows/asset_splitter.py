@@ -68,7 +68,7 @@ def create_asset_splitter(hyperstream, safe=True, purge=False):
         ("wearables_by_house",                      A, ["H"]),
         ("access_points_by_house",                  A, ["H"]),
         ("env_sensors_by_house",                    A, ["H"]),
-        ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
+        # ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
     )
 
     # Create all of the nodes
@@ -146,30 +146,30 @@ def create_asset_splitter(hyperstream, safe=True, purge=False):
         plate_manager=hyperstream.plate_manager
     )
 
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_splitter",
-            parameters=dict()
-        ),
-        source=N["env_sensors_by_house"],
-        splitting_node=None,
-        sink=N["fields_by_env_sensor"]
-    )
-
-    w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict()
-        ),
-        source=N["fields_by_env_sensor"],
-        output_plate=dict(
-            plate_id="H.EnvSensors.Fields",
-            meta_data_id="env_fields",
-            description="All fields in each environmental sensor",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+    # w.create_multi_output_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="asset_splitter",
+    #         parameters=dict()
+    #     ),
+    #     source=N["env_sensors_by_house"],
+    #     splitting_node=None,
+    #     sink=N["fields_by_env_sensor"]
+    # )
+    #
+    # w.create_node_creation_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="asset_plate_generator",
+    #         parameters=dict()
+    #     ),
+    #     source=N["fields_by_env_sensor"],
+    #     output_plate=dict(
+    #         plate_id="H.EnvSensors.Fields",
+    #         meta_data_id="env_fields",
+    #         description="All fields in each environmental sensor",
+    #         use_provided_values=False
+    #     ),
+    #     plate_manager=hyperstream.plate_manager
+    # )
 
     # w.create_node_creation_factor(
     #     tool=hyperstream.channel_manager.get_tool(
