@@ -59,7 +59,7 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
 
 
 
-def create_workflow_summariser(hyperstream, env_assets, safe=True):
+def create_workflow_summariser(hyperstream, safe=True):
     from hyperstream import TimeInterval
 
     workflow_id = "periodic_summaries"
@@ -99,6 +99,8 @@ def create_workflow_summariser(hyperstream, env_assets, safe=True):
         ("acc_per_uid",                             S, ["H.W"]),
         ("acc_per_uid_acclist",                     S, ["H.W"]),
         ("rss_per_uid_hour",                        M, ["H.W"]),
+        ("env_sensors_by_house",                    A, ["H"]),
+        ("fields_by_env_sensor",                   A, ["H.EnvSensors"]),
         ("wearables_by_house",                      A, ["H"]),
         ("access_points_by_house",                  A, ["H"]),
         ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"])
@@ -118,25 +120,20 @@ def create_workflow_summariser(hyperstream, env_assets, safe=True):
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter",
-            parameters=dict(
-                element="uid",
-                mapping=env_assets['sensor_uid_mappings']
-            )
+            name="splitter_from_stream",
+            parameters=dict(element="uid")
         ),
         source=N["env_raw"],
-        splitting_node=None,
+        splitting_node=N["env_sensors_by_house"],
         sink=N["env_per_uid"])
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="splitter_of_dict",
-            parameters=dict(
-                mapping=env_assets['sensor_uid_field_mappings']
-            )
+            name="splitter_from_stream",
+            parameters=dict()
         ),
         source=N["env_per_uid"],
-        splitting_node=None,
+        splitting_node=N["fields_by_env_sensor"],
         sink=N["env_per_uid_field"])
 
     w.create_factor(

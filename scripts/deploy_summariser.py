@@ -31,7 +31,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
     from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
     from sphere_connector_package.sphere_connector.modalities.environmental import SENSOR_MAPPINGS
-    from workflows.asset_splitter import create_asset_splitter
+    from workflows.asset_splitter import split_sphere_assets
 
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
@@ -45,8 +45,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     A = hyperstream.channel_manager.assets
     S = hyperstream.channel_manager.sphere
 
-    hyperstream.workflow_manager.delete_workflow("asset_splitter")
-    create_asset_splitter(hyperstream).execute(TimeInterval.up_to_now())
+    split_sphere_assets(hyperstream)
     print('asset_splitter done')
     if False: # find and insert meta-data about all environmental sensors (should come from assets instead)
         # MONGO: db.getCollection('ENV').distinct("uid")
@@ -163,7 +162,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id]
     except KeyError:
-        w = create_workflow_summariser(hyperstream, house=house, env_assets=env_assets, safe=False)
+        w = create_workflow_summariser(hyperstream, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
     t1 = parse("2016-11-28T11:50Z")
