@@ -55,9 +55,9 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
     #     except StreamNotFoundError:
     #         pass
 
-    A.purge_node("wearables_by_house")
-    A.purge_node("access_points_by_house")
-    D.purge_node("predicted_locations_broadcasted")
+    # A.purge_node("wearables_by_house")
+    # A.purge_node("access_points_by_house")
+    # D.purge_node("predicted_locations_broadcasted")
 
     # for h in [1, 2, 1176, 1116]:
     #     safe_purge(A, StreamId(name="wearables_by_house", meta_data=(('house', h),)))
