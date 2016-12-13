@@ -29,7 +29,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, StreamId, TimeInterval
     from hyperstream.utils import duration2str
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
-    from workflows.asset_splitter import create_asset_splitter
+    from workflows.asset_splitter import split_sphere_assets
 
     hyperstream = HyperStream(loglevel=loglevel)
 
@@ -43,7 +43,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
         A.purge_node("wearables_by_house")
         A.purge_node("access_points_by_house")
 
-    create_asset_splitter(hyperstream, safe=False).execute(TimeInterval.up_to_now())
+    split_sphere_assets(hyperstream)
 
     hyperstream.plate_manager.delete_plate("H")
     hyperstream.plate_manager.create_plate(
@@ -71,7 +71,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     print('number of sphere non_empty_streams: {}'.format(len(S.non_empty_streams)))
     print('number of memory non_empty_streams: {}'.format(len(M.non_empty_streams)))
     
-    df = M[StreamId('experiments_dataframe', dict(house=house))].window().values()[0]
+    df = M.find_stream(name='experiments_dataframe', house=house).window().values()[0]
 
     if len(df) > 0:
         # arrow.get(x).humanize()
@@ -86,8 +86,10 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
         pd.set_option('display.width', 1000)
         print(df[['id', 'start_as_text', 'duration_as_text', 'start', 'end', 'annotator']].to_string(index=False))
+        return True
     else:
         print("DataFrame is empty")
+        return False
 
 if __name__ == '__main__':
     import sys

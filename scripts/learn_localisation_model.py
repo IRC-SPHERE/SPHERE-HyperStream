@@ -63,7 +63,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
 
     # from datetime import timedelta
     # time_interval.end += timedelta(milliseconds=1)
-    df = M[StreamId('experiments_dataframe', dict(house=house))].window().values()[0]
+    df = M[StreamId('experiments_dataframe', (('house', house),))].window().values()[0]
     experiment_ids = set([df['experiment_id'][i - 1] for i in selection])
 
     experiment_ids_str = '_'.join(experiment_ids)
@@ -73,7 +73,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     # Ensure the model is overwritten if it's already there
     model_id = StreamId(
         name="location_prediction",
-        meta_data=dict(house=house, localisation_model="lda"))
+        meta_data=(('house', house), ('localisation_model', 'lda')))
 
     try:
         hyperstream.channel_manager.mongo.purge_stream(model_id)
@@ -97,7 +97,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     from hyperstream.utils import utcnow
 
     A.write_to_stream(
-        stream_id=StreamId(name="experiments_selected", meta_data=dict(house=house)),
+        stream_id=StreamId(name="experiments_selected", meta_data=(('house', house),)),
         data=StreamInstance(timestamp=utcnow(), value=list(experiment_ids))
     )
 

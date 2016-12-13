@@ -93,6 +93,7 @@ class PredefinedTools(object):
         channel_manager = hyperstream.channel_manager
 
         # get a dict of experiment_id => annotator_id mappings
+        # TODO: Reinsert Scripted experiments into meta data
         self.experiment_id_to_annotator_ids = \
             dict((n.identifier.split('.')[1].split('_')[1], n.data)
                  for n in hyperstream.plate_manager.meta_data_manager.global_plate_definitions.nodes.values()

@@ -71,7 +71,7 @@ def create_workflow_rssi_distributions_per_room(hyperstream, house, experiment_i
 
     # TODO: Perhaps we want to do this same
     A.write_to_stream(
-        stream_id=StreamId(name="experiments_selected", meta_data=dict(house=house)),
+        stream_id=StreamId(name="experiments_selected", meta_data=(('house', house),)),
         data=StreamInstance(timestamp=utcnow(), value=list(experiment_ids))
     )
 

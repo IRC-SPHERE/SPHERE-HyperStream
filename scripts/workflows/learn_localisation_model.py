@@ -108,7 +108,7 @@ def create_workflow_lda_localisation_model_learner(hyperstream, house, experimen
 
     # Put the experiments selected into an asset stream
     # A.write_to_stream(
-    #     stream_id=StreamId(name="experiments_selected", meta_data=dict(house=house)),
+    #     stream_id=StreamId(name="experiments_selected", meta_data=(('house', house),)),
     #     data=StreamInstance(timestamp=utcnow(), value=list(experiment_ids))
     # )
 

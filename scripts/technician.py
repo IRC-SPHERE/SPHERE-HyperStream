@@ -73,7 +73,8 @@ if __name__ == '__main__':
 
     delete_existing_workflows = True
 
-    display_experiments.run(args.house, delete_existing_workflows, args.loglevel)
+    if not display_experiments.run(args.house, delete_existing_workflows, args.loglevel):
+        sys.exit(1)
     print("")
 
     deployed = False

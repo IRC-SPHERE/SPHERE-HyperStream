@@ -26,15 +26,20 @@ import logging
 from time import sleep
 import signal
 
-globs = { 'hyperstream': None }
+globs = {'hyperstream': None}
 
 
 def display_predictions(hyperstream, time_interval, house, wearables):
+    from hyperstream.utils import StreamNotFoundError
     M = hyperstream.channel_manager.mongo
 
     for wearable in wearables:
-        predictions = M.find_stream(name='predicted_locations_broadcasted', house=house, wearable=wearable)\
-            .window(time_interval).last()
+        try:
+            predictions = M.find_stream(name='predicted_locations_broadcasted', house=house, wearable=wearable)\
+                .window(time_interval).last()
+        except StreamNotFoundError:
+            print("No predictions in interval {} for wearable {}".format(time_interval, wearable))
+            continue
 
         if predictions:
             print("Wearable {}:\t{}\t({})".format(
@@ -58,7 +63,7 @@ def run(house, wearables, loglevel=logging.CRITICAL):
 
     from display_access_points import display_access_points
 
-    display_access_points()
+    display_access_points(house=house)
     print()
     # db.getCollection('WEARABLE-ISO-TIME').distinct('aid',{wts:{$gt:ISODate("2016-11-17T16:40")})
 

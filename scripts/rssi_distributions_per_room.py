@@ -44,7 +44,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     time_interval = TimeInterval.up_to_now()
     w0.execute(time_interval)
 
-    df = M[StreamId('experiments_dataframe', dict(house=house))].window(TimeInterval.up_to_now()).values()[0]
+    df = M[StreamId('experiments_dataframe', (('house', house),))].window(TimeInterval.up_to_now()).values()[0]
     experiment_indices = selection
     experiment_ids = set([df['experiment_id'][i - 1] for i in selection])
 
@@ -75,7 +75,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     time_interval = TimeInterval.up_to_now()
     w1.execute(time_interval)
 
-    df = M[StreamId('dataframe_'+experiment_ids_str, dict(house=house))].window(TimeInterval.up_to_now()).values()[0]
+    df = M[StreamId('dataframe_'+experiment_ids_str, (('house', house),))].window(TimeInterval.up_to_now()).values()[0]
     df.to_csv(os.path.join(hyperstream.config.output_path, 'dataframe_{}.csv'.format(experiment_ids_str)))
 
     print('number of non_empty_streams: {}'.format(
