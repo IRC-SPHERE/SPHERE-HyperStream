@@ -63,7 +63,7 @@ def run(house, wearables, loglevel=logging.CRITICAL):
 
     from display_access_points import display_access_points
 
-    display_access_points()
+    display_access_points(house=house)
     print()
     # db.getCollection('WEARABLE-ISO-TIME').distinct('aid',{wts:{$gt:ISODate("2016-11-17T16:40")})
 
