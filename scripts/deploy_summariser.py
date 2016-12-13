@@ -47,90 +47,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     split_sphere_assets(hyperstream)
     print('asset_splitter done')
-    if False: # find and insert meta-data about all environmental sensors (should come from assets instead)
-        # MONGO: db.getCollection('ENV').distinct("uid")
-        sphere_connector = globs['sphere_connector']
-        t1 = parse("2016-11-28T11:50Z") # note that these are here just to get a handle on the collection
-        t2 = parse("2016-11-28T11:55Z")
-        window = DataWindow(sphere_connector, t1, t2)
-        collection = window.modalities['environmental'].collection
-        sensor_uids = collection.distinct('uid')
-        sensor_uid_mappings = dict()
-        sensor_uid_field_mappings = dict()
-        # aids = set(d['aid'] for d in docs)
-        for sensor_uid in sensor_uids:
-            tag= 'env_sensor'
-            identifier = '{}.{}'.format(globs['house'],sensor_uid)
-            parent = str(globs['house'])
-            data = sensor_uid
-            sensor_uid_mappings[data] = data
-            try:
-                hyperstream.plate_manager.meta_data_manager.insert(tag=tag,identifier=identifier,parent=parent,data=data)
-            except KeyError:
-                pass
-            sensor_fields = collection.find({'uid':sensor_uid}).distinct('e.n')
-            for sensor_field in sensor_fields:
-                tag2 = 'sensor_field'
-                mapped_field = SENSOR_MAPPINGS[sensor_field]
-                identifier2 = '{}.{}'.format(identifier,mapped_field)
-                parent2 = identifier
-                data2 = mapped_field
-                # sensor_uid_field_mappings[data2] = data2
-                try:
-                    hyperstream.plate_manager.meta_data_manager.insert(tag=tag2,identifier=identifier2,parent=parent2,data=data2)
-                except KeyError:
-                    pass
-#        for key in ['temperature','humidity','door','hot-water','light','cold-water','noise','dust','motion','electricity','water','pressure']:
-#            sensor_uid_field_mappings[key] = key
-        for key in SENSOR_MAPPINGS.keys():
-           sensor_uid_field_mappings[SENSOR_MAPPINGS[key]] = SENSOR_MAPPINGS[key]
-        # sensor_uid_field_mappings = SENSOR_MAPPINGS
-
-        for ap in assets['houses'][house_str]['access_points']:
-            tag = 'access_point'
-            identifier = '{}.{}'.format(globs['house'], ap)
-            parent = str(globs['house'])
-            data = assets['houses'][house_str]['access_points'][ap]
-            try:
-                hyperstream.plate_manager.meta_data_manager.insert(tag=tag, identifier=identifier, parent=parent,
-                                                                   data=data)
-            except KeyError:
-                pass
-        # for coord in ['x','y','z']:
-        #     tag = 'coord'
-        #     identifier = tag
-        #     parent = "root"
-        #     data = tag
-        #     try:
-        #         hyperstream.plate_manager.meta_data_manager.insert(tag=tag, identifier=identifier, parent=parent,
-        #                                                            data=data)
-        #     except KeyError:
-        #         pass
-
-        hyperstream.plate_manager.create_plate(
-            plate_id="H.EnvSensors",
-            description="Environmental sensors in each house",
-            meta_data_id="env_sensor",
-            values=[],
-            complement=True,
-            parent_plate="H"
-        )
-        hyperstream.plate_manager.create_plate(
-            plate_id="H.EnvSensors.Fields",
-            description="Fields of all environmental sensors in each house",
-            meta_data_id="sensor_field",
-            values=[],
-            complement=True,
-            parent_plate="H.EnvSensors"
-        )
-        hyperstream.plate_manager.create_plate(
-            plate_id="H.APs",
-            description="Access points in each house",
-            meta_data_id="access_point",
-            values=[],
-            complement=True,
-            parent_plate="H"
-        )
+    if False:
         hyperstream.plate_manager.create_plate(
             plate_id="H.W.Coords3d",
             description="3-d coordinates",
@@ -138,10 +55,6 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             values=[],
             complement=True,
             parent_plate="H.W"
-        )
-        env_assets = dict(
-            sensor_uid_mappings = sensor_uid_mappings,
-            sensor_uid_field_mappings = sensor_uid_field_mappings
         )
 
     workflow_id = "coord3d_plate_creation"
@@ -168,7 +81,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     t1 = parse("2016-11-28T11:50Z")
     t2 = parse("2016-11-28T11:55Z")
     t1 = parse("2016-12-06T09:00Z")
-    t2 = parse("2016-12-06T09:05Z")
+    t2 = parse("2016-12-06T09:01Z")
     t_1_2 = TimeInterval(start=t1,end=t2)
     # w.factors[0].execute(t_1_2)
     w.execute(t_1_2)
