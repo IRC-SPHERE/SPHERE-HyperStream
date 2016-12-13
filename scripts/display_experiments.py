@@ -86,8 +86,10 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
         pd.set_option('display.width', 1000)
         print(df[['id', 'start_as_text', 'duration_as_text', 'start', 'end', 'annotator']].to_string(index=False))
+        return True
     else:
         print("DataFrame is empty")
+        return False
 
 if __name__ == '__main__':
     import sys
