@@ -46,7 +46,6 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     S = hyperstream.channel_manager.sphere
 
     split_sphere_assets(hyperstream)
-    print('asset_splitter done')
     if False:
         hyperstream.plate_manager.create_plate(
             plate_id="H.W.Coords3d",

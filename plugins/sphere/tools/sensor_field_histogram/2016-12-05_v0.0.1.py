@@ -31,7 +31,7 @@ class SensorFieldHistogram(Tool):
 
     @check_input_stream_count(1)
     def _execute(self, sources, alignment_stream, interval):
-        field = sources[0].stream_id.as_dict()['meta_data']['env_field']
+        field = sources[0].stream_id.as_dict()['meta_data'][2][1] # ['env_field']
         params = self.field_specific_params[field]
         if params['breaks'] is not None:
             breaks = params['breaks']
