@@ -292,7 +292,7 @@ def create_workflow_summariser(hyperstream, safe=True):
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
             parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
         ),
-        sources=[],
+        sources=None,
         sink=N["acc_per_uid_acclist_coord_windows"])
 
     w.create_factor(
