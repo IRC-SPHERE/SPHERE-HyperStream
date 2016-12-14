@@ -102,18 +102,24 @@ def create_workflow_summariser(hyperstream, safe=True):
         ("acc_per_uid",                             S, ["H.W"]),
         ("acc_per_uid_acclist",                     S, ["H.W"]),
         ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"]),
-        ("acc_per_uid_acclist_coord_windows",       S, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_windows",       M, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg",           S, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_perc",      S, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_hist",      S, ["H.W.Coords3d"]),
+        ("vid_raw",                                 S, ["H"]),
+        ("vid_per_uid",                             S, ["H.Cameras"]),
         ("env_sensors_by_house",                    A, ["H"]),
-        ("fields_by_env_sensor",                   A, ["H.EnvSensors"]),
+        ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         ("wearables_by_house",                      A, ["H"]),
         ("access_points_by_house",                  A, ["H"])
     )
 
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    #############################
+    ### ENVIRONMENTAL SENSORS ###
+    #############################
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -183,6 +189,10 @@ def create_workflow_summariser(hyperstream, safe=True):
         sources=[N["env_per_uid_field_agg"]],
         sink=N["env_per_uid_field_agg_hist"])
 
+    ############################
+    ### WEARABLE SENSORS RSS ###
+    ############################
+
     w.create_multi_output_factor(
        tool=hyperstream.channel_manager.get_tool(
            name="sphere",
@@ -191,15 +201,6 @@ def create_workflow_summariser(hyperstream, safe=True):
        source=None,
        splitting_node=None,
        sink=N["rss_raw"])
-
-    w.create_multi_output_factor(
-       tool=hyperstream.channel_manager.get_tool(
-           name="sphere",
-           parameters=dict(modality="wearable",elements={"xl"})
-       ),
-       source=None,
-       splitting_node=None,
-       sink=N["acc_raw"])
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -213,37 +214,11 @@ def create_workflow_summariser(hyperstream, safe=True):
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="splitter_from_stream",
-            parameters=dict(element="uid")
-        ),
-        source=N["acc_raw"],
-        splitting_node=N["wearables_by_house"],
-        sink=N["acc_per_uid"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key='wearable-xl1')
-        ),
-        sources=[N["acc_per_uid"]],
-        sink=N["acc_per_uid_acclist"])
-
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="splitter_from_stream",
             parameters=dict(element="aid")
         ),
         source=N["rss_per_uid"],
         splitting_node=N["access_points_by_house"],
         sink=N["rss_per_uid_aid"])
-
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="splitter_of_list",
-            parameters=dict(mapping=['x','y','z'])
-        ),
-        source=N["acc_per_uid_acclist"],
-        splitting_node=None,
-        sink=N["acc_per_uid_acclist_coord"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -261,7 +236,7 @@ def create_workflow_summariser(hyperstream, safe=True):
     #     ),
     #     sources=None,
     #     sink=N["rss_per_uid_aid_value_windows"])
-
+    #
     # w.create_factor(
     #     tool=hyperstream.channel_manager.get_tool(
     #         name="sliding_listify",
@@ -285,6 +260,45 @@ def create_workflow_summariser(hyperstream, safe=True):
     #     ),
     #     sources=[N["rss_per_uid_aid_value_agg"]],
     #     sink=N["rss_per_uid_aid_value_agg_hist"])
+
+    #####################################
+    ### WEARABLE SENSORS ACCELERATION ###
+    #####################################
+
+    w.create_multi_output_factor(
+       tool=hyperstream.channel_manager.get_tool(
+           name="sphere",
+           parameters=dict(modality="wearable",elements={"xl"})
+       ),
+       source=None,
+       splitting_node=None,
+       sink=N["acc_raw"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter_from_stream",
+            parameters=dict(element="uid")
+        ),
+        source=N["acc_raw"],
+        splitting_node=N["wearables_by_house"],
+        sink=N["acc_per_uid"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='wearable-xl1')
+        ),
+        sources=[N["acc_per_uid"]],
+        sink=N["acc_per_uid_acclist"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter_of_list",
+            parameters=dict(mapping=['x','y','z'])
+        ),
+        source=N["acc_per_uid_acclist"],
+        splitting_node=None,
+        sink=N["acc_per_uid_acclist_coord"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -319,4 +333,27 @@ def create_workflow_summariser(hyperstream, safe=True):
         sources=[N["acc_per_uid_acclist_coord_agg"]],
         sink=N["acc_per_uid_acclist_coord_agg_hist"])
 
+    #####################
+    ### VIDEO SENSORS ###
+    #####################
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sphere",
+            parameters=dict(modality="video")
+        ),
+        source=None,
+        splitting_node=None,
+        sink=N["vid_raw"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="splitter_from_stream",
+            parameters=dict(element="uid",use_mapping_keys_only=False)
+        ),
+        source=N["vid_raw"],
+        splitting_node=N["cameras_by_house"],
+        sink=N["vid_per_uid"])
+
     return w
+

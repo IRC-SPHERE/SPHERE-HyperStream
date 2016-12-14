@@ -47,24 +47,13 @@
                 "a0e6f8ad8504": "A",
                 "a0e6f8ad8600": "B"
             },
-	    "env_sensors": {
-	        "fd00::212:4b00:0:1" : [
-		   "temperature",
-		   "humidity",
-		   "pressure",
-		   "water",
-		   "light",
-		   "motion"
-		],
-	        "fd00::212:4b00:0:2" : [
-		   "temperature",
-		   "humidity",
-		   "pressure",
-		   "water",
-		   "light",
-		   "motion"
-		],
-	        "fd00::212:4b00:0:3" : [
+            "cameras": {
+                "b8aeed756145": "unknown location:A",
+                "b8aeed75e024": "unknown location:B",
+                "b8aeed78cffe": "unknown location:C"
+            },
+            "env_sensors": {
+                "fd00::212:4b00:0:1" : [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -72,7 +61,7 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:4" : [
+                "fd00::212:4b00:0:2" : [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -80,7 +69,7 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:5" : [
+                "fd00::212:4b00:0:3" : [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -88,7 +77,7 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:80": [
+                "fd00::212:4b00:0:4" : [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -96,7 +85,7 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:81": [
+                "fd00::212:4b00:0:5" : [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -104,7 +93,7 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:83": [
+                "fd00::212:4b00:0:80": [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -112,7 +101,23 @@
                    "light",
                    "motion"
                 ],
-	        "fd00::212:4b00:0:84": [
+                "fd00::212:4b00:0:81": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:83": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:84": [
                    "temperature",
                    "humidity",
                    "pressure",
@@ -120,8 +125,7 @@
                    "light",
                    "motion"
                 ]
-	    }
-
+	        }
         },
         "1176": {
             "notes": "Woodland Road",
@@ -150,6 +154,8 @@
                 "a0e6f80000c0": "A",
                 "a0e6f8ad8504": "A",
                 "a0e6f8ad8600": "B"
+            },
+            "cameras": {
             }
         },
         "1116": {
@@ -166,9 +172,11 @@
                 "fd00::212:4b00:0:106": "bedroom 2:A"
             },
             "wearables": {
-                "a0:e6:f8:00:01:c0": "A",
-                "a0:e6:f8:00:01:c1": "B",
-                "a0:e6:f8:00:01:c2": "C"
+              "a0:e6:f8:00:01:c0": "A",
+              "a0:e6:f8:00:01:c1": "B",
+              "a0:e6:f8:00:01:c2": "C"
+            },
+            "cameras": {
             }
         },
         "1167": {
@@ -188,6 +196,8 @@
                 "a0:e6:f8:00:01:c0": "A",
                 "a0:e6:f8:00:01:c1": "B",
                 "a0:e6:f8:00:01:c2": "C"
+            },
+            "cameras": {
             }
         },
         "2": {
@@ -195,6 +205,8 @@
             "access_points": {
             },
             "wearables": {
+            },
+            "cameras": {
             }
         }
     }

@@ -112,6 +112,7 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
         ("devices_by_house",                        A, ["H"]),
         ("wearables_by_house",                      A, ["H"]),
         ("access_points_by_house",                  A, ["H"]),
+        ("cameras_by_house",                        A, ["H"]),
         ("env_sensors_by_house",                    A, ["H"])
     )
 
@@ -159,6 +160,16 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
         sink=N["wearables_by_house"]
     )
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key="cameras")
+        ),
+        sources=[N["devices_by_house"]],
+        alignment_node=None,
+        sink=N["cameras_by_house"]
+    )
+
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
@@ -199,6 +210,21 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
             plate_id="H.W",
             meta_data_id="wearable",
             description="All wearables in each house",
+            use_provided_values=False
+        ),
+        plate_manager=hyperstream.plate_manager
+    )
+
+    w.create_node_creation_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="asset_plate_generator",
+            parameters=dict(element=None,use_value_instead_of_key=True)
+        ),
+        source=N["cameras_by_house"],
+        output_plate=dict(
+            plate_id="H.Cameras",
+            meta_data_id="camera",
+            description="All cameras in each house",
             use_provided_values=False
         ),
         plate_manager=hyperstream.plate_manager
