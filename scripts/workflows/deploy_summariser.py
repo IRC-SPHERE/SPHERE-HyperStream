@@ -86,24 +86,30 @@ def create_workflow_summariser(hyperstream, safe=True):
         ("env_raw",                                 S, ["H"]),
         ("env_per_uid",                             S, ["H.EnvSensors"]),
         ("env_per_uid_field",                       S, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_field_windows",               M, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg",                   S, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_perc",              S, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_hist",              S, ["H.EnvSensors.Fields"]),
         ("rss_raw",                                 S, ["H"]),
-        ("acc_raw",                                 S, ["H"]),
-        ("every_hour",                              M, ["H.EnvSensors.Fields"]),
-        # ("every_hour",                              M, ["H.W"]),
         ("rss_per_uid",                             S, ["H.W"]),
         ("rss_per_uid_aid",                         S, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value",                   S, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_windows",           M, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_agg",               S, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_agg_perc",          S, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_agg_hist",          S, ["H.W","H.APs"]),
+        ("acc_raw",                                 S, ["H"]),
         ("acc_per_uid",                             S, ["H.W"]),
         ("acc_per_uid_acclist",                     S, ["H.W"]),
-        ("rss_per_uid_hour",                        M, ["H.W"]),
+        ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_windows",       S, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_agg",           S, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_agg_perc",      S, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_agg_hist",      S, ["H.W.Coords3d"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                   A, ["H.EnvSensors"]),
         ("wearables_by_house",                      A, ["H"]),
-        ("access_points_by_house",                  A, ["H"]),
-        ("acc_per_uid_acclist_coord",               S, ["H.W.Coords3d"])
+        ("access_points_by_house",                  A, ["H"])
     )
 
     # Create all of the nodes
@@ -143,14 +149,14 @@ def create_workflow_summariser(hyperstream, safe=True):
             parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
         ),
         sources=None,
-        sink=N["every_hour"])
+        sink=N["env_per_uid_field_windows"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_listify",
             parameters=dict()
         ),
-        sources=[N["every_hour"], N["env_per_uid_field"]],
+        sources=[N["env_per_uid_field_windows"], N["env_per_uid_field"]],
         sink=N["env_per_uid_field_agg"])
 
     w.create_factor(
@@ -247,40 +253,70 @@ def create_workflow_summariser(hyperstream, safe=True):
         sources=[N["rss_per_uid_aid"]],
         sink=N["rss_per_uid_aid_value"])
 
-    ######
-    # w.create_multi_output_factor(
+    # w.create_factor(
     #     tool=hyperstream.channel_manager.get_tool(
-    #         name="splitter",
-    #         parameters=dict(
-    #             element="uid",
-    #             mapping=mappings['uid']
-    #         )
+    #         name="sliding_window",
+    #         # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+    #         parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
     #     ),
-    #     source=N["rss_raw"],
-    #     splitting_node=None,
-    #     sink=N["rss_per_uid_aid"])
+    #     sources=None,
+    #     sink=N["rss_per_uid_aid_value_windows"])
 
-    # def component_wise_max(init_value=None, id_field='aid', value_field='rss'):
-    #     if init_value is None:
-    #         init_value = {}
-    #
-    #     def func(data):
-    #         result = init_value.copy()
-    #         for (time, value) in data:
-    #             if value[id_field] in result:
-    #                 result[value[id_field]] = max(result[value[id_field]], value[value_field])
-    #             else:
-    #                 result[value[id_field]] = value[value_field]
-    #         return result
-    #
-    #     return func
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="sliding_listify",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["rss_per_uid_aid_value_windows"], N["rss_per_uid_aid_value"]],
+    #     sink=N["rss_per_uid_aid_value_agg"])
     #
     # w.create_factor(
     #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_apply",
-    #         parameters=dict(func=component_wise_max())
+    #         name="percentiles_from_list",
+    #         parameters=dict(n_segments=4,percentiles=None)
     #     ),
-    #     sources=[N["every_hour"], N["rss_per_uid"]],
-    #     sink=N["rss_per_uid_hour"])
+    #     sources=[N["rss_per_uid_aid_value_agg"]],
+    #     sink=N["rss_per_uid_aid_value_agg_perc"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="histogram_from_list",
+    #         parameters=dict(first_break=-120,break_width=1,n_breaks=101,breaks=None)
+    #     ),
+    #     sources=[N["rss_per_uid_aid_value_agg"]],
+    #     sink=N["rss_per_uid_aid_value_agg_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+        ),
+        sources=None,
+        sink=N["acc_per_uid_acclist_coord_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist_coord_windows"], N["acc_per_uid_acclist_coord"]],
+        sink=N["acc_per_uid_acclist_coord_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="percentiles_from_list",
+            parameters=dict(n_segments=4,percentiles=None)
+        ),
+        sources=[N["acc_per_uid_acclist_coord_agg"]],
+        sink=N["acc_per_uid_acclist_coord_agg_perc"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="histogram_from_list",
+            parameters=dict(first_break=-5,break_width=0.1,n_breaks=101,breaks=None)
+        ),
+        sources=[N["acc_per_uid_acclist_coord_agg"]],
+        sink=N["acc_per_uid_acclist_coord_agg_hist"])
 
     return w
