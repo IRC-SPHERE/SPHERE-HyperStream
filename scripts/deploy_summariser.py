@@ -46,15 +46,15 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     S = hyperstream.channel_manager.sphere
 
     split_sphere_assets(hyperstream)
-    if False:
-        hyperstream.plate_manager.create_plate(
-            plate_id="H.W.Coords3d",
-            description="3-d coordinates",
-            meta_data_id="coord",
-            values=[],
-            complement=True,
-            parent_plate="H.W"
-        )
+
+    hyperstream.plate_manager.create_plate(
+        plate_id="H.W.Coords3d",
+        description="3-d coordinates",
+        meta_data_id="coord",
+        values=[],
+        complement=True,
+        parent_plate="H.W"
+    )
 
     workflow_id = "coord3d_plate_creation"
     if delete_existing_workflows:
