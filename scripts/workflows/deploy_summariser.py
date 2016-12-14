@@ -253,39 +253,6 @@ def create_workflow_summariser(hyperstream, safe=True):
         sources=[N["rss_per_uid_aid"]],
         sink=N["rss_per_uid_aid_value"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_window",
-    #         # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-    #         parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
-    #     ),
-    #     sources=None,
-    #     sink=N["rss_per_uid_aid_value_windows"])
-
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_listify",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_windows"], N["rss_per_uid_aid_value"]],
-    #     sink=N["rss_per_uid_aid_value_agg"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="percentiles_from_list",
-    #         parameters=dict(n_segments=4,percentiles=None)
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_agg"]],
-    #     sink=N["rss_per_uid_aid_value_agg_perc"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="histogram_from_list",
-    #         parameters=dict(first_break=-120,break_width=1,n_breaks=101,breaks=None)
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_agg"]],
-    #     sink=N["rss_per_uid_aid_value_agg_hist"])
-
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
@@ -293,6 +260,39 @@ def create_workflow_summariser(hyperstream, safe=True):
             parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
         ),
         sources=None,
+        sink=N["rss_per_uid_aid_value_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_aid_value_windows"], N["rss_per_uid_aid_value"]],
+        sink=N["rss_per_uid_aid_value_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="percentiles_from_list",
+            parameters=dict(n_segments=4,percentiles=None)
+        ),
+        sources=[N["rss_per_uid_aid_value_agg"]],
+        sink=N["rss_per_uid_aid_value_agg_perc"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="histogram_from_list",
+            parameters=dict(first_break=-120,break_width=1,n_breaks=101,breaks=None)
+        ),
+        sources=[N["rss_per_uid_aid_value_agg"]],
+        sink=N["rss_per_uid_aid_value_agg_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+        ),
+        sources=[],
         sink=N["acc_per_uid_acclist_coord_windows"])
 
     w.create_factor(
