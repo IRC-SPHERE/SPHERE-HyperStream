@@ -70,8 +70,8 @@ scripted_experiments = TimeIntervals(
 #
 # # TODO: Hard coded for SPHERE house at the moment
 # mappings = {
-#     "aid": assets["houses"]["1"]["access_points"],
-#     "uid": assets["houses"]["1"]["wearables"]
+#     "aid": assets["house"]["1"]["access_points"],
+#     "uid": assets["house"]["1"]["wearables"]
 # }
 
 # # Also include versions without colons
