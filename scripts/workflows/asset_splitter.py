@@ -39,12 +39,8 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def create_asset_splitter_0(hyperstream, safe=True, purge=False):
-    from hyperstream import TimeInterval
-
+def create_asset_splitter_0(hyperstream, safe=True):
     workflow_id = "asset_splitter_0"
-
-    SA = hyperstream.channel_manager.sphere_assets
 
     try:
         w = hyperstream.create_workflow(
@@ -59,20 +55,13 @@ def create_asset_splitter_0(hyperstream, safe=True, purge=False):
         else:
             return hyperstream.workflow_manager.workflows[workflow_id]
 
-    nodes = (
-        ("devices",                                 SA, []),
-    )
-
-    # Create all of the nodes
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
-
     # First create the plate values for the node
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element="houses",use_value_instead_of_key=False)
+            parameters=dict(element="house", use_value_instead_of_key=False)
         ),
-        source=N["devices"],
+        source=w.create_node("devices", hyperstream.channel_manager.sphere_assets, []),
         output_plate=dict(
             plate_id="H",
             meta_data_id="house",
@@ -84,13 +73,10 @@ def create_asset_splitter_0(hyperstream, safe=True, purge=False):
 
     return w
 
-def create_asset_splitter_1(hyperstream, safe=True, purge=False):
-    from hyperstream import TimeInterval
 
+def create_asset_splitter_1(hyperstream, safe=True):
     workflow_id = "asset_splitter_1"
 
-    D = hyperstream.channel_manager.mongo
-    M = hyperstream.channel_manager.memory
     SA = hyperstream.channel_manager.sphere_assets
     A = hyperstream.channel_manager.assets
 
@@ -99,7 +85,8 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
             workflow_id=workflow_id,
             name="Asset Splitter 1",
             owner="MK",
-            description="Splits the assets into separate streams on house plate and creates sub-plates (level 1 in the hierarchy)",
+            description="Splits the assets into separate streams on house plate and creates sub-plates "
+                        "(level 1 in the hierarchy)",
             online=False)
     except KeyError as e:
         if safe:
@@ -123,7 +110,7 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_splitter",
-            parameters=dict(element="houses")
+            parameters=dict(element="house")
         ),
         source=N["devices"],
         splitting_node=None,
@@ -232,9 +219,8 @@ def create_asset_splitter_1(hyperstream, safe=True, purge=False):
 
     return w
 
-def create_asset_splitter_2(hyperstream, safe=True, purge=False):
-    from hyperstream import TimeInterval
 
+def create_asset_splitter_2(hyperstream, safe=True):
     workflow_id = "asset_splitter_2"
 
     D = hyperstream.channel_manager.mongo
@@ -266,7 +252,6 @@ def create_asset_splitter_2(hyperstream, safe=True, purge=False):
 
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
-
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
