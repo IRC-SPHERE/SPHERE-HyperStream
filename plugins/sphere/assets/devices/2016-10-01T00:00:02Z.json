@@ -177,9 +177,9 @@
               "a0:e6:f8:00:01:c2": "C"
             },
             "cameras": {
-                "b8aeed7e8371": "1",
-                "b8aeed7e868d": "2",
-                "b8aeed7db949": "3"
+                "b8aeed7e8371": "hallway:A",
+                "b8aeed7e868d": "lounge:A",
+                "b8aeed7db949": "kitchen:A"
             },
              "env_sensors": {
                  "00079": [
