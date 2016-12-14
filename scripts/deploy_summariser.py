@@ -20,17 +20,14 @@
 
 import logging
 from dateutil.parser import parse
-import json
-import os
 
-globs = { 'sphere_connector': None }
+globs = {'sphere_connector': None}
 
 
-def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
+def run(delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, TimeInterval
     from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
-    from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
-    from sphere_connector_package.sphere_connector.modalities.environmental import SENSOR_MAPPINGS
+    from sphere_connector_package.sphere_connector import SphereConnector
     from workflows.asset_splitter import split_sphere_assets
 
     if not globs['sphere_connector']:
@@ -41,9 +38,6 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
             sphere_logger=None)
 
     hyperstream = HyperStream(loglevel=loglevel)
-    M = hyperstream.channel_manager.memory
-    A = hyperstream.channel_manager.assets
-    S = hyperstream.channel_manager.sphere
 
     split_sphere_assets(hyperstream)
     if False:
@@ -97,7 +91,7 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    from plugins.sphere.utils import get_default_parser
-    args = get_default_parser(default_loglevel=logging.INFO)
-    run(args.house, delete_existing_workflows=True, loglevel=args.loglevel)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.logging_parser(default_loglevel=logging.INFO)
+    run(delete_existing_workflows=True, loglevel=args.loglevel)
 

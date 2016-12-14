@@ -96,6 +96,6 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    from plugins.sphere.utils import get_default_parser
-    args = get_default_parser(default_loglevel=logging.INFO)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.house_parser(default_loglevel=logging.INFO)
     run(args.house, delete_existing_workflows=True, loglevel=args.loglevel)

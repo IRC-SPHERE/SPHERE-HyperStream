@@ -73,8 +73,8 @@ if __name__ == '__main__':
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
-    from plugins.sphere.utils import get_default_parser
-    args = get_default_parser(default_loglevel=logging.INFO)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.house_parser(default_loglevel=logging.INFO)
 
     while True:
         run(args.house)
