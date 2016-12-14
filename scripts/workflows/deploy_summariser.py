@@ -108,8 +108,16 @@ def create_workflow_summariser(hyperstream, safe=True):
         ("acc_per_uid_acclist_coord_agg_hist",      S, ["H.W.Coords3d"]),
         ("vid_raw",                                 S, ["H"]),
         ("vid_per_uid",                             S, ["H.Cameras"]),
+        ("vid_per_uid_2dcen",                       S, ["H.Cameras"]),
+        ("vid_per_uid_2dbb",                        S, ["H.Cameras"]),
+        ("vid_per_uid_3dbb",                        S, ["H.Cameras"]),
+        ("vid_per_uid_3dcen",                       S, ["H.Cameras"]),
+        ("vid_per_uid_activity",                    S, ["H.Cameras"]),
+        ("vid_per_uid_intensity",                   S, ["H.Cameras"]),
+        ("vid_per_uid_userid",                      S, ["H.Cameras"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
+        ("cameras_by_house",                        A, ["H"]),
         ("wearables_by_house",                      A, ["H"]),
         ("access_points_by_house",                  A, ["H"])
     )
@@ -228,38 +236,38 @@ def create_workflow_summariser(hyperstream, safe=True):
         sources=[N["rss_per_uid_aid"]],
         sink=N["rss_per_uid_aid_value"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_window",
-    #         # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-    #         parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
-    #     ),
-    #     sources=None,
-    #     sink=N["rss_per_uid_aid_value_windows"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_listify",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_windows"], N["rss_per_uid_aid_value"]],
-    #     sink=N["rss_per_uid_aid_value_agg"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="percentiles_from_list",
-    #         parameters=dict(n_segments=4,percentiles=None)
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_agg"]],
-    #     sink=N["rss_per_uid_aid_value_agg_perc"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="histogram_from_list",
-    #         parameters=dict(first_break=-120,break_width=1,n_breaks=101,breaks=None)
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_agg"]],
-    #     sink=N["rss_per_uid_aid_value_agg_hist"])
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+        ),
+        sources=None,
+        sink=N["rss_per_uid_aid_value_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_aid_value_windows"], N["rss_per_uid_aid_value"]],
+        sink=N["rss_per_uid_aid_value_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="percentiles_from_list",
+            parameters=dict(n_segments=4,percentiles=None)
+        ),
+        sources=[N["rss_per_uid_aid_value_agg"]],
+        sink=N["rss_per_uid_aid_value_agg_perc"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="histogram_from_list",
+            parameters=dict(first_break=-120,break_width=1,n_breaks=101,breaks=None)
+        ),
+        sources=[N["rss_per_uid_aid_value_agg"]],
+        sink=N["rss_per_uid_aid_value_agg_hist"])
 
     #####################################
     ### WEARABLE SENSORS ACCELERATION ###
@@ -354,6 +362,62 @@ def create_workflow_summariser(hyperstream, safe=True):
         source=N["vid_raw"],
         splitting_node=N["cameras_by_house"],
         sink=N["vid_per_uid"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-2DCen')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_2dcen"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-2Dbb')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_2dbb"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-3Dbb')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_3dbb"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-3Dcen')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_3dcen"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-Activity')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_activity"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-Intensity')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_intensity"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="component",
+            parameters=dict(key='video-userID')
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_userid"])
 
     return w
 

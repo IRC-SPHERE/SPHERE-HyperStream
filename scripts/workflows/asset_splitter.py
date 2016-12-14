@@ -256,10 +256,6 @@ def create_asset_splitter_2(hyperstream, safe=True, purge=False):
             return hyperstream.workflow_manager.workflows[workflow_id]
 
     nodes = (
-        ("devices",                                 SA, []),
-        ("devices_by_house",                        M, ["H"]),
-        ("wearables_by_house",                      A, ["H"]),
-        ("access_points_by_house",                  A, ["H"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
     )
