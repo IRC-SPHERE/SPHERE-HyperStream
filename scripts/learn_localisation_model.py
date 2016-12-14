@@ -127,6 +127,6 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    from plugins.sphere.utils import get_technician_selection_parser
-    args = get_technician_selection_parser(default_loglevel=logging.INFO)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.technician_selection_parser(default_loglevel=logging.INFO)
     run(house=args.house, selection=map(int, args.technicians_selection), loglevel=args.loglevel)

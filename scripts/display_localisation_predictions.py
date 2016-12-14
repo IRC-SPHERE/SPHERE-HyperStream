@@ -76,8 +76,8 @@ if __name__ == '__main__':
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     sys.path.append(path)
 
-    from plugins.sphere.utils import get_wearable_list_parser
-    args = get_wearable_list_parser(wearables="ABCD", default_loglevel=logging.INFO)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.wearable_list_parser(wearables="ABCD", default_loglevel=logging.INFO)
 
     def signal_handler(signal, frame):
         sys.exit(0)

@@ -17,12 +17,9 @@
 #  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
-import json
-import os
+
 
 def create_workflow_coord_plate_creation(hyperstream, safe=True):
-    from hyperstream import TimeInterval
-
     workflow_id = "coord3d_plate_creation"
 
     try:
@@ -31,7 +28,7 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
             name="Coord3d plate creation",
             owner="MK",
             description="Coord3d plate creation",
-            online=False)
+            online=True)
     except KeyError as e:
         if safe:
             raise e
@@ -57,10 +54,7 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
     return w
 
 
-
-
 def create_workflow_summariser(hyperstream, safe=True):
-    from hyperstream import TimeInterval
 
     workflow_id = "periodic_summaries"
 

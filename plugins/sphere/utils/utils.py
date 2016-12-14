@@ -21,39 +21,55 @@
 import argparse
 import logging
 
-CHOICES = (logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.CRITICAL)
 
+class ArgumentParser(object):
+    CHOICES = (logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.CRITICAL)
 
-def get_default_parser(default_loglevel=logging.DEBUG):
-    """
-    Gets a default argument parser including the house id and logging level
-    :return:
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house')
-    parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
-    return parser.parse_args()
+    @staticmethod
+    def logging_parser(default_loglevel=logging.DEBUG):
+        """
+        Gets a default argument parser including the house id and logging level
+        :return:
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
+                            choices=ArgumentParser.CHOICES)
+        return parser.parse_args()
 
+    @staticmethod
+    def house_parser(default_loglevel=logging.DEBUG):
+        """
+        Gets a default argument parser including the house id and logging level
+        :return:
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--house', dest='house')
+        parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
+                            choices=ArgumentParser.CHOICES)
+        return parser.parse_args()
 
-def get_technician_selection_parser(default_loglevel=logging.DEBUG):
-    """
-    Gets an argument parser including the house id, technician's selection, and logging level
-    :return:
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house')
-    parser.add_argument('--selection', dest='technicians_selection', nargs=2, type=int)
-    parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
-    return parser.parse_args()
+    @staticmethod
+    def technician_selection_parser(default_loglevel=logging.DEBUG):
+        """
+        Gets an argument parser including the house id, technician's selection, and logging level
+        :return:
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--house', dest='house')
+        parser.add_argument('--selection', dest='technicians_selection', nargs=2, type=int)
+        parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
+                            choices=ArgumentParser.CHOICES)
+        return parser.parse_args()
 
-
-def get_wearable_list_parser(wearables="ABCDEF", default_loglevel=logging.DEBUG):
-    """
-    Gets an argument parser including the house id, list of wearables, and logging level
-    :return:
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--house', dest='house')
-    parser.add_argument("--wearables", dest='wearables', default=wearables)
-    parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel, choices=CHOICES)
-    return parser.parse_args()
+    @staticmethod
+    def wearable_list_parser(wearables="ABCDEF", default_loglevel=logging.DEBUG):
+        """
+        Gets an argument parser including the house id, list of wearables, and logging level
+        :return:
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--house', dest='house')
+        parser.add_argument("--wearables", dest='wearables', default=wearables)
+        parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
+                            choices=ArgumentParser.CHOICES)
+        return parser.parse_args()

@@ -85,6 +85,6 @@ if __name__ == '__main__':
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    from plugins.sphere.utils import get_wearable_list_parser
-    args = get_wearable_list_parser(default_loglevel=logging.INFO)
+    from plugins.sphere.utils import ArgumentParser
+    args = ArgumentParser.wearable_list_parser(default_loglevel=logging.INFO)
     run(args.house, args.wearables, delete_existing_workflows=True, loglevel=args.loglevel)
