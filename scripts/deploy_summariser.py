@@ -62,14 +62,6 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
         w = create_workflow_summariser(hyperstream, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
-    t1 = parse("2016-11-28T11:50Z")
-    t2 = parse("2016-11-28T11:55Z")
-    t1 = parse("2016-12-06T09:00Z")
-    t2 = parse("2016-12-06T09:01Z")
-    t_1_2 = TimeInterval(start=t1,end=t2)
-    # w.factors[0].execute(t_1_2)
-    w.execute(t_1_2)
-
     time_interval = TimeInterval.now_minus(minutes=1)
     w.execute(time_interval)
 
