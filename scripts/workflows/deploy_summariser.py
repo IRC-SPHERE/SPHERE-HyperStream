@@ -59,7 +59,7 @@ def create_workflow_summariser(hyperstream, safe=True):
     workflow_id = "periodic_summaries"
 
     S = hyperstream.channel_manager.sphere
-    D = hyperstream.channel_manager.mongo
+    D = hyperstream.channel_manager.summary
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
 
