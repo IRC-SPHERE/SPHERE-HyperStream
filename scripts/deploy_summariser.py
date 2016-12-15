@@ -41,15 +41,6 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
 
     split_sphere_assets(hyperstream)
 
-    hyperstream.plate_manager.create_plate(
-        plate_id="H.W.Coords3d",
-        description="3-d coordinates",
-        meta_data_id="coord",
-        values=[],
-        complement=True,
-        parent_plate="H.W"
-    )
-
     workflow_id = "coord3d_plate_creation"
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow(workflow_id)
@@ -70,14 +61,6 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     except KeyError:
         w = create_workflow_summariser(hyperstream, safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
-
-    t1 = parse("2016-11-28T11:50Z")
-    t2 = parse("2016-11-28T11:55Z")
-    t1 = parse("2016-12-06T09:00Z")
-    t2 = parse("2016-12-06T09:01Z")
-    t_1_2 = TimeInterval(start=t1,end=t2)
-    # w.factors[0].execute(t_1_2)
-    w.execute(t_1_2)
 
     time_interval = TimeInterval.now_minus(minutes=1)
     w.execute(time_interval)
