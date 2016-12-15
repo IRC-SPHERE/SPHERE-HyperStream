@@ -168,8 +168,21 @@ def create_workflow_summariser(hyperstream, safe=True):
         ("vid_per_uid_3dcen_z_perc",                S, ["H.Cameras"]),
         ("vid_per_uid_3dcen_z_hist",                S, ["H.Cameras"]),
         ("vid_per_uid_activity",                    S, ["H.Cameras"]),
+        ("vid_per_uid_activity_agg",                S, ["H.Cameras"]),
+        ("vid_per_uid_activity_hist",               S, ["H.Cameras"]),
         ("vid_per_uid_intensity",                   S, ["H.Cameras"]),
+        ("vid_per_uid_intensity_agg",               S, ["H.Cameras"]),
+        ("vid_per_uid_intensity_hist",              S, ["H.Cameras"]),
         ("vid_per_uid_userid",                      S, ["H.Cameras"]),
+        ("vid_per_uid_userid_agg",                  S, ["H.Cameras"]),
+        ("vid_per_uid_userid_hist",                 S, ["H.Cameras"]),
+        ("prediction",                              S, ["H"]),
+        ("prediction_windows",                      M, ["H"]),
+        ("prediction_agg",                          S, ["H"]),
+        ("prediction_mean",                         S, ["H"]),
+        ("prediction_map",                          S, ["H"]),
+        ("prediction_map_agg",                      S, ["H"]),
+        ("prediction_map_hist",                     S, ["H"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         ("cameras_by_house",                        A, ["H"]),
@@ -442,6 +455,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         'intensity': 'video-Intensity',
         'userid'   : 'video-userID'
     }
+    create_histograms_for = ['activity','intensity','userid']
 
     for k in comp_names.keys():
         w.create_factor(
@@ -487,216 +501,84 @@ def create_workflow_summariser(hyperstream, safe=True):
                 sources=[N["vid_per_uid_"+ki+"_agg"]],
                 sink=N["vid_per_uid_"+ki+"_hist"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=1)
-    #     ),
-    #     sources=[N["vid_per_uid_2dcen"]],
-    #     sink=N["vid_per_uid_2dcen_y"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_listify",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["vid_per_uid_windows"], N["vid_per_uid_2dcen_y"]],
-    #     sink=N["vid_per_uid_2dcen_y_agg"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="percentiles_from_list",
-    #         parameters=dict(n_segments=4, percentiles=None)
-    #     ),
-    #     sources=[N["vid_per_uid_2dcen_y_agg"]],
-    #     sink=N["vid_per_uid_2dcen_y_perc"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-2Dbb')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_2dbb"])
-    #
-    # fields = ['left','top','right','bottom']
-    #
-    # for i in range(len(fields)):
-    #     w.create_factor(
-    #         tool=hyperstream.channel_manager.get_tool(
-    #             name="slice",
-    #             parameters=dict(index=0)
-    #         ),
-    #         sources=[N["vid_per_uid_2dbb"]],
-    #         sink=N["vid_per_uid_2dbb_"+fields[i]])
-    #
-    #     w.create_factor(
-    #         tool=hyperstream.channel_manager.get_tool(
-    #             name="sliding_listify",
-    #             parameters=dict()
-    #         ),
-    #         sources=[N["vid_per_uid_windows"], N["vid_per_uid_2dbb_left"]],
-    #         sink=N["vid_per_uid_2dbb_left_agg"])
-    #
-    #     w.create_factor(
-    #         tool=hyperstream.channel_manager.get_tool(
-    #             name="percentiles_from_list",
-    #             parameters=dict(n_segments=4, percentiles=None)
-    #         ),
-    #         sources=[N["vid_per_uid_2dbb_left_agg"]],
-    #         sink=N["vid_per_uid_2dbb_left_perc"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=1)
-    #     ),
-    #     sources=[N["vid_per_uid_2dbb"]],
-    #     sink=N["vid_per_uid_2dbb_top"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="sliding_listify",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["vid_per_uid_windows"], N["vid_per_uid_2dbb_top"]],
-    #     sink=N["vid_per_uid_2dbb_top_agg"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="percentiles_from_list",
-    #         parameters=dict(n_segments=4, percentiles=None)
-    #     ),
-    #     sources=[N["vid_per_uid_2dbb_top_agg"]],
-    #     sink=N["vid_per_uid_2dbb_top_perc"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=2)
-    #     ),
-    #     sources=[N["vid_per_uid_2dbb"]],
-    #     sink=N["vid_per_uid_2dbb_right"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=3)
-    #     ),
-    #     sources=[N["vid_per_uid_2dbb"]],
-    #     sink=N["vid_per_uid_2dbb_bottom"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-3Dbb')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_3dbb"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=0)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_left"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=1)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_top"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=2)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_front"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=3)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_right"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=4)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_bottom"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=5)
-    #     ),
-    #     sources=[N["vid_per_uid_3dbb"]],
-    #     sink=N["vid_per_uid_3dbb_back"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-3Dcen')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_3dcen"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=0)
-    #     ),
-    #     sources=[N["vid_per_uid_3dcen"]],
-    #     sink=N["vid_per_uid_3dcen_x"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=1)
-    #     ),
-    #     sources=[N["vid_per_uid_3dcen"]],
-    #     sink=N["vid_per_uid_3dcen_y"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="slice",
-    #         parameters=dict(index=2)
-    #     ),
-    #     sources=[N["vid_per_uid_3dcen"]],
-    #     sink=N["vid_per_uid_3dcen_z"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-Activity')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_activity"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-Intensity')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_intensity"])
-    #
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="component",
-    #         parameters=dict(key='video-userID')
-    #     ),
-    #     sources=[N["vid_per_uid"]],
-    #     sink=N["vid_per_uid_userid"])
+    for k in create_histograms_for:
+
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="sliding_listify",
+                parameters=dict()
+            ),
+            sources=[N["vid_per_uid_windows"], N["vid_per_uid_"+k]],
+            sink=N["vid_per_uid_"+k+"_agg"])
+
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="histogram_from_list",
+                parameters=dict(categorical=True)
+            ),
+            sources=[N["vid_per_uid_"+k+"_agg"]],
+            sink=N["vid_per_uid_"+k+"_hist"])
+
+    ###################
+    ### PREDICTIONS ###
+    ###################
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="random_predictions",
+            parameters=dict(locations=['kitchen','lounge','hall'])
+        ),
+        sources=[N["env_raw"]],
+        sink=N["prediction"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+        ),
+        sources=None,
+        sink=N["prediction_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["prediction_windows"], N["prediction"]],
+        sink=N["prediction_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="list_dict_mean",
+            parameters=dict()
+        ),
+        sources=[N["prediction_agg"]],
+        sink=N["prediction_mean"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="dict_argmax",
+            parameters=dict()
+        ),
+        sources=[N["prediction"]],
+        sink=N["prediction_map"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["prediction_windows"], N["prediction_map"]],
+        sink=N["prediction_map_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="histogram_from_list",
+            parameters=dict(categorical=True)
+        ),
+        sources=[N["prediction_map_agg"]],
+        sink=N["prediction_map_hist"])
 
     return w
 
