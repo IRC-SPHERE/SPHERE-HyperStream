@@ -90,7 +90,8 @@ if __name__ == '__main__':
             if not technicians_selection or len(technicians_selection) < 2:
                 print("Expected at least two integer ids")
 
-        learn_localisation_model.run(args.house, technicians_selection, delete_existing_workflows, args.loglevel)
+        if not learn_localisation_model.run(args.house, technicians_selection, delete_existing_workflows, args.loglevel):
+            break
 
         if query_yes_no("Deploy model?"):
             deploy_localisation_model.run(args.house, args.wearables, delete_existing_workflows, args.loglevel)

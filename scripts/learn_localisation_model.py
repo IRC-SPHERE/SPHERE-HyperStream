@@ -110,7 +110,8 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     try:
         model = D[model_id].window().last().value
     except AttributeError:
-        raise
+        print("No model was learnt - possibly there was no data recorded?")
+        return False
 
     for experiment_id in list(experiment_ids):
         print("Experiment id: {}".format(experiment_id))
@@ -121,6 +122,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
         print("Confusion Matrix:")
         pprint(model['performance'][experiment_id]['confusion_matrix'])
         print("")
+    return True
 
 
 if __name__ == '__main__':

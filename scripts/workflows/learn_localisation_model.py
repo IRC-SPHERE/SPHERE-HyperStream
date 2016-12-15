@@ -89,13 +89,13 @@ def create_workflow_lda_localisation_model_learner(hyperstream, house, experimen
         ("rss_time",                                S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
         ("annotation_raw_locations",                S, ["H"]),  # Raw annotation data
         ("annotation_time",                         S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
-        ("every_2s",                                M, ["H.SelectedLocalisationExperiment"]),  # sliding windows one every minute
-        ("annotation_state_location",               M, ["H.SelectedLocalisationExperiment"]),  # Annotation data in 2s windows
-        ("annotation_state_2s_windows",             M, ["H.SelectedLocalisationExperiment"]),
-        ("rss_2s",                                  M, ["H.SelectedLocalisationExperiment"]),  # max(RSS) per AP in past 2s of RSS
-        ("merged_2s",                               M, ["H.SelectedLocalisationExperiment"]),  # rss_2s with annotation_state_2s
-        ("merged_2s_flat_" + experiment_ids_str,    M, ["H"]),  # flattened version of merged_2s
-        ("merged_2s_split_" + experiment_ids_str,   M, ["H", "LocalisationModels"]),
+        ("every_2s",                                S, ["H.SelectedLocalisationExperiment"]),  # sliding windows one every minute
+        ("annotation_state_location",               S, ["H.SelectedLocalisationExperiment"]),  # Annotation data in 2s windows
+        ("annotation_state_2s_windows",             S, ["H.SelectedLocalisationExperiment"]),
+        ("rss_2s",                                  S, ["H.SelectedLocalisationExperiment"]),  # max(RSS) per AP in past 2s of RSS
+        ("merged_2s",                               S, ["H.SelectedLocalisationExperiment"]),  # rss_2s with annotation_state_2s
+        ("merged_2s_flat_" + experiment_ids_str,    S, ["H"]),  # flattened version of merged_2s
+        ("merged_2s_split_" + experiment_ids_str,   S, ["H", "LocalisationModels"]),
         ("location_prediction",                     D, ["H", "LocalisationModels"]),
         ("experiments_selected",                    A, ["H"])
     )
