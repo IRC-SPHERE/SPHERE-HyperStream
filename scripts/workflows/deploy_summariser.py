@@ -54,7 +54,13 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
     return w
 
 
-def create_workflow_summariser(hyperstream, safe=True):
+def create_workflow_summariser(hyperstream,
+                               env_window_size =1*60*60.0,
+                               rss_window_size =4*60*60.0,
+                               acc_window_size =4*60*60.0,
+                               vid_window_size =4*60*60.0,
+                               pred_window_size=4*60*60.0,
+                               safe=True):
 
     workflow_id = "periodic_summaries"
 
@@ -228,7 +234,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+            parameters=dict(lower=-env_window_size, upper=0.0, increment=env_window_size)
         ),
         sources=None,
         sink=N["env_per_uid_field_windows"])
@@ -308,7 +314,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+            parameters=dict(lower=-rss_window_size, upper=0.0, increment=rss_window_size)
         ),
         sources=None,
         sink=N["rss_per_uid_aid_value_windows"])
@@ -380,7 +386,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+            parameters=dict(lower=-acc_window_size, upper=0.0, increment=acc_window_size)
         ),
         sources=None,
         sink=N["acc_per_uid_acclist_coord_windows"])
@@ -435,7 +441,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+            parameters=dict(lower=-vid_window_size, upper=0.0, increment=vid_window_size)
         ),
         sources=None,
         sink=N["vid_per_uid_windows"])
@@ -535,7 +541,7 @@ def create_workflow_summariser(hyperstream, safe=True):
         tool=hyperstream.channel_manager.get_tool(
             name="sliding_window",
             # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-20.0, upper=0.0, increment=20.0)
+            parameters=dict(lower=-pred_window_size, upper=0.0, increment=pred_window_size)
         ),
         sources=None,
         sink=N["prediction_windows"])
