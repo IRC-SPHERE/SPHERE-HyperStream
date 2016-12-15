@@ -182,13 +182,14 @@ def create_workflow_summariser(hyperstream,
         ("vid_per_uid_userid",                      S, ["H.Cameras"]),
         ("vid_per_uid_userid_agg",                  S, ["H.Cameras"]),
         ("vid_per_uid_userid_hist",                 D, ["H.Cameras"]),
-        ("prediction",                              S, ["H"]),
-        ("prediction_windows",                      M, ["H"]),
-        ("prediction_agg",                          S, ["H"]),
-        ("prediction_mean",                         D, ["H"]),
-        ("prediction_map",                          S, ["H"]),
-        ("prediction_map_agg",                      S, ["H"]),
-        ("prediction_map_hist",                     D, ["H"]),
+        # ("prediction",                              S, ["H"]),
+        ("predicted_locations_broadcasted",         D, ["H.W"]),
+        ("prediction_windows",                      M, ["H.W"]),
+        ("prediction_agg",                          S, ["H.W"]),
+        ("prediction_mean",                         D, ["H.W"]),
+        ("prediction_map",                          S, ["H.W"]),
+        ("prediction_map_agg",                      S, ["H.W"]),
+        ("prediction_map_hist",                     D, ["H.W"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         ("cameras_by_house",                        A, ["H"]),
@@ -529,13 +530,13 @@ def create_workflow_summariser(hyperstream,
     ### PREDICTIONS ###
     ###################
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="random_predictions",
-            parameters=dict(locations=['kitchen','lounge','hall'])
-        ),
-        sources=[N["env_raw"]],
-        sink=N["prediction"])
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="random_predictions",
+    #         parameters=dict(locations=['kitchen','lounge','hall'])
+    #     ),
+    #     sources=[N["env_raw"]],
+    #     sink=N["prediction"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -551,7 +552,7 @@ def create_workflow_summariser(hyperstream,
             name="sliding_listify",
             parameters=dict()
         ),
-        sources=[N["prediction_windows"], N["prediction"]],
+        sources=[N["prediction_windows"], N["predicted_locations_broadcasted"]],
         sink=N["prediction_agg"])
 
     w.create_factor(
@@ -567,7 +568,7 @@ def create_workflow_summariser(hyperstream,
             name="dict_argmax",
             parameters=dict()
         ),
-        sources=[N["prediction"]],
+        sources=[N["predicted_locations_broadcasted"]],
         sink=N["prediction_map"])
 
     w.create_factor(
