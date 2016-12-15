@@ -59,7 +59,13 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id]
     except KeyError:
-        w = create_workflow_summariser(hyperstream, safe=False)
+        w = create_workflow_summariser(hyperstream,
+                                       env_window_size=30.0,
+                                       rss_window_size=30.0,
+                                       acc_window_size=30.0,
+                                       vid_window_size=30.0,
+                                       pred_window_size=30.0,
+                                       safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
     time_interval = TimeInterval.now_minus(minutes=1)
