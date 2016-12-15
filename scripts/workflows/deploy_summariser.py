@@ -562,7 +562,7 @@ def create_workflow_summariser(hyperstream, safe=True):
             name="dict_argmax",
             parameters=dict()
         ),
-        sources=[N["prediction"]],
+        sources=[N["predicted_locations_broadcasted"]],
         sink=N["prediction_map"])
 
     w.create_factor(
