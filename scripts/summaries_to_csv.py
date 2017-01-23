@@ -20,6 +20,7 @@
 
 import logging
 from dateutil.parser import parse
+import pandas as pd
 
 globs = {'sphere_connector': None}
 
@@ -44,15 +45,29 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id]
     except KeyError:
-        w = create_workflow_summaries_to_csv(hyperstream,safe=False)
+        percentile_results = []
+        w = create_workflow_summaries_to_csv(hyperstream,percentile_results=percentile_results,safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
-    t1 = parse("2016-12-15T21:58:25Z")
-    t2 = parse("2016-12-15T22:02:05Z")
+    day_str = "2016_12_15_23_00"
+    t1 = parse("2016-12-15T19:58:25Z")
+    t2 = parse("2016-12-15T20:01:05Z")
+    t1 = parse("2016-12-15T22:58:25Z")
+    t2 = parse("2016-12-15T23:01:05Z")
 
     t_1_2 = TimeInterval(start=t1,end=t2)
     # w.factors[0].execute(t_1_2)
     w.execute(t_1_2)
+
+    env_results = w.factors[0].tool.global_result_list
+
+    csv_string = pd.DataFrame(env_results).to_csv(sep="\t", header=False)
+
+    with open("visualise_summaries/env_summaries_{}.csv".format(day_str), "w") as text_file:
+        text_file.write(csv_string)
+
+    # print(env_results)
+    # print(percentile_results)
 
 #    time_interval = TimeInterval.now_minus(minutes=1)
 #    w.execute(time_interval)
