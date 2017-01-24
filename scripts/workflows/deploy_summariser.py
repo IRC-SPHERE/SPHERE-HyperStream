@@ -91,6 +91,9 @@ def create_workflow_summariser(hyperstream,
         ("env_per_uid_field_agg",                   S, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_perc",              X, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_hist",              X, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_field_sink",                  M, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_sink",                        M, ["H.EnvSensors"]),
+        ("env_sink",                                M, ["H"]),
         ("rss_raw",                                 S, ["H"]),
         ("rss_per_uid",                             S, ["H.W"]),
         ("rss_per_uid_aid",                         S, ["H.W","H.APs"]),
@@ -99,6 +102,9 @@ def create_workflow_summariser(hyperstream,
         ("rss_per_uid_aid_value_agg",               S, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_sink",              M, ["H.W","H.APs"]),
+        ("rss_per_uid_sink",                        M, ["H.W"]),
+        ("rss_sink",                                M, ["H"]),
         ("acc_raw",                                 S, ["H"]),
         ("acc_per_uid",                             S, ["H.W"]),
         ("acc_per_uid_acclist",                     S, ["H.W"]),
@@ -107,6 +113,9 @@ def create_workflow_summariser(hyperstream,
         ("acc_per_uid_acclist_coord_agg",           S, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_sink",          M, ["H.W.Coords3d"]),
+        ("acc_per_uid_sink",                        M, ["H.W"]),
+        ("acc_sink",                                M, ["H"]),
         ("vid_raw",                                 S, ["H"]),
         ("vid_per_uid",                             S, ["H.Cameras"]),
         ("vid_per_uid_windows",                     M, ["H.Cameras"]),
@@ -183,6 +192,8 @@ def create_workflow_summariser(hyperstream,
         ("vid_per_uid_userid",                      S, ["H.Cameras"]),
         ("vid_per_uid_userid_agg",                  S, ["H.Cameras"]),
         ("vid_per_uid_userid_hist",                 X, ["H.Cameras"]),
+        ("vid_per_uid_sink",                        M, ["H.Cameras"]),
+        ("vid_sink",                                M, ["H"]),
         # ("prediction",                              S, ["H"]),
         ("predicted_locations_broadcasted",         D, ["H.W"]),
         ("prediction_windows",                      M, ["H.W"]),
@@ -191,6 +202,9 @@ def create_workflow_summariser(hyperstream,
         ("prediction_map",                          S, ["H.W"]),
         ("prediction_map_agg",                      S, ["H.W"]),
         ("prediction_map_hist",                     X, ["H.W"]),
+        ("prediction_per_wearable_sink",            M, ["H.W"]),
+        ("prediction_sink",                         M, ["H"]),
+        ("overall_sink",                            M, ["H"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         ("cameras_by_house",                        A, ["H"]),
@@ -273,6 +287,30 @@ def create_workflow_summariser(hyperstream,
         sources=[N["env_per_uid_field_agg"]],
         sink=N["env_per_uid_field_agg_hist"])
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=[N["env_per_uid_field_agg_perc"],N["env_per_uid_field_agg_hist"]],
+        sink=N["env_per_uid_field_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["env_per_uid_field_sink"]],
+        sink=N["env_per_uid_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["env_per_uid_sink"]],
+        sink=N["env_sink"])
+
     ############################
     ### WEARABLE SENSORS RSS ###
     ############################
@@ -344,6 +382,30 @@ def create_workflow_summariser(hyperstream,
         ),
         sources=[N["rss_per_uid_aid_value_agg"]],
         sink=N["rss_per_uid_aid_value_agg_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_aid_value_agg_perc"],N["rss_per_uid_aid_value_agg_hist"]],
+        sink=N["rss_per_uid_aid_value_sink"])
+
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="plate_sink",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["rss_per_uid_aid_value_sink"]],
+    #     sink=N["rss_per_uid_sink"])
+
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="plate_sink",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["rss_per_uid_sink"]],
+    #     sink=N["rss_sink"])
 
     #####################################
     ### WEARABLE SENSORS ACCELERATION ###
@@ -417,6 +479,30 @@ def create_workflow_summariser(hyperstream,
         sources=[N["acc_per_uid_acclist_coord_agg"]],
         sink=N["acc_per_uid_acclist_coord_agg_hist"])
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist_coord_agg_perc"],N["acc_per_uid_acclist_coord_agg_hist"]],
+        sink=N["acc_per_uid_acclist_coord_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist_coord_sink"]],
+        sink=N["acc_per_uid_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_sink"]],
+        sink=N["acc_sink"])
+
     #####################
     ### VIDEO SENSORS ###
     #####################
@@ -465,6 +551,8 @@ def create_workflow_summariser(hyperstream,
     }
     create_histograms_for = ['activity','intensity','userid']
 
+    vid_sink_input_list = []
+
     for k in comp_names.keys():
         w.create_factor(
             tool=hyperstream.channel_manager.get_tool(
@@ -501,6 +589,8 @@ def create_workflow_summariser(hyperstream,
                 sources=[N["vid_per_uid_"+ki+"_agg"]],
                 sink=N["vid_per_uid_"+ki+"_perc"])
 
+            vid_sink_input_list.append(N["vid_per_uid_"+ki+"_perc"])
+
             w.create_factor(
                 tool=hyperstream.channel_manager.get_tool(
                     name="histogram_from_list",
@@ -508,6 +598,8 @@ def create_workflow_summariser(hyperstream,
                 ),
                 sources=[N["vid_per_uid_"+ki+"_agg"]],
                 sink=N["vid_per_uid_"+ki+"_hist"])
+
+            vid_sink_input_list.append(N["vid_per_uid_"+ki+"_hist"])
 
     for k in create_histograms_for:
 
@@ -526,6 +618,24 @@ def create_workflow_summariser(hyperstream,
             ),
             sources=[N["vid_per_uid_"+k+"_agg"]],
             sink=N["vid_per_uid_"+k+"_hist"])
+
+        vid_sink_input_list.append(N["vid_per_uid_"+k+"_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=vid_sink_input_list,
+        sink=N["vid_per_uid_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["vid_per_uid_sink"]],
+        sink=N["vid_sink"])
 
     ###################
     ### PREDICTIONS ###
@@ -587,6 +697,31 @@ def create_workflow_summariser(hyperstream,
         ),
         sources=[N["prediction_map_agg"]],
         sink=N["prediction_map_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=[N["prediction_mean"],N["prediction_map_hist"]],
+        sink=N["prediction_per_wearable_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["prediction_per_wearable_sink"]],
+        sink=N["prediction_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        # sources=[N["env_sink"],N["rss_sink"],N["acc_sink"],N["vid_sink"],N["prediction_sink"]],
+        sources=[N["env_sink"],N["acc_sink"],N["vid_sink"],N["prediction_sink"]],
+        sink=N["overall_sink"])
 
     return w
 
