@@ -94,6 +94,8 @@ def create_workflow_summariser(hyperstream,
         ("env_per_uid_field_sink",                  M, ["H.EnvSensors.Fields"]),
         ("env_per_uid_sink",                        M, ["H.EnvSensors"]),
         ("env_sink",                                M, ["H"]),
+        ("env_windows",                             M, ["H"]),
+        ("env_sliding_sink",                        M, ["H"]),
         ("rss_raw",                                 S, ["H"]),
         ("rss_per_uid",                             S, ["H.W"]),
         ("rss_per_uid_aid",                         S, ["H.W","H.APs"]),
@@ -103,6 +105,7 @@ def create_workflow_summariser(hyperstream,
         ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_sink",              M, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_sliding_sink",      M, ["H.W","H.APs"]),
         ("rss_per_uid_sink",                        M, ["H.W"]),
         ("rss_sink",                                M, ["H"]),
         ("acc_raw",                                 S, ["H"]),
@@ -204,7 +207,9 @@ def create_workflow_summariser(hyperstream,
         ("prediction_map_hist",                     X, ["H.W"]),
         ("prediction_per_wearable_sink",            M, ["H.W"]),
         ("prediction_sink",                         M, ["H"]),
-        ("overall_sink",                            M, ["H"]),
+        ("non_env_windows",                         M, ["H"]),
+        ("non_env_sink",                            M, ["H"]),
+        ("non_env_sliding_sink",                    M, ["H"]),
         ("env_sensors_by_house",                    A, ["H"]),
         ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         ("cameras_by_house",                        A, ["H"]),
@@ -311,6 +316,23 @@ def create_workflow_summariser(hyperstream,
         sources=[N["env_per_uid_sink"]],
         sink=N["env_sink"])
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-env_window_size, upper=0.0, increment=env_window_size)
+        ),
+        sources=None,
+        sink=N["env_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_sink",
+            parameters=dict()
+        ),
+        sources=[N["env_windows"],N["env_sink"]],
+        sink=N["env_sliding_sink"])
+
     ############################
     ### WEARABLE SENSORS RSS ###
     ############################
@@ -391,21 +413,21 @@ def create_workflow_summariser(hyperstream,
         sources=[N["rss_per_uid_aid_value_agg_perc"],N["rss_per_uid_aid_value_agg_hist"]],
         sink=N["rss_per_uid_aid_value_sink"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="plate_sink",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["rss_per_uid_aid_value_sink"]],
-    #     sink=N["rss_per_uid_sink"])
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_aid_value_sink"]],
+        sink=N["rss_per_uid_sink"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(
-    #         name="plate_sink",
-    #         parameters=dict()
-    #     ),
-    #     sources=[N["rss_per_uid_sink"]],
-    #     sink=N["rss_sink"])
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="plate_sink",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_sink"]],
+        sink=N["rss_sink"])
 
     #####################################
     ### WEARABLE SENSORS ACCELERATION ###
@@ -716,12 +738,28 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-pred_window_size, upper=0.0, increment=pred_window_size)
+        ),
+        sources=None,
+        sink=N["non_env_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="sink",
             parameters=dict()
         ),
-        # sources=[N["env_sink"],N["rss_sink"],N["acc_sink"],N["vid_sink"],N["prediction_sink"]],
-        sources=[N["env_sink"],N["acc_sink"],N["vid_sink"],N["prediction_sink"]],
-        sink=N["overall_sink"])
+        sources=[N["acc_sink"],N["rss_sink"],N["vid_sink"],N["prediction_sink"]],
+        sink=N["non_env_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_sink",
+            parameters=dict()
+        ),
+        sources=[N["non_env_windows"],N["non_env_sink"]],
+        sink=N["non_env_sliding_sink"])
 
     return w
 
