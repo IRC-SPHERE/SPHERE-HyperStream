@@ -40,14 +40,6 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("asset_splitter")
-        A.purge_node("devices")
-        A.purge_node("devices_by_house")
-        A.purge_node("wearables_by_house")
-        A.purge_node("access_points_by_house")
-        A.purge_node("cameras_by_house")
-        A.purge_node("env_sensors_by_house")
-        A.purge_node("fields_by_env_sensor")
-
 
     split_sphere_assets(hyperstream)
 

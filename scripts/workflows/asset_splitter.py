@@ -42,6 +42,8 @@
 def create_asset_splitter_0(hyperstream, safe=True):
     workflow_id = "asset_splitter_0"
 
+    A = hyperstream.channel_manager.assets
+
     try:
         w = hyperstream.create_workflow(
             workflow_id=workflow_id,
@@ -70,6 +72,8 @@ def create_asset_splitter_0(hyperstream, safe=True):
         ),
         plate_manager=hyperstream.plate_manager
     )
+
+    A.purge_node("devices")
 
     return w
 
@@ -105,6 +109,12 @@ def create_asset_splitter_1(hyperstream, safe=True):
 
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    A.purge_node("devices_by_house")
+    A.purge_node("wearables_by_house")
+    A.purge_node("access_points_by_house")
+    A.purge_node("cameras_by_house")
+    A.purge_node("env_sensors_by_house")
 
     # Now populate the node
     w.create_multi_output_factor(
@@ -248,6 +258,8 @@ def create_asset_splitter_2(hyperstream, safe=True):
 
     # Create all of the nodes
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    A.purge_node("fields_by_env_sensor")
 
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
