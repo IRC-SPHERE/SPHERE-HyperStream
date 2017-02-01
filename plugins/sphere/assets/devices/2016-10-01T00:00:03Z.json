@@ -1,0 +1,339 @@
+{
+    "house": {
+        "1": {
+            "notes": "SPHERE house",
+            "access_points": {
+                "b827eb26dbd6": "hallway:A",
+                "b827eb643ba7": "lounge:A",
+                "b827eb0654a9": "study:A",
+                "b827eb48a755": "kitchen:A",
+                "b827eb645a8e": "kitchen:B",
+                "b827eb62fe45": "hallway:B",
+                "b827eb036271": "lounge:B",
+                "b827ebfd0967": "bedroom 1:A",
+                "b827ebcb1413": "bedroom 1:B",
+                "b827eb3f1106": "bedroom 2:A",
+                "b827ebea7bc4": "lounge:C",
+                "b827eb94cbd1": "kitchen:C",
+                "b827eb524fec": "study:B",
+                "fd00::200:0:0:0": "unknown location:A",
+                "fd00::212:4b00:0:1": "unknown location:A",
+                "fd00::212:4b00:0:2": "unknown location:B",
+                "fd00::212:4b00:0:3": "unknown location:C",
+                "fd00::212:4b00:0:4": "unknown location:D",
+                "fd00::212:4b00:0:5": "unknown location:E"
+
+            },
+            "wearables": {
+                "0aa05543a5c2": "A",
+                "00:12:4b:ad:8a:04": "A",
+                "00:12:4b:ad:83:85": "B",
+                "00:12:4b:ad:94:81": "C",
+                "00:12:4b:ad:87:84": "D",
+                "a0:e6:f8:ad:8a:04": "A",
+                "a0:e6:f8:ad:83:85": "B",
+                "a0:e6:f8:ad:94:81": "C",
+                "a0:e6:f8:ad:87:84": "D",
+                "a0:e6:f8:ad:85:04": "A",
+                "a0:e6:f8:00:00:c0": "A",
+                "00124bad8a04": "A",
+                "00124bad8385": "B",
+                "00124bad9481": "C",
+                "00124bad8784": "D",
+                "a0e6f8ad8a04": "A",
+                "a0e6f8ad8385": "B",
+                "a0e6f8ad9481": "C",
+                "a0e6f8ad8784": "D",
+                "a0e6f80000c0": "A",
+                "a0e6f8ad8504": "A",
+                "a0e6f8ad8600": "B"
+            },
+            "cameras": {
+                "b8aeed756145": "unknown location:A",
+                "b8aeed75e024": "unknown location:B",
+                "b8aeed78cffe": "unknown location:C"
+            },
+            "env_sensors": {
+                "03454": [
+                    "electricity"
+                ],
+                "fd00::212:4b00:0:1" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:2" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:3" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:4" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:5" : [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:80": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:81": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:83": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ],
+                "fd00::212:4b00:0:84": [
+                   "temperature",
+                   "humidity",
+                   "pressure",
+                   "water",
+                   "light",
+                   "motion"
+                ]
+	        }
+        },
+        "1176": {
+            "notes": "Woodland Road",
+            "access_points": {
+            },
+            "wearables": {
+                "0aa05543a5c2": "A",
+                "00:12:4b:ad:8a:04": "A",
+                "00:12:4b:ad:83:85": "B",
+                "00:12:4b:ad:94:81": "C",
+                "00:12:4b:ad:87:84": "D",
+                "a0:e6:f8:ad:8a:04": "A",
+                "a0:e6:f8:ad:83:85": "B",
+                "a0:e6:f8:ad:94:81": "C",
+                "a0:e6:f8:ad:87:84": "D",
+                "a0:e6:f8:ad:85:04": "A",
+                "a0:e6:f8:00:00:c0": "A",
+                "00124bad8a04": "A",
+                "00124bad8385": "B",
+                "00124bad9481": "C",
+                "00124bad8784": "D",
+                "a0e6f8ad8a04": "A",
+                "a0e6f8ad8385": "B",
+                "a0e6f8ad9481": "C",
+                "a0e6f8ad8784": "D",
+                "a0e6f80000c0": "A",
+                "a0e6f8ad8504": "A",
+                "a0e6f8ad8600": "B"
+            },
+            "cameras": {
+            }
+        },
+        "1116": {
+            "notes": "Pilot house 1",
+            "access_points": {
+                "b8:ae:ed:7d:b9:49": "study:A",
+                "b8:ae:ed:7e:83:71": "hallway:A",
+                "b8:ae:ed:7e:86:8d": "lounge:A",
+                "fd00::212:4b00:0:101": "study:B",
+                "fd00::212:4b00:0:102": "hallway:B",
+                "fd00::212:4b00:0:103": "lounge:B",
+                "fd00::212:4b00:0:104": "kitchen:A",
+                "fd00::212:4b00:0:105": "bedroom 1:A",
+                "fd00::212:4b00:0:106": "bedroom 2:A"
+            },
+            "wearables": {
+                "a0:e6:f8:00:01:c0": "A",
+                "a0:e6:f8:00:01:c1": "B",
+                "a0:e6:f8:00:01:c2": "C",
+                "a0:e6:f8:00:00:c0": "A",
+                "a0:e6:f8:00:00:c1": "B",
+                "a0:e6:f8:00:00:c2": "C"
+            },
+            "cameras": {
+                "b8aeed7e8371": "hallway:A",
+                "b8aeed7e868d": "lounge:A",
+                "b8aeed7db949": "kitchen:A"
+            },
+             "env_sensors": {
+                 "00079": [
+                     "electricity"
+                 ],
+                 "00104": [
+                     "electricity"
+                 ],
+                 "00244": [
+                     "electricity"
+                 ],
+                 "00584": [
+                     "electricity"
+                 ],
+                 "01051": [
+                     "electricity"
+                 ],
+                 "01319": [
+                     "electricity"
+                 ],
+                 "01400": [
+                     "electricity"
+                 ],
+                 "02160": [
+                     "electricity"
+                 ],
+                 "02324": [
+                     "electricity"
+                 ],
+                 "02470": [
+                     "electricity"
+                 ],
+                 "fd00::212:4b00:0:102": [
+                     "temperature",
+                     "pressure"
+                 ],
+                 "fd00::212:4b00:0:103": [
+                     "temperature",
+                     "pressure"
+                 ],
+                 "fd00::212:4b00:0:104": [
+                     "temperature",
+                     "pressure"
+                 ],
+                 "fd00::212:4b00:0:105": [
+                     "temperature",
+                     "pressure"
+                 ],
+                 "fd00::212:4b00:0:106": [
+                     "temperature",
+                     "pressure"
+                 ],
+                 "fd00::212:4b00:0:180": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:181": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:182": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:183": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:184": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:185": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:186": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ],
+                 "fd00::212:4b00:0:187": [
+                     "temperature",
+                     "humidity",
+                     "pressure",
+                     "water",
+                     "light",
+                     "motion"
+                 ]
+             }
+        },
+        "1167": {
+            "notes": "Woodland Road (erronious ID)",
+            "access_points": {
+                "b8:ae:ed:7d:b9:49": "study:A",
+                "b8:ae:ed:7e:83:71": "hallway:A",
+                "b8:ae:ed:7e:86:8d": "lounge:A",
+                "fd00::212:4b00:0:101": "study:B",
+                "fd00::212:4b00:0:102": "hallway:B",
+                "fd00::212:4b00:0:103": "lounge:B",
+                "fd00::212:4b00:0:104": "kitchen:A",
+                "fd00::212:4b00:0:105": "bedroom 1:A",
+                "fd00::212:4b00:0:106": "bedroom 2:A"
+            },
+            "wearables": {
+                "a0:e6:f8:00:01:c0": "A",
+                "a0:e6:f8:00:01:c1": "B",
+                "a0:e6:f8:00:01:c2": "C"
+            },
+            "cameras": {
+            }
+        },
+        "2": {
+            "notes": "DEPRECATED ID",
+            "access_points": {
+            },
+            "wearables": {
+            },
+            "cameras": {
+            }
+        }
+    }
+}
