@@ -347,9 +347,12 @@
                 "b8aeed7f00e5": "kitchen:A"
             },
              "env_sensors": {
+                 "00716": ["electricity"],
+                 "01474": ["electricity"],
                  "02746": ["electricity"],
                  "02470": ["electricity"],
                  "02521": ["electricity"],
+                 "03061": ["electricity"],
                  "04063": ["electricity"],
                  "fd00::212:4b00:0:102": ["temperature", "humidity", "pressure", "water", "light", "motion"],
                  "fd00::212:4b00:0:302": ["temperature", "humidity", "pressure", "water", "light", "motion"],
