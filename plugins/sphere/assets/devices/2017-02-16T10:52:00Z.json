@@ -329,6 +329,7 @@
         "1193": {
             "notes": "Pilot house 2",
             "access_points": {
+                "fd00::212:4b00:0:301": "root:A",
                 "fd00::212:4b00:0:302": "kitchen:A",
                 "fd00::212:4b00:0:303": "bedroom 2:A",
                 "fd00::212:4b00:0:304": "bedroom 1:A",
