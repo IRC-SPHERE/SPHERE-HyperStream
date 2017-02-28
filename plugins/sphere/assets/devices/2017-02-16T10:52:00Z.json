@@ -334,7 +334,10 @@
                 "fd00::212:4b00:0:303": "bedroom 2:A",
                 "fd00::212:4b00:0:304": "bedroom 1:A",
                 "fd00::212:4b00:0:305": "bedroom 3:A",
-                "fd00::212:4b00:0:306": "hallway:A"
+                "fd00::212:4b00:0:306": "hallway:A",
+                "b8:ae:ed:7e:7d:4d": "hallway:B",
+                "b8:ae:ed:7e:db:c8": "lounge:B",
+                "b8:ae:ed:7f:00:e5": "kitchen:B"
             },
             "wearables": {
                 "a0:e6:f8:00:03:c0": "A",
