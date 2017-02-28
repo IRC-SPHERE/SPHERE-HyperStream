@@ -45,8 +45,9 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id]
     except KeyError:
-        percentile_results = []
-        w = create_workflow_summaries_to_csv(hyperstream,percentile_results=percentile_results,safe=False)
+        # percentile_results = []
+        # w = create_workflow_summaries_to_csv(hyperstream,percentile_results=percentile_results,safe=False)
+        w = create_workflow_summaries_to_csv(hyperstream,safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
     day_str = "2016_12_15_23_00"
@@ -54,6 +55,8 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     t2 = parse("2016-12-15T20:01:05Z")
     t1 = parse("2016-12-15T22:58:25Z")
     t2 = parse("2016-12-15T23:01:05Z")
+    t1 = parse("2017-02-24T08:01:00Z")
+    t2 = parse("2017-02-24T08:04:00Z")
 
     t_1_2 = TimeInterval(start=t1,end=t2)
     # w.factors[0].execute(t_1_2)
@@ -63,7 +66,7 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
 
     csv_string = pd.DataFrame(env_results).to_csv(sep="\t", header=False)
 
-    with open("visualise_summaries/env_summaries_{}.csv".format(day_str), "w") as text_file:
+    with open("mk/visualise_summaries/env_summaries_{}.csv".format(day_str), "w") as text_file:
         text_file.write(csv_string)
 
     # print(env_results)

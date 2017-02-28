@@ -18,6 +18,7 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
+import numpy as np
 
 def create_workflow_summaries_to_csv(hyperstream,safe=True):
 
@@ -27,7 +28,7 @@ def create_workflow_summaries_to_csv(hyperstream,safe=True):
 #    D = hyperstream.channel_manager.mongo
     X = hyperstream.channel_manager.summary
     M = hyperstream.channel_manager.memory
-#    A = hyperstream.channel_manager.assets
+    A = hyperstream.channel_manager.assets
 
     try:
         w = hyperstream.create_workflow(
@@ -173,7 +174,7 @@ def create_workflow_summaries_to_csv(hyperstream,safe=True):
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="percentiles_to_csv",
-            parameters=dict()
+            parameters=dict(selector_meta_data=None)
 #            parameters=dict(n_segments=4,percentiles=None)
         ),
         sources=[N[x] for x in percentile_nodes],
