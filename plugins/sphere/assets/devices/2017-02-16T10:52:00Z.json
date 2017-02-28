@@ -329,6 +329,11 @@
         "1193": {
             "notes": "Pilot house 2",
             "access_points": {
+                "fd00::212:4b00:0:302": "kitchen:A",
+                "fd00::212:4b00:0:303": "bedroom 2:A",
+                "fd00::212:4b00:0:304": "bedroom 1:A",
+                "fd00::212:4b00:0:305": "bedroom 3:A",
+                "fd00::212:4b00:0:306": "hallway:A"
             },
             "wearables": {
                 "a0:e6:f8:00:03:c0": "A",
@@ -342,9 +347,12 @@
                 "b8aeed7f00e5": "kitchen:A"
             },
              "env_sensors": {
+                 "00716": ["electricity"],
+                 "01474": ["electricity"],
                  "02746": ["electricity"],
                  "02470": ["electricity"],
                  "02521": ["electricity"],
+                 "03061": ["electricity"],
                  "04063": ["electricity"],
                  "fd00::212:4b00:0:102": ["temperature", "humidity", "pressure", "water", "light", "motion"],
                  "fd00::212:4b00:0:302": ["temperature", "humidity", "pressure", "water", "light", "motion"],
