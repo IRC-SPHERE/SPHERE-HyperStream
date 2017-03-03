@@ -118,8 +118,14 @@ def create_workflow_summariser(hyperstream,
         ("acc_per_uid_acclist_coord_agg",           S, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
-        ("acc_per_uid_acclist_coord_agg_count",     X, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_sink",          M, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_plate_sink",    M, ["H.W"]),
+        ("acc_per_uid_windows",                     M, ["H.W"]),
+        ("acc_per_uid_magnitude",                   S, ["H.W"]),
+        ("acc_per_uid_magnitude_agg",               S, ["H.W"]),
+        ("acc_per_uid_magnitude_agg_perc",          X, ["H.W"]),
+        ("acc_per_uid_magnitude_agg_hist",          X, ["H.W"]),
+        ("acc_per_uid_count",                       X, ["H.W"]),
         ("acc_per_uid_sink",                        M, ["H.W"]),
         ("acc_sink",                                M, ["H"]),
         ("vid_raw",                                 S, ["H"]),
@@ -138,6 +144,10 @@ def create_workflow_summariser(hyperstream,
         ("vid_per_uid_2dcen_y_perc",                X, ["H.Cameras"]),
         ("vid_per_uid_2dcen_y_hist",                X, ["H.Cameras"]),
         ("vid_per_uid_2dbb",                        S, ["H.Cameras"]),
+        ("vid_per_uid_2dbb_area",                   S, ["H.Cameras"]),
+        ("vid_per_uid_2dbb_area_agg",               S, ["H.Cameras"]),
+        ("vid_per_uid_2dbb_area_perc",              X, ["H.Cameras"]),
+        ("vid_per_uid_2dbb_area_hist",              X, ["H.Cameras"]),
         # ("vid_per_uid_2dbb_left",                   S, ["H.Cameras"]),
         # ("vid_per_uid_2dbb_left_agg",               S, ["H.Cameras"]),
         # ("vid_per_uid_2dbb_left_perc",              X, ["H.Cameras"]),
@@ -154,7 +164,11 @@ def create_workflow_summariser(hyperstream,
         # ("vid_per_uid_2dbb_bottom_agg",             S, ["H.Cameras"]),
         # ("vid_per_uid_2dbb_bottom_perc",            X, ["H.Cameras"]),
         # ("vid_per_uid_2dbb_bottom_hist",            X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb",                        S, ["H.Cameras"]),
+        ("vid_per_uid_3dbb",                          S, ["H.Cameras"]),
+        ("vid_per_uid_3dbb_volume",                   S, ["H.Cameras"]),
+        ("vid_per_uid_3dbb_volume_agg",               S, ["H.Cameras"]),
+        ("vid_per_uid_3dbb_volume_perc",              X, ["H.Cameras"]),
+        ("vid_per_uid_3dbb_volume_hist",              X, ["H.Cameras"]),
         # ("vid_per_uid_3dbb_left",                   S, ["H.Cameras"]),
         # ("vid_per_uid_3dbb_left_agg",               S, ["H.Cameras"]),
         # ("vid_per_uid_3dbb_left_perc",              X, ["H.Cameras"]),
@@ -207,6 +221,7 @@ def create_workflow_summariser(hyperstream,
         ("predicted_locations_broadcasted",         D, ["H.W"]),
         ("prediction_windows",                      M, ["H.W"]),
         ("prediction_agg",                          S, ["H.W"]),
+        ("prediction_count",                        X, ["H.W"]),
         ("prediction_mean",                         X, ["H.W"]),
         ("prediction_map",                          S, ["H.W"]),
         ("prediction_map_agg",                      S, ["H.W"]),
@@ -481,6 +496,55 @@ def create_workflow_summariser(hyperstream,
         sources=[N["acc_per_uid"]],
         sink=N["acc_per_uid_acclist"])
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="calc_acc_magnitude",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist"]],
+        sink=N["acc_per_uid_magnitude"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_window",
+            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+            parameters=dict(lower=-acc_window_size, upper=0.0, increment=acc_window_size)
+        ),
+        sources=None,
+        sink=N["acc_per_uid_windows"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sliding_listify",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_windows"], N["acc_per_uid_magnitude"]],
+        sink=N["acc_per_uid_magnitude_agg"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="percentiles_from_list",
+            parameters=dict(n_segments=4,percentiles=None)
+        ),
+        sources=[N["acc_per_uid_magnitude_agg"]],
+        sink=N["acc_per_uid_magnitude_agg_perc"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="histogram_from_list",
+            parameters=dict(first_break=-5,break_width=0.1,n_breaks=101,breaks=None)
+        ),
+        sources=[N["acc_per_uid_magnitude_agg"]],
+        sink=N["acc_per_uid_magnitude_agg_hist"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="list_length",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_magnitude_agg"]],
+        sink=N["acc_per_uid_count"])
+
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="splitter_of_list",
@@ -525,18 +589,10 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
-            name="list_length",
-            parameters=dict()
-        ),
-        sources=[N["acc_per_uid_acclist_coord_agg"]],
-        sink=N["acc_per_uid_acclist_coord_agg_count"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
             name="sink",
             parameters=dict()
         ),
-        sources=[N["acc_per_uid_acclist_coord_agg_perc"],N["acc_per_uid_acclist_coord_agg_hist"],N["acc_per_uid_acclist_coord_agg_count"]],
+        sources=[N["acc_per_uid_acclist_coord_agg_perc"],N["acc_per_uid_acclist_coord_agg_hist"]],
         sink=N["acc_per_uid_acclist_coord_sink"])
 
     w.create_factor(
@@ -545,6 +601,14 @@ def create_workflow_summariser(hyperstream,
             parameters=dict()
         ),
         sources=[N["acc_per_uid_acclist_coord_sink"]],
+        sink=N["acc_per_uid_acclist_coord_plate_sink"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="sink",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist_coord_plate_sink"],N["acc_per_uid_magnitude_agg_hist"],N["acc_per_uid_magnitude_agg_perc"],N["acc_per_uid_count"]],
         sink=N["acc_per_uid_sink"])
 
     w.create_factor(
@@ -644,6 +708,51 @@ def create_workflow_summariser(hyperstream,
             ),
             sources=[N["vid_per_uid"]],
             sink=N["vid_per_uid_"+k])
+
+    for calc_feature in ['area','volume']:
+        if calc_feature=='area':
+            feature_source_node = N["vid_per_uid_2dbb"]
+            feature_name = "2dbb_area"
+            break_width = 500
+        else:
+            feature_source_node = N["vid_per_uid_3dbb"]
+            feature_name = "3dbb_volume"
+            break_width = 20
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="calc_bb_"+calc_feature,
+                parameters=dict()
+            ),
+            sources=[feature_source_node],
+            sink=N["vid_per_uid_"+feature_name])
+
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="sliding_listify",
+                parameters=dict()
+            ),
+            sources=[N["vid_per_uid_windows"], N["vid_per_uid_"+feature_name]],
+            sink=N["vid_per_uid_"+feature_name+"_agg"])
+
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="percentiles_from_list",
+                parameters=dict(n_segments=4, percentiles=None)
+            ),
+            sources=[N["vid_per_uid_"+feature_name+"_agg"]],
+            sink=N["vid_per_uid_"+feature_name+"_perc"])
+
+        vid_sink_input_list.append(N["vid_per_uid_"+feature_name+"_perc"])
+
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="histogram_from_list",
+                parameters=dict(first_break=0, break_width=break_width, n_breaks=101, breaks=None)
+            ),
+            sources=[N["vid_per_uid_"+feature_name+"_agg"]],
+            sink=N["vid_per_uid_"+feature_name+"_hist"])
+
+        vid_sink_input_list.append(N["vid_per_uid_"+feature_name+"_hist"])
 
     for k in structure.keys():
         for i in range(len(structure[k])):
@@ -751,6 +860,14 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="list_length",
+            parameters=dict()
+        ),
+        sources=[N["prediction_agg"]],
+        sink=N["prediction_count"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="list_dict_mean",
             parameters=dict()
         ),
@@ -786,7 +903,7 @@ def create_workflow_summariser(hyperstream,
             name="sink",
             parameters=dict()
         ),
-        sources=[N["prediction_mean"],N["prediction_map_hist"]],
+        sources=[N["prediction_count"],N["prediction_mean"],N["prediction_map_hist"]],
         sink=N["prediction_per_wearable_sink"])
 
     w.create_factor(
