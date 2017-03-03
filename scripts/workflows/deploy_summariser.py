@@ -91,6 +91,7 @@ def create_workflow_summariser(hyperstream,
         ("env_per_uid_field_agg",                   S, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_perc",              X, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_agg_hist",              X, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_field_agg_count",             X, ["H.EnvSensors.Fields"]),
         ("env_per_uid_field_sink",                  M, ["H.EnvSensors.Fields"]),
         ("env_per_uid_sink",                        M, ["H.EnvSensors"]),
         ("env_sink",                                M, ["H"]),
@@ -104,6 +105,7 @@ def create_workflow_summariser(hyperstream,
         ("rss_per_uid_aid_value_agg",               S, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_agg_count",         X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_sink",              M, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_sliding_sink",      M, ["H.W","H.APs"]),
         ("rss_per_uid_sink",                        M, ["H.W"]),
@@ -116,12 +118,16 @@ def create_workflow_summariser(hyperstream,
         ("acc_per_uid_acclist_coord_agg",           S, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
+        ("acc_per_uid_acclist_coord_agg_count",     X, ["H.W.Coords3d"]),
         ("acc_per_uid_acclist_coord_sink",          M, ["H.W.Coords3d"]),
         ("acc_per_uid_sink",                        M, ["H.W"]),
         ("acc_sink",                                M, ["H"]),
         ("vid_raw",                                 S, ["H"]),
         ("vid_per_uid",                             S, ["H.Cameras"]),
         ("vid_per_uid_windows",                     M, ["H.Cameras"]),
+        ("vid_per_uid_counts",                      S, ["H.Cameras"]),
+        ("vid_per_uid_counts_agg",                  S, ["H.Cameras"]),
+        ("vid_per_uid_counts_agg_total",            X, ["H.Cameras"]),
         ("vid_per_uid_2dcen",                       S, ["H.Cameras"]),
         ("vid_per_uid_2dcen_x",                     S, ["H.Cameras"]),
         ("vid_per_uid_2dcen_x_agg",                 S, ["H.Cameras"]),
@@ -132,47 +138,47 @@ def create_workflow_summariser(hyperstream,
         ("vid_per_uid_2dcen_y_perc",                X, ["H.Cameras"]),
         ("vid_per_uid_2dcen_y_hist",                X, ["H.Cameras"]),
         ("vid_per_uid_2dbb",                        S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_left",                   S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_left_agg",               S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_left_perc",              X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_left_hist",              X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_top",                    S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_top_agg",                S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_top_perc",               X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_top_hist",               X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_right",                  S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_right_agg",              S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_right_perc",             X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_right_hist",             X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_bottom",                 S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_bottom_agg",             S, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_bottom_perc",            X, ["H.Cameras"]),
-        ("vid_per_uid_2dbb_bottom_hist",            X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_left",                   S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_left_agg",               S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_left_perc",              X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_left_hist",              X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_top",                    S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_top_agg",                S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_top_perc",               X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_top_hist",               X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_right",                  S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_right_agg",              S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_right_perc",             X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_right_hist",             X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_bottom",                 S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_bottom_agg",             S, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_bottom_perc",            X, ["H.Cameras"]),
+        # ("vid_per_uid_2dbb_bottom_hist",            X, ["H.Cameras"]),
         ("vid_per_uid_3dbb",                        S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_left",                   S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_left_agg",               S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_left_perc",              X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_left_hist",              X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_top",                    S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_top_agg",                S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_top_perc",               X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_top_hist",               X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_front",                  S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_front_agg",              S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_front_perc",             X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_front_hist",             X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_right",                  S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_right_agg",              S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_right_perc",             X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_right_hist",             X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_bottom",                 S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_bottom_agg",             S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_bottom_perc",            X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_bottom_hist",            X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_back",                   S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_back_agg",               S, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_back_perc",              X, ["H.Cameras"]),
-        ("vid_per_uid_3dbb_back_hist",              X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_left",                   S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_left_agg",               S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_left_perc",              X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_left_hist",              X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_top",                    S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_top_agg",                S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_top_perc",               X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_top_hist",               X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_front",                  S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_front_agg",              S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_front_perc",             X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_front_hist",             X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_right",                  S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_right_agg",              S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_right_perc",             X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_right_hist",             X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_bottom",                 S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_bottom_agg",             S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_bottom_perc",            X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_bottom_hist",            X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_back",                   S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_back_agg",               S, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_back_perc",              X, ["H.Cameras"]),
+        # ("vid_per_uid_3dbb_back_hist",              X, ["H.Cameras"]),
         ("vid_per_uid_3dcen",                       S, ["H.Cameras"]),
         ("vid_per_uid_3dcen_x",                     S, ["H.Cameras"]),
         ("vid_per_uid_3dcen_x_agg",                 S, ["H.Cameras"]),
@@ -294,10 +300,18 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="list_length",
+            parameters=dict()
+        ),
+        sources=[N["env_per_uid_field_agg"]],
+        sink=N["env_per_uid_field_agg_count"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="sink",
             parameters=dict()
         ),
-        sources=[N["env_per_uid_field_agg_perc"],N["env_per_uid_field_agg_hist"]],
+        sources=[N["env_per_uid_field_agg_perc"],N["env_per_uid_field_agg_hist"],N["env_per_uid_field_agg_count"]],
         sink=N["env_per_uid_field_sink"])
 
     w.create_factor(
@@ -407,10 +421,18 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="list_length",
+            parameters=dict()
+        ),
+        sources=[N["rss_per_uid_aid_value_agg"]],
+        sink=N["rss_per_uid_aid_value_agg_count"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="sink",
             parameters=dict()
         ),
-        sources=[N["rss_per_uid_aid_value_agg_perc"],N["rss_per_uid_aid_value_agg_hist"]],
+        sources=[N["rss_per_uid_aid_value_agg_perc"],N["rss_per_uid_aid_value_agg_hist"],N["rss_per_uid_aid_value_agg_count"]],
         sink=N["rss_per_uid_aid_value_sink"])
 
     w.create_factor(
@@ -503,10 +525,18 @@ def create_workflow_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="list_length",
+            parameters=dict()
+        ),
+        sources=[N["acc_per_uid_acclist_coord_agg"]],
+        sink=N["acc_per_uid_acclist_coord_agg_count"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="sink",
             parameters=dict()
         ),
-        sources=[N["acc_per_uid_acclist_coord_agg_perc"],N["acc_per_uid_acclist_coord_agg_hist"]],
+        sources=[N["acc_per_uid_acclist_coord_agg_perc"],N["acc_per_uid_acclist_coord_agg_hist"],N["acc_per_uid_acclist_coord_agg_count"]],
         sink=N["acc_per_uid_acclist_coord_sink"])
 
     w.create_factor(
@@ -558,8 +588,8 @@ def create_workflow_summariser(hyperstream,
 
     structure = {
         '2dcen': ['x','y'],
-        '2dbb' : ['left','top','right','bottom'],
-        '3dbb' : ['left','top','front','right','bottom','back'],
+        # '2dbb' : ['left','top','right','bottom'],
+        # '3dbb' : ['left','top','front','right','bottom','back'],
         '3dcen': ['x','y','z']
     }
     comp_names = {
@@ -573,7 +603,38 @@ def create_workflow_summariser(hyperstream,
     }
     create_histograms_for = ['activity','intensity','userid']
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="dict_values_to_const",
+            parameters=dict(const=1)
+        ),
+        sources=[N["vid_per_uid"]],
+        sink=N["vid_per_uid_counts"])
+
+    w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="sliding_listify",
+                parameters=dict()
+            ),
+            sources=[N["vid_per_uid_windows"], N["vid_per_uid_counts"]],
+            sink=N["vid_per_uid_counts_agg"])
+
+    start_dict = dict()
+    for k in comp_names.keys():
+        start_dict[comp_names[k]] = 0
+    start_dict['video-FeaturesREID'] = 0
+    start_dict['video-silhouette'] = 0
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="list_dict_sum",
+            parameters=dict(start_dict=start_dict,log_new_keys=True,insert_new_keys=True)
+        ),
+        sources=[N["vid_per_uid_counts_agg"]],
+        sink=N["vid_per_uid_counts_agg_total"])
+
     vid_sink_input_list = []
+    vid_sink_input_list.append(N["vid_per_uid_counts_agg_total"])
 
     for k in comp_names.keys():
         w.create_factor(
