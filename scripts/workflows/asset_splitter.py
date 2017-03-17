@@ -39,10 +39,12 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def create_asset_splitter_0(hyperstream, safe=True):
+# noinspection PyPep8Naming
+def create_asset_splitter_0(hyperstream, house, safe=True):
     workflow_id = "asset_splitter_0"
 
     A = hyperstream.channel_manager.assets
+    SA = hyperstream.channel_manager.sphere_assets
 
     try:
         w = hyperstream.create_workflow(
@@ -57,13 +59,15 @@ def create_asset_splitter_0(hyperstream, safe=True):
         else:
             return hyperstream.workflow_manager.workflows[workflow_id]
 
+    filters = (house,) if house else None
+
     # First create the plate values for the node
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element="house", use_value_instead_of_key=False)
+            parameters=dict(element="house", filters=filters, use_value_instead_of_key=False)
         ),
-        source=w.create_node("devices", hyperstream.channel_manager.sphere_assets, []),
+        source=w.create_node("devices", SA, []),
         output_plate=dict(
             plate_id="H",
             meta_data_id="house",
@@ -78,7 +82,8 @@ def create_asset_splitter_0(hyperstream, safe=True):
     return w
 
 
-def create_asset_splitter_1(hyperstream, safe=True):
+# noinspection PyPep8Naming
+def create_asset_splitter_1(hyperstream, house, safe=True):
     workflow_id = "asset_splitter_1"
 
     SA = hyperstream.channel_manager.sphere_assets
@@ -120,7 +125,7 @@ def create_asset_splitter_1(hyperstream, safe=True):
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_splitter",
-            parameters=dict(element="house")
+            parameters=dict(element="house", filters=house)
         ),
         source=N["devices"],
         splitting_node=None,
@@ -170,7 +175,7 @@ def create_asset_splitter_1(hyperstream, safe=True):
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element=None,use_value_instead_of_key=False)
+            parameters=dict(element=None, use_value_instead_of_key=False)
         ),
         source=N["env_sensors_by_house"],
         output_plate=dict(
@@ -185,7 +190,7 @@ def create_asset_splitter_1(hyperstream, safe=True):
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element=None,use_value_instead_of_key=True)
+            parameters=dict(element=None, use_value_instead_of_key=True)
         ),
         source=N["access_points_by_house"],
         output_plate=dict(
@@ -200,7 +205,7 @@ def create_asset_splitter_1(hyperstream, safe=True):
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element=None,use_value_instead_of_key=True)
+            parameters=dict(element=None, use_value_instead_of_key=True)
         ),
         source=N["wearables_by_house"],
         output_plate=dict(
@@ -215,7 +220,7 @@ def create_asset_splitter_1(hyperstream, safe=True):
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element=None,use_value_instead_of_key=True)
+            parameters=dict(element=None, use_value_instead_of_key=True)
         ),
         source=N["cameras_by_house"],
         output_plate=dict(
@@ -230,12 +235,10 @@ def create_asset_splitter_1(hyperstream, safe=True):
     return w
 
 
+# noinspection PyPep8Naming
 def create_asset_splitter_2(hyperstream, safe=True):
     workflow_id = "asset_splitter_2"
 
-    D = hyperstream.channel_manager.mongo
-    M = hyperstream.channel_manager.memory
-    SA = hyperstream.channel_manager.sphere_assets
     A = hyperstream.channel_manager.assets
 
     try:
@@ -274,7 +277,7 @@ def create_asset_splitter_2(hyperstream, safe=True):
     w.create_node_creation_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="asset_plate_generator",
-            parameters=dict(element=None,use_value_instead_of_key=False)
+            parameters=dict(element=None, use_value_instead_of_key=False)
         ),
         source=N["fields_by_env_sensor"],
         output_plate=dict(
@@ -289,17 +292,15 @@ def create_asset_splitter_2(hyperstream, safe=True):
     return w
 
 
-def split_sphere_assets(hyperstream):
+def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
+    if delete_existing_workflows:
+        hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_0")
+        hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_1")
+        hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_2")
+
     from hyperstream import TimeInterval
     time_interval = TimeInterval.up_to_now()
-    hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_0")
-    create_asset_splitter_0(hyperstream).execute(time_interval)
-    hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_1")
-    create_asset_splitter_1(hyperstream).execute(time_interval)
-    hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_2")
-    create_asset_splitter_2(hyperstream).execute(time_interval)
 
-if __name__ == '__main__':
-    from hyperstream import HyperStream
-    hyperstream = HyperStream()
-    split_sphere_assets(hyperstream)
+    create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
+    create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
+    create_asset_splitter_2(hyperstream).execute(time_interval)
