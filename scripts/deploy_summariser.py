@@ -30,14 +30,14 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     from sphere_connector_package.sphere_connector import SphereConnector
     from workflows.asset_splitter import split_sphere_assets
 
+    hyperstream = HyperStream(loglevel=loglevel)
+
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
             config_filename='config.json',
             include_mongo=True,
             include_redcap=False,
             sphere_logger=None)
-
-    hyperstream = HyperStream(loglevel=loglevel)
 
     split_sphere_assets(hyperstream)
 
