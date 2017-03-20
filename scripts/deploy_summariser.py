@@ -19,7 +19,6 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
-from dateutil.parser import parse
 
 globs = {'sphere_connector': None}
 
