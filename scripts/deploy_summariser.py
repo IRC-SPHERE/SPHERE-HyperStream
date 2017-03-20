@@ -58,7 +58,7 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     except KeyError:
 
         w = create_workflow_summariser(hyperstream,
-                                       env_window_size=  1 *  1 * 60.0,
+                                       env_window_size=  1 * 60 * 60.0,
                                        rss_window_size=  4 * 60 * 60.0,
                                        acc_window_size=  4 * 60 * 60.0,
                                        vid_window_size=  4 * 60 * 60.0,
@@ -66,9 +66,7 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
                                        safe=False)
         hyperstream.workflow_manager.commit_workflow(workflow_id)
 
-    # time_interval = TimeInterval.now_minus(minutes=1)
-    time_interval = TimeInterval(parse("2016-04-15T16:20:00Z"), parse("2016-04-15T16:23:00Z"))
-
+    time_interval = TimeInterval.now_minus(minutes=1)
     w.execute(time_interval)
 
     print('number of non_empty_streams: {}'.format(
