@@ -26,7 +26,7 @@ import pandas as pd
 
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
-    from hyperstream import HyperStream, StreamId, TimeInterval
+    from hyperstream import HyperStream, TimeInterval
     from hyperstream.utils import duration2str
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
     from workflows.asset_splitter import split_sphere_assets
@@ -36,12 +36,11 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     # Various channels
     M = hyperstream.channel_manager.memory
     S = hyperstream.channel_manager.sphere
-    A = hyperstream.channel_manager.assets
 
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("asset_splitter")
 
-    split_sphere_assets(hyperstream)
+    split_sphere_assets(hyperstream, house)
 
     hyperstream.plate_manager.delete_plate("H")
     hyperstream.plate_manager.create_plate(
