@@ -72,4 +72,4 @@ component_filter = StreamId('component_filter')
 
 # A.purge_stream(StreamId("wearables_by_house", meta_data=(('house', '1'),)))
 # A.purge_stream(StreamId("access_points_by_house", meta_data=(('house', '1'),)))
-split_sphere_assets(hyperstream)
+split_sphere_assets(hyperstream, house="1")

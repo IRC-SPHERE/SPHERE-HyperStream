@@ -41,7 +41,7 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
         hyperstream.workflow_manager.delete_workflow(workflow_id0)
         hyperstream.workflow_manager.delete_workflow(workflow_id1)
 
-    split_sphere_assets(hyperstream)
+    split_sphere_assets(hyperstream, house)
 
     try:
         w = hyperstream.workflow_manager.workflows[workflow_id1]
