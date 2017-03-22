@@ -76,13 +76,14 @@ def display_diagnostics(house):
         print("No environmental data found")
         print()
 
-    vid = window.environmental.get_data(rename_keys=False)
+    vid = window.video.get_data(rename_keys=False)
     df = pd.DataFrame(vid)
     if not df.empty:
-        for sensor in ['video-2DCen', 'video-2Dbb', 'video-3Dbb', 'video-3Dcen', 'video-Activity', 'video-FeaturesREID', 'video-Intensity']:
+        # Leave off 'video-FeaturesREID' for now
+        for sensor in ['video-2DCen', 'video-2Dbb', 'video-3Dbb', 'video-3Dcen', 'video-Activity', 'video-Intensity']:
             if sensor in df:
                 print(sensor[6:])
-                print(df.groupby('uid').describe(0))
+                print(df.groupby('uid')[sensor].describe())
             else:
                 print("no {} data".format(sensor))
             print()
@@ -93,14 +94,15 @@ def display_diagnostics(house):
                 print(df.groupby('uid').size())
             else:
                 print("no {}s".format(sensor[6:]))
+            print()
 
         for sensor in ['video-userID']:
             if sensor in df:
                 print("Unique {}s: {}".format(sensor[6:], list(set(df[sensor].dropna()))))
             else:
                 print("no {}s".format(sensor[6:]))
+            print()
 
-        print()
     else:
         print("No video data found")
         print()
