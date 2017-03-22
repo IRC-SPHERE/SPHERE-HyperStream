@@ -67,7 +67,10 @@ def display_diagnostics(house):
     df = pd.DataFrame(env)
     if not df.empty:
         for sensor in ['electricity', 'humidity', 'light', 'pressure', 'temperature', 'water']:
-            print(df.groupby('uid').agg({sensor: [np.min, np.median, np.max]}).dropna())
+            if sensor in df:
+                print(df.groupby('uid').agg({sensor: [np.min, np.median, np.max]}).dropna())
+            else:
+                print("no {} data".format(sensor))
             print()
     else:
         print("No environmental sensors found")
