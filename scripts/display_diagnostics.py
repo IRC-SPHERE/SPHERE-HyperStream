@@ -94,14 +94,15 @@ def display_diagnostics(house):
                 print(df.groupby('uid').size())
             else:
                 print("no {}s".format(sensor[6:]))
+            print()
 
         for sensor in ['video-userID']:
             if sensor in df:
                 print("Unique {}s: {}".format(sensor[6:], list(set(df[sensor].dropna()))))
             else:
                 print("no {}s".format(sensor[6:]))
+            print()
 
-        print()
     else:
         print("No video data found")
         print()
