@@ -43,7 +43,7 @@ def display_diagnostics(house):
             sphere_logger=None)
 
     t2 = utcnow()
-    t1 = t2 - timedelta(seconds=15)
+    t1 = t2 - timedelta(seconds=60)
 
     sphere_connector = globs['sphere_connector']
     window = DataWindow(sphere_connector, t1, t2)
@@ -97,6 +97,6 @@ if __name__ == '__main__':
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.house_parser(default_loglevel=logging.INFO)
 
-    while True:
-        run(args.house)
-        sleep(1)
+    # while True:
+    run(args.house)
+    #    sleep(5)
