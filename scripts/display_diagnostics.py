@@ -73,7 +73,36 @@ def display_diagnostics(house):
                 print("no {} data".format(sensor))
             print()
     else:
-        print("No environmental sensors found")
+        print("No environmental data found")
+        print()
+
+    vid = window.environmental.get_data(rename_keys=False)
+    df = pd.DataFrame(vid)
+    if not df.empty:
+        for sensor in ['video-2DCen', 'video-2Dbb', 'video-3Dbb', 'video-3Dcen', 'video-Activity', 'video-FeaturesREID', 'video-Intensity']:
+            if sensor in df:
+                print(sensor[6:])
+                print(df.groupby('uid').describe(0))
+            else:
+                print("no {} data".format(sensor))
+            print()
+
+        for sensor in ['video-silhouette']:
+            if sensor in df:
+                print(sensor[6:])
+                print(df.groupby('uid').size())
+            else:
+                print("no {}s".format(sensor[6:]))
+
+        for sensor in ['video-userID']:
+            if sensor in df:
+                print("Unique {}s: {}".format(sensor[6:], list(set(df[sensor].dropna()))))
+            else:
+                print("no {}s".format(sensor[6:]))
+
+        print()
+    else:
+        print("No video data found")
         print()
 
 
