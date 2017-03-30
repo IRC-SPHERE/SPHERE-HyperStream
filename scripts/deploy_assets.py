@@ -27,7 +27,7 @@ def run(house, loglevel=logging.INFO):
     from hyperstream import HyperStream
     from workflows.asset_splitter import split_sphere_assets
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     split_sphere_assets(hyperstream, house=house)
 
 

@@ -28,7 +28,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
     from workflows.rssi_distributions_per_room import create_workflow_rssi_distributions_per_room
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     M = hyperstream.channel_manager.memory
 
     workflow_id0 = "list_technicians_walkarounds"

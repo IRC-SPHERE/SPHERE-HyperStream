@@ -43,7 +43,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     from workflows.learn_localisation_model import create_workflow_lda_localisation_model_learner
     from hyperstream.utils import StreamNotFoundError, reconstruct_interval
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     M = hyperstream.channel_manager.memory
     D = hyperstream.channel_manager.mongo
     A = hyperstream.channel_manager.assets

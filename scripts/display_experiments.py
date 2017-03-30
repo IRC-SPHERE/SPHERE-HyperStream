@@ -31,7 +31,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
     from workflows.asset_splitter import split_sphere_assets
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
 
     # Various channels
     M = hyperstream.channel_manager.memory

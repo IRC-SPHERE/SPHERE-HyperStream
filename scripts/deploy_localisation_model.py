@@ -26,7 +26,7 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
     from workflows.asset_splitter import split_sphere_assets
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     D = hyperstream.channel_manager.mongo
     A = hyperstream.channel_manager.assets
 

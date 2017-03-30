@@ -56,7 +56,7 @@ def run(house, wearables, loglevel=logging.CRITICAL):
     from hyperstream import HyperStream, TimeInterval
 
     if not globs['hyperstream']:
-        globs['hyperstream'] = HyperStream(loglevel=loglevel)
+        globs['hyperstream'] = HyperStream(loglevel=loglevel, file_logger=None)
 
     display_predictions(globs['hyperstream'], TimeInterval.now_minus(minutes=1), house, wearables)
     print()

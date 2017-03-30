@@ -38,7 +38,7 @@ second = timedelta(seconds=1)
 zero = timedelta(0)
 
 # Hyperstream setup
-hyperstream = HyperStream()
+hyperstream = HyperStream(file_logger=None)
 sphere_connector = SphereConnector(include_mongo=True, include_redcap=False)
 
 channels = hyperstream.channel_manager

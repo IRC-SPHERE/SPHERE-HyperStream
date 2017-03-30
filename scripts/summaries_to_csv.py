@@ -37,7 +37,7 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
             include_redcap=False,
             sphere_logger=None)
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
 
     workflow_id = "summaries_to_csv"
     if delete_existing_workflows:

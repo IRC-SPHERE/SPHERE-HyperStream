@@ -28,7 +28,7 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
     from sphere_connector_package.sphere_connector import SphereConnector
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
 
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
