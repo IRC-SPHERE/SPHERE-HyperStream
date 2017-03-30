@@ -76,7 +76,9 @@ def create_workflow_summariser(hyperstream,
             name="Live Summaries",
             owner="MK",
             description="Live summaries of all modalities",
-            online=True)
+            online=True,
+            monitor=True
+        )
     except KeyError as e:
         if safe:
             raise e
