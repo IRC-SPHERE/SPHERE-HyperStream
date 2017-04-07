@@ -350,6 +350,7 @@ def create_asset_splitter_2(hyperstream, safe=True):
 def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_0")
+        hyperstream.workflow_manager.delete_workflow("hypercat_reader")
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_1")
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_2")
 
