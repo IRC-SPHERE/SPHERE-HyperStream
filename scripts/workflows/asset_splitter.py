@@ -82,6 +82,61 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
     return w
 
 
+def create_hypercat_parser(hyperstream, house, safe=True):
+    from hyperstream.time_interval import TimeInterval, MIN_DATE
+
+    SA = hyperstream.channel_manager.sphere_assets
+    S = hyperstream.channel_manager.sphere
+
+    workflow_id = "hypercat_reader"
+    try:
+        w = hyperstream.create_workflow(
+            workflow_id=workflow_id,
+            name="HyperCat Reader",
+            owner="MK",
+            description="Read the hypercat, and dump into the assets stream",
+            online=False)
+    except KeyError as e:
+        if safe:
+            raise e
+        else:
+            return hyperstream.workflow_manager.workflows[workflow_id]
+
+    nodes = (("devices", SA, []),
+             ("hc_devices", S, ["H"])
+             )
+
+    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
+    # time_interval = TimeInterval.up_to_now()
+
+    w.create_multi_output_factor(tool=hyperstream.channel_manager.get_tool(
+            name="sphere",
+            parameters=dict(modality="hypercat")),
+        source=None,
+        splitting_node=None,
+        sink=N["hc_devices"])
+
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict()),
+    #     sources=[N["hc_devices"]],
+    #     sink=N["devices"]
+    # )
+
+    w.execute(time_interval)
+
+    source = N["hc_devices"].streams.values()[0]
+    sink = N["devices"].streams.values()[0]
+    ci = sink.calculated_intervals
+    sink.calculated_intervals = []
+
+    tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house=house))
+    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+
+    sink.calculated_intervals = ci
+
+
 # noinspection PyPep8Naming
 def create_asset_splitter_1(hyperstream, house, safe=True):
     workflow_id = "asset_splitter_1"
@@ -302,5 +357,6 @@ def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     time_interval = TimeInterval.up_to_now()
 
     create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
+    create_hypercat_parser(hyperstream, house=house)
     create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
     create_asset_splitter_2(hyperstream).execute(time_interval)
