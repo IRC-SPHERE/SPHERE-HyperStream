@@ -88,6 +88,12 @@ def create_hypercat_parser(hyperstream, house, safe=True):
     SA = hyperstream.channel_manager.sphere_assets
     S = hyperstream.channel_manager.sphere
 
+    # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
+    identifier = 'house_{}'.format(house)
+    if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
+        hyperstream.plate_manager.meta_data_manager.insert(
+            tag='house', identifier=identifier, parent='root', data=house)
+
     workflow_id = "hypercat_reader"
     try:
         w = hyperstream.create_workflow(
@@ -113,7 +119,7 @@ def create_hypercat_parser(hyperstream, house, safe=True):
 
     w.create_multi_output_factor(tool=hyperstream.channel_manager.get_tool(
             name="sphere",
-            parameters=dict(modality="hypercat")),
+            parameters=dict(modality="hypercat", default_house=house)),
         source=None,
         splitting_node=None,
         sink=N["hc_devices"])
@@ -362,6 +368,6 @@ def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     time_interval = TimeInterval.up_to_now()
 
     create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
-    # create_hypercat_parser(hyperstream, house=house)
+    create_hypercat_parser(hyperstream, house=house)
     create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
     create_asset_splitter_2(hyperstream).execute(time_interval)
