@@ -30,7 +30,7 @@ ENV = ["temperature", "humidity", "pressure", "water", "light", "motion"]
 
 class HypercatParser(Tool):
     """
-    Tool for parsing the HyperCat into the format understood by the SPEHERE Assets channel
+    Tool for parsing the HyperCat into the format understood by the SPHERE Assets channel
     """
 
     def __init__(self, house):
