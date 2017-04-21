@@ -126,7 +126,11 @@ def create_hypercat_parser(hyperstream, house, safe=True):
 
     w.execute(time_interval)
 
-    source = N["hc_devices"].streams.values()[0]
+    try:
+        source = S.streams[S.non_empty_streams.keys()[0]]
+    except IndexError:
+        source = N["hc_devices"].streams.values()[0]
+
     sink = N["devices"].streams.values()[0]
     ci = sink.calculated_intervals
     sink.calculated_intervals = []
@@ -235,7 +239,7 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
         source=N["env_sensors_by_house"],
         output_plate=dict(
             plate_id="H.EnvSensors",
-            meta_data_id="env_sensor",
+            meta_data_id="env_sensors",
             description="All environmental sensors in each house",
             use_provided_values=False
         ),
@@ -358,6 +362,6 @@ def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     time_interval = TimeInterval.up_to_now()
 
     create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
-    create_hypercat_parser(hyperstream, house=house)
+    # create_hypercat_parser(hyperstream, house=house)
     create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
     create_asset_splitter_2(hyperstream).execute(time_interval)
