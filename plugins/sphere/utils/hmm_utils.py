@@ -22,11 +22,15 @@
 import numpy as np
 from scipy.stats import multivariate_normal
 from hmmlearn.hmm import _BaseHMM, _validate_covars
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.utils import check_X_y
+from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.fixes import bincount
 
 ### MK: the following has been first copied from hmm.GaussianHMM?? of hmmlearn and then modified
 # TODO: Eliminate unnecessary ingredients
 
-class RSSI_HMM(_BaseHMM):
+class BernoulliGaussianHMM(_BaseHMM):
     """Hidden Markov Model with Bernoulli missingness and Gaussian emissions.
 
     Parameters
@@ -123,7 +127,7 @@ class RSSI_HMM(_BaseHMM):
         self.miss_probs_weight = miss_probs_weight
 
     def _check(self):
-        super(RSSI_HMM, self)._check()
+        super(BernoulliGaussianHMM, self)._check()
 
         self.means_ = np.asarray(self.means_)
         self.n_features = self.means_.shape[1]
@@ -132,7 +136,7 @@ class RSSI_HMM(_BaseHMM):
         _validate_covars(self.covars_, 'full', self.n_components)
 
     def _init(self, X, lengths=None):
-        super(RSSI_HMM, self)._init(X, lengths=lengths)
+        super(BernoulliGaussianHMM, self)._init(X, lengths=lengths)
 
         _, n_features = X.shape
         if hasattr(self, 'n_features') and self.n_features != n_features:
@@ -166,18 +170,91 @@ class RSSI_HMM(_BaseHMM):
     def decode(self, X, lengths=None, algorithm=None):
         XX = X.copy()
         XX[np.isnan(XX)] = -1e100
-        return super(RSSI_HMM, self).decode(XX, lengths=lengths, algorithm=algorithm)
+        return super(BernoulliGaussianHMM, self).decode(XX, lengths=lengths, algorithm=algorithm)
 
     def _decode_viterbi(self, X):
         XX = X.copy()
         XX[XX==-1e100] = np.nan
-        return super(RSSI_HMM, self)._decode_viterbi(XX)
+        return super(BernoulliGaussianHMM, self)._decode_viterbi(XX)
 
 
 
+class RoomRssiHMM(BaseEstimator, ClassifierMixin):
+
+    def __init__(self, pseudo_rssi_list=[-100,-80,np.nan,np.nan]):
+        """
+        :param pseudo_rssi_list: used as a prior by adding to the observed data before estimating parameters
+        """
+        self.pseudo_rssi_list = pseudo_rssi_list
+
+    def fit(self, X, y, tol=None):
+        """Fit the model according to the given training data and parameters.
+
+        Parameters
+        ----------
+        X : array-like, shape = [n_samples, n_features]
+            Training vector, where n_samples is the number of samples and
+            n_features is the number of features.
+
+        y : array, shape = [n_samples]
+            Target values (integers)
+        """
+
+        # X, y = check_X_y(X, y)
+        if type_of_target(y) not in ['binary', 'multiclass']:
+            raise ValueError("Unknown label type: %r" % type_of_target(y))
+        self.classes_, y = np.unique(y, return_inverse=True)
+        n_samples, n_features = X.shape
+        n_classes = len(self.classes_)
+        if n_classes < 2:
+            raise ValueError('y has less than 2 classes')
+        self.startprob_ = (bincount(y)+1.0) / (len(y)+n_classes)
+        transmat = np.zeros((n_classes,n_classes))
+        for i in xrange(len(y)-1):
+            transmat[y[i],y[i+1]] = transmat[y[i],y[i+1]] + 1
+        transmat = (transmat.transpose() / np.sum(transmat,1)).transpose()
+        self.transmat_ = transmat
+        pseudo_rows = np.tile(self.pseudo_rssi_list,(X.shape[1],1)).transpose()
+        means = []
+        covars = []
+        miss_probs = []
+        for cl in xrange(n_classes):
+            X_cl = np.concatenate((X[y == cl, :],pseudo_rows),0)
+            miss_probs_cl = np.mean(np.isnan(X_cl),0)
+            mean_cl = np.nanmean(X_cl,0)
+            covar_cl = np.diag(np.nanvar(X_cl,0,ddof=1))
+            miss_probs.append(miss_probs_cl)
+            means.append(mean_cl)
+            covars.append(covar_cl)
+        self.miss_probs_ = np.asarray(miss_probs)
+        self.means_ = np.asarray(means)
+        self.covars_ = np.asarray(covars)
+        return self
+
+    def predict(self, X):
+        """Perform classification on an array of test vectors X.
+
+        The predicted class C for each sample in X is returned.
+
+        Parameters
+        ----------
+        X : array-like, shape = [n_samples, n_features]
+
+        Returns
+        -------
+        C : array, shape = [n_samples]
+        """
+        model = BernoulliGaussianHMM(n_components=len(self.classes_))
+        model.startprob_ = self.startprob_
+        model.transmat_ = self.transmat_
+        model.means_ = self.means_
+        model.covars_ = self.covars_
+        model.miss_probs_ = self.miss_probs_
+        y_pred = self.classes_.take(model.predict(X))
+        return y_pred
 
 # np.random.seed(42)
-# model = RSSI_HMM(n_components=4)
+# model = BernoulliGaussianHMM(n_components=4)
 # model.startprob_ = np.array([0.6, 0.2, 0.1, 0.1])
 # model.transmat_ = np.array([[0.7, 0.1, 0.1, 0.1],
 #                             [0.3, 0.4, 0.2, 0.1],

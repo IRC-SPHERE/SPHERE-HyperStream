@@ -20,5 +20,5 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
 from sklearn_utils import FillZeros, serialise_dict, serialise_to_json, deserialise_json_pipeline, serialise_pipeline
-from hmm_utils import RSSI_HMM
+from hmm_utils import RoomRssiHMM
 from utils import ArgumentParser
