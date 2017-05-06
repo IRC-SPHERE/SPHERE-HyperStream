@@ -122,6 +122,9 @@ class SphereChannel(MemoryChannel):
                     # logging.debug(e.message)
                     doc = StreamInstance(
                         timestamp=document_collection.timestamp + timedelta(microseconds=1),
+                        # timestamp=document_collection.timestamp + timedelta(microseconds=1000),
+                        # MK used 1000 here when storing derived streams later back to mongo
+                        # TODO: come up with a better solution
                         value=document_collection.value)
                     return writer(doc)
             elif isinstance(document_collection, list):

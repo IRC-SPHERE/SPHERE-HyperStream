@@ -106,11 +106,12 @@
             },
             "notes": "Auto-generated from HyperCat",
             "wearables": {
-                "a0:e6:f8:00:03:c0": "A",
-                "a0:e6:f8:00:03:c1": "B"
+                "a0:e6:f8:00:00:c0": "A",
+                "a0:e6:f8:00:00:c1": "B"
             }
         },
         "1": {
+	    "notes": "SPHERE house",
             "access_points": {
                 "fd00::212:4b00:0:3": "kitchen",
                 "fd00::212:4b00:0:4": "lounge",
@@ -118,9 +119,9 @@
                 "fd00::212:4b00:0:6": "bedroom2"
             },
             "cameras": {
-                "b8aeed756145": "unknown location:A",
-                "b8aeed75e024": "unknown location:B",
-                "b8aeed78cffe": "unknown location:C"
+                "b8aeed756145": "lounge",
+                "b8aeed75e024": "hall",
+                "b8aeed78cffe": "kitchen"
             },
             "env_sensors": {
                 "03182": [
@@ -209,12 +210,38 @@
                     "water",
                     "light",
                     "motion"
+                ],
+                "fd00::212:4b00:0:85": [
+                    "temperature",
+                    "humidity",
+                    "pressure",
+                    "water",
+                    "light",
+                    "motion"
+                ],
+                "fd00::212:4b00:0:86": [
+                    "temperature",
+                    "humidity",
+                    "pressure",
+                    "water",
+                    "light",
+                    "motion"
+                ],
+                "fd00::212:4b00:0:87": [
+                    "temperature",
+                    "humidity",
+                    "pressure",
+                    "water",
+                    "light",
+                    "motion"
                 ]
             },
             "notes": "SPHERE house",
             "wearables": {
                 "a0:e6:f8:00:00:c0": "A",
-                "a0:e6:f8:00:00:c1": "B"
+                "a0:e6:f8:00:00:c1": "B",
+                "a0:e6:f8:00:00:c2": "C",
+                "a0:e6:f8:00:00:c3": "D"
             }
         },
         "1116": {

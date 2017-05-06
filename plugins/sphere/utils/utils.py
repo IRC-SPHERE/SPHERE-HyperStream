@@ -73,3 +73,17 @@ class ArgumentParser(object):
         parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
                             choices=ArgumentParser.CHOICES)
         return parser.parse_args()
+
+
+    @staticmethod
+    def wearable_tap_sync_parser(default_loglevel=logging.DEBUG):
+        """
+        Gets an argument parser including the house id, approximate time of synchronising 5 taps and logging level
+        :return:
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--house', dest='house')
+        parser.add_argument("--time", dest='time')
+        parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
+                            choices=ArgumentParser.CHOICES)
+        return parser.parse_args()
