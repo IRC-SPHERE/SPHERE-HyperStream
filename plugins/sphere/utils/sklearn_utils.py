@@ -28,7 +28,7 @@ from numpy import asarray, __name__ as numpy_name
 class FillZeros(BaseEstimator, TransformerMixin):
     def __init__(self, default_value=-110):
         super(FillZeros, self).__init__()
-        self.default_value = -110
+        self.default_value = default_value
     
     def fit(self, X, y=None):
         return self

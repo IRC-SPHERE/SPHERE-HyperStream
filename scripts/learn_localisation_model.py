@@ -43,7 +43,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     from workflows.learn_localisation_model import create_workflow_lda_localisation_model_learner
     from hyperstream.utils import StreamNotFoundError, reconstruct_interval
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     M = hyperstream.channel_manager.memory
     D = hyperstream.channel_manager.mongo
     A = hyperstream.channel_manager.assets
@@ -71,14 +71,14 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     create_selected_localisation_plates(hyperstream)
 
     # Ensure the model is overwritten if it's already there
-    model_id = StreamId(
-        name="location_prediction",
-        meta_data=(('house', house), ('localisation_model', 'lda')))
-
-    try:
-        hyperstream.channel_manager.mongo.purge_stream(model_id)
-    except StreamNotFoundError:
-        pass
+    for model_name in ('lda','svm','room_rssi_hmm'):
+        model_id = StreamId(
+            name="location_prediction",
+            meta_data=(('house', house), ('localisation_model', model_name)))
+        try:
+            hyperstream.channel_manager.mongo.purge_stream(model_id)
+        except StreamNotFoundError:
+            pass
 
     workflow_id1 = "lda_localisation_model_learner_"+experiment_ids_str
 
@@ -107,21 +107,25 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
     print('number of non_empty_streams: {}'.format(
         len(hyperstream.channel_manager.memory.non_empty_streams)))
 
-    try:
-        model = D[model_id].window().last().value
-    except AttributeError:
-        print("No model was learnt - possibly there was no data recorded?")
-        return False
+    for model_name in ('lda','svm','room_rssi_hmm'):
+        print("Model: {}".format(model_name))
+        model_id = StreamId(
+            name="location_prediction",
+            meta_data=(('house', house), ('localisation_model', model_name)))
+        try:
+            model = D[model_id].window().last().value
+        except (AttributeError, KeyError):
+            print("No {} model was learnt - not requested or no data recorded?".format(model_name))
 
-    for experiment_id in list(experiment_ids):
-        print("Experiment id: {}".format(experiment_id))
-        print("Time interval: {}".format(reconstruct_interval(experiment_id)))
-        print("Accuracy: {}".format(pformat(model['performance'][experiment_id]['accuracy'])))
-        print("Macro F1: {}".format(pformat(model['performance'][experiment_id]['f1_score_macro'])))
-        print("Micro F1: {}".format(pformat(model['performance'][experiment_id]['f1_score_micro'])))
-        print("Confusion Matrix:")
-        pprint(model['performance'][experiment_id]['confusion_matrix'])
-        print("")
+        for experiment_id in list(experiment_ids):
+            print("Experiment id: {}".format(experiment_id))
+            print("Time interval: {}".format(reconstruct_interval(experiment_id)))
+            print("Accuracy: {}".format(pformat(model['performance'][experiment_id]['accuracy'])))
+            print("Macro F1: {}".format(pformat(model['performance'][experiment_id]['f1_score_macro'])))
+            print("Micro F1: {}".format(pformat(model['performance'][experiment_id]['f1_score_micro'])))
+            print("Confusion Matrix:")
+            pprint(model['performance'][experiment_id]['confusion_matrix'])
+            print("")
     return True
 
 

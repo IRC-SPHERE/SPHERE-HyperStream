@@ -19,7 +19,6 @@
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
-from dateutil.parser import parse
 
 globs = {'sphere_connector': None}
 
@@ -28,7 +27,8 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
     from hyperstream import HyperStream, TimeInterval
     from workflows.deploy_summariser import create_workflow_coord_plate_creation, create_workflow_summariser
     from sphere_connector_package.sphere_connector import SphereConnector
-    from workflows.asset_splitter import split_sphere_assets
+
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
 
     if not globs['sphere_connector']:
         globs['sphere_connector'] = SphereConnector(
@@ -36,10 +36,6 @@ def run(delete_existing_workflows=True, loglevel=logging.INFO):
             include_mongo=True,
             include_redcap=False,
             sphere_logger=None)
-
-    hyperstream = HyperStream(loglevel=loglevel)
-
-    split_sphere_assets(hyperstream)
 
     workflow_id = "coord3d_plate_creation"
     if delete_existing_workflows:

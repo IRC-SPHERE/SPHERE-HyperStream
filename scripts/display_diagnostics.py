@@ -31,7 +31,7 @@ import numpy as np
 globs = { 'sphere_connector': None }
 
 
-def display_access_points(house):
+def display_diagnostics(house):
     from hyperstream.utils import utcnow
     from sphere_connector_package.sphere_connector import SphereConnector, DataWindow
 
@@ -43,28 +43,73 @@ def display_access_points(house):
             sphere_logger=None)
 
     t2 = utcnow()
-    t1 = t2 - timedelta(seconds=15)
+    t1 = t2 - timedelta(seconds=60)
 
     sphere_connector = globs['sphere_connector']
     window = DataWindow(sphere_connector, t1, t2)
-    docs = window.wearable.get_data(elements={'rss'}, rename_keys=False)
+    rss = window.wearable.get_data(elements={'rss'}, rename_keys=False)
     # aids = set(d['aid'] for d in filter(lambda x: x['hid'] == house if 'hid' in x else True, docs))
 
     #if aids:
     #    print("Access points: ")
     #    for i, aid in enumerate(aids):
     #        print("{}: {}".format(i, aid))
-    
-    
-    df = pd.DataFrame(docs)
+
+    df = pd.DataFrame(rss)
     if not df.empty:
         print(df.groupby(['aid', 'uid']).agg({'wearable-rss': np.max}))
+        print()
     else:
         print("No access points found")
+        print()
+
+    env = window.environmental.get_data(rename_keys=False)
+    df = pd.DataFrame(env)
+    if not df.empty:
+        for sensor in ['electricity', 'humidity', 'light', 'pressure', 'temperature', 'water']:
+            if sensor in df:
+                print(df.groupby('uid').agg({sensor: [np.min, np.median, np.max]}).dropna())
+            else:
+                print("no {} data".format(sensor))
+            print()
+    else:
+        print("No environmental data found")
+        print()
+
+    vid = window.video.get_data(rename_keys=False)
+    df = pd.DataFrame(vid)
+    if not df.empty:
+        # Leave off 'video-FeaturesREID' for now
+        for sensor in ['video-2DCen', 'video-2Dbb', 'video-3Dbb', 'video-3Dcen', 'video-Activity', 'video-Intensity']:
+            if sensor in df:
+                print(sensor[6:])
+                print(df.groupby('uid')[sensor].describe())
+            else:
+                print("no {} data".format(sensor))
+            print()
+
+        for sensor in ['video-silhouette']:
+            if sensor in df:
+                print(sensor[6:])
+                print(df.groupby('uid').size())
+            else:
+                print("no {}s".format(sensor[6:]))
+            print()
+
+        for sensor in ['video-userID']:
+            if sensor in df:
+                print("Unique {}s: {}".format(sensor[6:], list(set(df[sensor].dropna()))))
+            else:
+                print("no {}s".format(sensor[6:]))
+            print()
+
+    else:
+        print("No video data found")
+        print()
 
 
 def run(house):
-    display_access_points(house=house)
+    display_diagnostics(house=house)
     print()
 
 
@@ -83,6 +128,6 @@ if __name__ == '__main__':
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.house_parser(default_loglevel=logging.INFO)
 
-    while True:
-        run(args.house)
-        sleep(1)
+    # while True:
+    run(args.house)
+    #    sleep(5)

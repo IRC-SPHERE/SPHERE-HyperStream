@@ -23,27 +23,25 @@ from __future__ import print_function
 import arrow
 import logging
 import pandas as pd
+import pytz
 
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
-    from hyperstream import HyperStream, StreamId, TimeInterval
+    from hyperstream import HyperStream, TimeInterval
     from hyperstream.utils import duration2str
     from workflows.display_experiments import create_workflow_list_technicians_walkarounds
     from workflows.asset_splitter import split_sphere_assets
 
-    hyperstream = HyperStream(loglevel=loglevel)
+    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
 
     # Various channels
     M = hyperstream.channel_manager.memory
     S = hyperstream.channel_manager.sphere
-    A = hyperstream.channel_manager.assets
 
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("asset_splitter")
-        A.purge_node("wearables_by_house")
-        A.purge_node("access_points_by_house")
 
-    split_sphere_assets(hyperstream)
+    split_sphere_assets(hyperstream, house)
 
     hyperstream.plate_manager.delete_plate("H")
     hyperstream.plate_manager.create_plate(
@@ -74,9 +72,12 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
     df = M.find_stream(name='experiments_dataframe', house=house).window().values()[0]
 
     if len(df) > 0:
-        # arrow.get(x).humanize()
-        # df['start'] = df['start'].map('{:%Y-%m-%d %H:%M:%S}'.format)
+        # TODO: the following line gave a timezone error in some circumstances (when only 1 experiment?)
         df['duration'] = df['end'] - df['start']
+        # TODO: the following 3 lines worked in that cas but give an error in some cases (when more than 1 experiment?)
+        # df['start_utc'] = pd.Series(pd.DatetimeIndex(df['start']).tz_convert('UTC'))
+        # df['end_utc'] = pd.Series(pd.DatetimeIndex(df['end']).tz_convert('UTC'))
+        # df['duration'] = df['end_utc'] - df['start_utc']
         df['start'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['start'])
         df['end'] = map(lambda x: '{:%Y-%m-%d %H:%M:%S}'.format(x), df['end'])
         # df['duration'] = map(lambda x:'{:%Mmin %Ssec}'.format(x),df['duration'])
