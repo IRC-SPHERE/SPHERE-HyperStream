@@ -81,6 +81,54 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
 
     return w
 
+def create_hypercat_dumps_parser(hyperstream, safe=True):
+    from hyperstream.time_interval import TimeInterval, MIN_DATE
+
+    SA = hyperstream.channel_manager.sphere_assets
+    S = hyperstream.channel_manager.sphere
+
+    workflow_id = "hypercat_dumps_reader"
+    try:
+        w = hyperstream.create_workflow(
+            workflow_id=workflow_id,
+            name="HyperCat Dumps Reader",
+            owner="MK",
+            description="Read the hypercat dumps about houses, and dump into the assets stream",
+            online=False)
+    except KeyError as e:
+        if safe:
+            raise e
+        else:
+            return hyperstream.workflow_manager.workflows[workflow_id]
+
+    nodes = (("devices", SA, []),
+             ("hypercat_dumps", SA, [])
+             )
+
+    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+
+    time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
+    # time_interval = TimeInterval.up_to_now()
+
+    source = N["hypercat_dumps"].streams.values()[0]
+    sink = N["devices"].streams.values()[0]
+    ci = sink.calculated_intervals
+    sink.calculated_intervals = []
+
+    tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house="all"))
+    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+
+    sink.calculated_intervals = ci
+
+    # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
+    for timestamp, data in source.window(time_interval):
+        house = data['house']
+        identifier = 'house_{}'.format(house)
+        if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
+            hyperstream.plate_manager.meta_data_manager.insert(
+                tag='house', identifier=identifier, parent='root', data=house)
+
+
 
 def create_hypercat_parser(hyperstream, house, safe=True):
     from hyperstream.time_interval import TimeInterval, MIN_DATE
@@ -360,14 +408,23 @@ def create_asset_splitter_2(hyperstream, safe=True):
 def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_0")
-        hyperstream.workflow_manager.delete_workflow("hypercat_reader")
+        if house=="all":
+            hyperstream.workflow_manager.delete_workflow("hypercat_dumps_reader")
+        else:
+            hyperstream.workflow_manager.delete_workflow("hypercat_reader")
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_1")
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_2")
 
     from hyperstream import TimeInterval
     time_interval = TimeInterval.up_to_now()
 
-    create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
-    create_hypercat_parser(hyperstream, house=house)
-    create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
+    if house=="all":
+        create_asset_splitter_0(hyperstream, house=None).execute(time_interval)
+        create_hypercat_dumps_parser(hyperstream)
+        create_asset_splitter_0(hyperstream, house=None,safe=False).execute(time_interval)
+        create_asset_splitter_1(hyperstream, house=None).execute(time_interval)
+    else:
+        create_asset_splitter_0(hyperstream, house=house).execute(time_interval)
+        create_hypercat_parser(hyperstream, house=house)
+        create_asset_splitter_1(hyperstream, house=house).execute(time_interval)
     create_asset_splitter_2(hyperstream).execute(time_interval)

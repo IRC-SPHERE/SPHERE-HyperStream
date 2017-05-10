@@ -68,7 +68,7 @@ class ArgumentParser(object):
         :return:
         """
         parser = argparse.ArgumentParser()
-        parser.add_argument('--house', dest='house')
+        parser.add_argument('--house', dest='house', help='current house id or "all" for all houses')
         parser.add_argument("--wearables", dest='wearables', default=wearables)
         parser.add_argument("--loglevel", dest='loglevel', nargs='?', type=int, default=default_loglevel,
                             choices=ArgumentParser.CHOICES)
