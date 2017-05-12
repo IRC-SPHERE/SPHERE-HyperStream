@@ -1,0 +1,411 @@
+{
+  "house": 7130,
+  "hypercat": [
+    {
+      "_id": {
+        "$oid": "5915be69d64fdd0e4c2b97c5"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Root Sphere Gateway",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPG2_BR",
+          "rel": "device_type"
+        },
+        {
+          "val": "living room 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e01",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c01cd64fdd0e4c2b97c6"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Sphere Gateway",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPG2_F",
+          "rel": "device_type"
+        },
+        {
+          "val": "living room 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e03",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c04ed64fdd0e4c2b97c7"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Sphere Gateway",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPG2_F",
+          "rel": "device_type"
+        },
+        {
+          "val": "bedroom 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e04",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c0a7d64fdd0e4c2b97c8"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "living room 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e80",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c0fdd64fdd0e4c2b97c9"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "living room 2",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e81",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c132d64fdd0e4c2b97ca"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "hall 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e82",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c1cad64fdd0e4c2b97cb"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "bathroom 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e83",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c20ad64fdd0e4c2b97cc"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "bedroom 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e84",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c245d64fdd0e4c2b97cd"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Enviromental Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPES2",
+          "rel": "device_type"
+        },
+        {
+          "val": "kitchen 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "fd00::212:4b00:0:4e85",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c2bbd64fdd0e4c2b97ce"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Wearable Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPW2",
+          "rel": "device_type"
+        },
+        {
+          "val": "A",
+          "rel": "person"
+        },
+        {
+          "val": "",
+          "rel": "device_description"
+        }
+      ],
+      "href": "a0:e6:f8:00:4e:c0",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c2d1d64fdd0e4c2b97cf"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Wearable Sensor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "SPW2",
+          "rel": "device_type"
+        },
+        {
+          "val": "B",
+          "rel": "person"
+        },
+        {
+          "val": "",
+          "rel": "device_description"
+        }
+      ],
+      "href": "a0:e6:f8:00:4e:c1",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c400d64fdd0e4c2b97d1"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Power Usage Monitor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Current Cost Appliance",
+          "rel": "device_type"
+        },
+        {
+          "val": "slow cooker",
+          "rel": "appliance"
+        },
+        {
+          "val": "kitchen 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "00737",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c468d64fdd0e4c2b97d2"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Power Usage Monitor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Current Cost Appliance",
+          "rel": "device_type"
+        },
+        {
+          "val": "multi cooker",
+          "rel": "appliance"
+        },
+        {
+          "val": "kitchen 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "03943",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c492d64fdd0e4c2b97d3"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Power Usage Monitor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Current Cost Appliance",
+          "rel": "device_type"
+        },
+        {
+          "val": "dehumidifier",
+          "rel": "appliance"
+        },
+        {
+          "val": "bedroom 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "00863",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915c6f1d64fdd0e4c2b97d4"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Power Usage Monitor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Current Cost Appliance",
+          "rel": "device_type"
+        },
+        {
+          "val": "Mains",
+          "rel": "appliance"
+        },
+        {
+          "val": "hall 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "02675",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915cbe6d64fdd0e4c2b97d6"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Motion Detector",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Intel NUC VIDEO",
+          "rel": "device_type"
+        },
+        {
+          "val": "living room 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "B8AEEDE9CE92",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915cd45d64fdd0e4c2b97d7"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Motion Detector",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Intel NUC VIDEO",
+          "rel": "device_type"
+        },
+        {
+          "val": "hall 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "B8AEEDE9D2FD",
+      "cat_id": "public"
+    },
+    {
+      "_id": {
+        "$oid": "5915d2fbd64fdd0e4c2b97d8"
+      },
+      "i-object-metadata": [
+        {
+          "val": "Power Usage Monitor",
+          "rel": "urn:X-tsbiot:rels:hasDescription:en"
+        },
+        {
+          "val": "Current Cost Appliance",
+          "rel": "device_type"
+        },
+        {
+          "val": "Kettle",
+          "rel": "appliance"
+        },
+        {
+          "val": "kitchen 1",
+          "rel": "house_location"
+        }
+      ],
+      "href": "01675",
+      "cat_id": "public"
+    }
+  ]
+}
