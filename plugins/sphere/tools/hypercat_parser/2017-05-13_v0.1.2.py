@@ -107,7 +107,7 @@ class HypercatParser(Tool):
                     # Also use as access point
                     uid_with_colons = uid[0:2] + ':' + uid[2:4] + ':' + uid[4:6] + ':' + uid[6:8] + ':' + uid[8:10] + ':' + uid[10:12]
                     a_locs[location] += 1
-                    assets['house'][self.house]['access_points'][uid_with_colons] = \
+                    assets['house'][house]['access_points'][uid_with_colons] = \
                         location + ":" + chr(a_locs[location] - 1 + ord("A"))
 
                 elif device_type == u'Intel NUC HOME' or description == u'Home Gateway':
