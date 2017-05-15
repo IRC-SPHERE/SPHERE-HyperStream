@@ -32,6 +32,18 @@ class SummaryChannel(DatabaseChannel):
     """
     Channel for storing summaries
     """
+    def get_results(self, stream, time_interval):
+        """
+        Get the results for a given stream
+        :param time_interval: The time interval
+        :param stream: The stream object
+        :return: A generator over stream instances
+        """
+        query = stream.stream_id.as_raw()
+        query['datetime'] = {'$gt': time_interval.start, '$lte': time_interval.end}
+        with switch_db(SummaryInstanceModel, 'hyperstream'):
+            for instance in SummaryInstanceModel.objects(__raw__=query):
+                yield StreamInstance(timestamp=instance.datetime, value=instance.value)
 
     def get_stream_writer(self, stream):
         """
