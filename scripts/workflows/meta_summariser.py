@@ -18,6 +18,7 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
+from hyperstream.utils import MIN_DATE
 
 def create_workflow_coord_plate_creation(hyperstream, safe=True):
     workflow_id = "coord3d_plate_creation"
@@ -55,11 +56,11 @@ def create_workflow_coord_plate_creation(hyperstream, safe=True):
 
 
 def create_workflow_meta_summariser(hyperstream,
-                                    source_host = 'strauss.ccr.bris.ac.uk',
-                                    source_folder = '/var/datastore/activitysummaries',
-                                    tmp_folder = '/tmp'
-                                    # target_folder = '/data/shared/daily_summaries',
-                                    target_folder = '~/sync/repos/2016_hyperstream/sphere_hyperstream/mk/visualise_summaries/all_houses'
+#                                    source_host = 'strauss.ccr.bris.ac.uk',
+#                                    source_folder = '/var/datastore/activitysummaries',
+#                                    tmp_folder = '/tmp'
+#                                    # target_folder = '/data/shared/daily_summaries',
+#                                    target_folder = '~/sync/repos/2016_hyperstream/sphere_hyperstream/mk/visualise_summaries/all_houses'
                                safe=True):
 
     workflow_id = "periodic_meta_summaries"
@@ -69,6 +70,7 @@ def create_workflow_meta_summariser(hyperstream,
     X = hyperstream.channel_manager.summary
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
+
 
     try:
         w = hyperstream.create_workflow(
@@ -85,20 +87,35 @@ def create_workflow_meta_summariser(hyperstream,
         else:
             return hyperstream.workflow_manager.workflows[workflow_id]
 
+    D=M ####### TODO: REMOVE THIS TEMPORARY COMMAND SOON
+
     nodes = (
-        ("imported_summaries",                      D, None)
+        # ("imported_summaries",                      D, None),
+        # ("genie_events",                              D, ["H"]),
+        # ("deployment_start_time",                     D, ["H"]),
+        ("h_every_1h",                                  M, ["H"]),
+        ("h_every_4h",                                  M, ["H"]),
+        ("h_expected_status_during_1h",                 M, ["H"]),
+        ("h_expected_status_during_4h",                 M, ["H"]),
         # ("env_per_uid_field_agg_perc",              X, ["H.EnvSensors.Fields"]),
         # ("env_per_uid_field_agg_hist",              X, ["H.EnvSensors.Fields"]),
-        # ("env_per_uid_field_agg_count",             X, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_field_agg_count",             X, ["H.EnvSensors.Fields"]),
+        ("env_per_uid_all_count",                   D, ["H.EnvSensors"]),
+        ("env_per_uid_status",                      D, ["H.EnvSensors"]),
         # ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
         # ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
-        # ("rss_per_uid_aid_value_agg_count",         X, ["H.W","H.APs"]),
+        ("rss_per_uid_aid_value_agg_count",         X, ["H.W","H.APs"]),
+        ("rss_per_aid_all_count",                   D, ["H.APs"]),
+        ("rss_per_aid_status",                      D, ["H.APs"]),
         # ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
         # ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
         # ("acc_per_uid_magnitude_agg_perc",          X, ["H.W"]),
         # ("acc_per_uid_magnitude_agg_hist",          X, ["H.W"]),
-        # ("acc_per_uid_count",                       X, ["H.W"]),
-        # ("vid_per_uid_counts_agg_total",            X, ["H.Cameras"]),
+        ("acc_per_uid_count",                       X, ["H.W"]),
+        ("h_w_expected_status_during_4h",           M, ["H.W"]),
+        ("acc_per_uid_status",                      D, ["H.W"]),
+        ("vid_per_uid_counts_agg_total",            X, ["H.Cameras"]),
+        ("vid_per_uid_status",                      D, ["H.Cameras"]),
         # ("vid_per_uid_2dcen_x_perc",                X, ["H.Cameras"]),
         # ("vid_per_uid_2dcen_x_hist",                X, ["H.Cameras"]),
         # ("vid_per_uid_2dcen_y_perc",                X, ["H.Cameras"]),
@@ -117,13 +134,15 @@ def create_workflow_meta_summariser(hyperstream,
         # ("vid_per_uid_intensity_hist",              X, ["H.Cameras"]),
         # ("vid_per_uid_userid_hist",                 X, ["H.Cameras"]),
         # ("predicted_locations_broadcasted",         D, ["H.W"]),
-        # ("prediction_count",                        X, ["H.W"]),
+        ("prediction_count",                        X, ["H.W"]),
+        ("all_predictions",                         D, ["H"]),
+        ("prediction_status",                       D, ["H"]),
         # ("prediction_mean",                         X, ["H.W"]),
         # ("prediction_map_hist",                     X, ["H.W"]),
         # ("env_sensors_by_house",                    A, ["H"]),
         # ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
         # ("cameras_by_house",                        A, ["H"]),
-        # ("wearables_by_house",                      A, ["H"]),
+        ("wearables_by_house",                      A, ["H"]),
         # ("access_points_by_house",                  A, ["H"])
     )
 
@@ -133,6 +152,56 @@ def create_workflow_meta_summariser(hyperstream,
     #############################
     ### ENVIRONMENTAL SENSORS ###
     #############################
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="clock",
+            parameters=dict(first=MIN_DATE, stride=1*60*60.0)
+        ),
+        sources=None,
+        sink=N["h_every_1h"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="clock",
+            parameters=dict(first=MIN_DATE, stride=4*60*60.0)
+        ),
+        sources=None,
+        sink=N["h_every_4h"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="apply",
+            parameters=dict(func=lambda x:1)
+        ),
+        sources=[N["h_every_1h"]],
+        sink=N["h_expected_status_during_1h"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="apply",
+            parameters=dict(func=lambda x:1)
+        ),
+        sources=[N["h_every_4h"]],
+        sink=N["h_expected_status_during_4h"])
+
+    w.create_multi_output_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="stream_broadcaster_from_stream",
+            parameters=dict(func=lambda x:x)
+        ),
+        source=N["h_expected_status_during_4h"],
+        splitting_node=N["wearables_by_house"],
+        sink=N["h_w_expected_status_during_4h"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="status_from_count_for_metasummaries",
+            parameters=dict()
+        ),
+        sources=[N["h_w_expected_status_during_4h"],N["acc_per_uid_count"]],
+        sink=N["acc_per_uid_status"])
+
 
     # w.create_multi_output_factor(
     #     tool=hyperstream.channel_manager.get_tool(
