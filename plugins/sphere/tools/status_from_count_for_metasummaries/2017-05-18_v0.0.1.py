@@ -38,29 +38,22 @@ class StatusFromCountForMetasummaries(Tool):
         counts_stream = (x for x in sources[1].window(interval, force_calculation=False))
         counts_doc = None
         for time,expected_status in expected_status_stream:
+            res = expected_status.copy()
+            res['data'] = False
             if counts_doc is None:
                 try:
                     counts_doc = next(counts_stream)
                 except:
                     pass
             if (counts_doc is not None) and (counts_doc.timestamp==time):
-                ok = False
+                counts = counts_doc.value
                 try:
-                    ok = counts_doc.value > 0
+                    res['data'] = counts > 0
                 except:
                     try:
-                        ok = sum(counts_doc.value) > 0
+                        res['data'] = sum(counts) > 0
                     except:
-                        ok = sum(counts_doc.value.values())
-                if expected_status==1:
-                    res = 1 + ok
-                else:
-                    res = 0
+                        res['data'] = sum(counts.values())
                 counts_doc = None
-            else:
-                if expected_status==1:
-                    res = 1
-                else:
-                    res = 0
             yield StreamInstance(time,res)
 
