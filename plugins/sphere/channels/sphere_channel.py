@@ -20,10 +20,14 @@
 
 import os
 from collections import Iterable
-import logging
 from datetime import timedelta
 
-from sphere_connector_package.sphere_connector import SphereConnector, DataWindow, Experiment, ExperimentConfig
+try:
+    # noinspection PyUnresolvedReferences
+    from sphere_connector import SphereConnector, DataWindow, Experiment, ExperimentConfig
+except ImportError:
+    # noinspection PyUnresolvedReferences
+    from sphere_connector_package.sphere_connector import SphereConnector, DataWindow, Experiment, ExperimentConfig
 
 from hyperstream.channels.memory_channel import MemoryChannel
 from hyperstream import TimeIntervals, TimeInterval, StreamInstance
