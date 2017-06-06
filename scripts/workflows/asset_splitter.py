@@ -81,8 +81,9 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
 
     return w
 
+
 def create_hypercat_dumps_parser(hyperstream, safe=True):
-    from hyperstream.time_interval import TimeInterval, MIN_DATE
+    from hyperstream.time_interval import TimeInterval, TimeIntervals, MIN_DATE
 
     SA = hyperstream.channel_manager.sphere_assets
     S = hyperstream.channel_manager.sphere
@@ -113,7 +114,7 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
     source = N["hypercat_dumps"].streams.values()[0]
     sink = N["devices"].streams.values()[0]
     ci = sink.calculated_intervals
-    sink.calculated_intervals = []
+    sink.calculated_intervals = TimeIntervals([])
 
     tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house="all"))
     tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
@@ -129,9 +130,8 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
                 tag='house', identifier=identifier, parent='root', data=house)
 
 
-
 def create_hypercat_parser(hyperstream, house, safe=True):
-    from hyperstream.time_interval import TimeInterval, MIN_DATE
+    from hyperstream.time_interval import TimeInterval, TimeIntervals, MIN_DATE
 
     SA = hyperstream.channel_manager.sphere_assets
     S = hyperstream.channel_manager.sphere
@@ -187,7 +187,7 @@ def create_hypercat_parser(hyperstream, house, safe=True):
 
     sink = N["devices"].streams.values()[0]
     ci = sink.calculated_intervals
-    sink.calculated_intervals = []
+    sink.calculated_intervals = TimeIntervals([])
 
     tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house=house))
     tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
