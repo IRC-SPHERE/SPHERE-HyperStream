@@ -117,7 +117,7 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
     sink.calculated_intervals = TimeIntervals([])
 
     tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house="all"))
-    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+    tool.execute(sources=[source, sink], sink=sink, interval=time_interval, alignment_stream=None)
 
     sink.calculated_intervals = ci
 
@@ -190,7 +190,7 @@ def create_hypercat_parser(hyperstream, house, safe=True):
     sink.calculated_intervals = TimeIntervals([])
 
     tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house=house))
-    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+    tool.execute(sources=[source, sink], sink=sink, interval=time_interval, alignment_stream=None)
 
     sink.calculated_intervals = ci
 

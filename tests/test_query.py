@@ -82,7 +82,7 @@ class HyperStreamQueryTests(unittest.TestCase):
             output_plate=hyperstream.plate_manager.plates["H"]
         )
 
-        elec_tool.execute(sources=[env], sink=elec, alignment_stream=None, interval=ti)
+        elec_tool.execute(sources=[env], sink=elec, interval=ti, alignment_stream=None)
 
         q1 = "\n".join("=".join(map(str, ee)) for ee in elec.window(ti))
         
@@ -122,11 +122,7 @@ class HyperStreamQueryTests(unittest.TestCase):
         t_ra = channels.get_tool("relative_apply", parameters=dict(func=online_average))
 
         # Execute the tools
-        t_clock.execute(
-            alignment_stream=None,
-            sources=None,
-            sink=M[every30s],
-            interval=ti)
+        t_clock.execute(sources=None, sink=M[every30s], interval=ti, alignment_stream=None)
 
         t_env.execute(
             source=None,
@@ -137,29 +133,11 @@ class HyperStreamQueryTests(unittest.TestCase):
             output_plate=hyperstream.plate_manager.plates["H"]
         )
 
-        t_kitchen.execute(
-            alignment_stream=None,
-            sources=[S[environmental]],
-            sink=M[kitchen],
-            interval=ti)
-
-        t_motion.execute(
-            alignment_stream=None,
-            sources=[M[kitchen]],
-            sink=M[kitchen_motion],
-            interval=ti)
-
-        t_rw.execute(
-            alignment_stream=M[every30s],
-            sources=[M[kitchen_motion]],
-            sink=M[m_kitchen_30_s_window],
-            interval=ti)
-
-        t_ra.execute(
-            alignment_stream=None,
-            sources=[M[m_kitchen_30_s_window]],
-            sink=M[average],
-            interval=ti)
+        t_kitchen.execute(sources=[S[environmental]], sink=M[kitchen], interval=ti)
+        t_motion.execute(sources=[M[kitchen]], sink=M[kitchen_motion], interval=ti)
+        t_rw.execute(sources=[M[kitchen_motion]], sink=M[m_kitchen_30_s_window], interval=ti,
+                     alignment_stream=M[every30s])
+        t_ra.execute(sources=[M[m_kitchen_30_s_window]], sink=M[average], interval=ti)
 
         import logging
         for kv in M[m_kitchen_30_s_window].window(ti):
@@ -218,7 +196,7 @@ class HyperStreamQueryTests(unittest.TestCase):
             output_plate=hyperstream.plate_manager.plates["H"]
         )
 
-        elec_tool.execute(sources=[env], sink=elec, alignment_stream=None, interval=ti)
+        elec_tool.execute(sources=[env], sink=elec, interval=ti, alignment_stream=None)
 
         q1 = "\n".join("=".join(map(str, ee)) for ee in elec.window(ti))
 
@@ -277,12 +255,8 @@ class HyperStreamQueryTests(unittest.TestCase):
             )
         )
 
-        stream_tool_sliding_window.execute(
-            sources=None,
-            sink=stream_memory_sliding_window,
-            alignment_stream=None,
-            interval=interval
-        )
+        stream_tool_sliding_window.execute(sources=None, sink=stream_memory_sliding_window, interval=interval,
+                                           alignment_stream=None)
 
         assert str(stream_memory_sliding_window.window(interval).first().value) == \
             '(2016-04-28 20:00:00+00:00, 2016-04-28 20:00:30+00:00]'
@@ -323,12 +297,8 @@ class HyperStreamQueryTests(unittest.TestCase):
             )
         )
 
-        tool_kitchen.execute(
-            sources=[stream_sphere_environmental],
-            sink=stream_memory_kitchen,
-            alignment_stream=None,
-            interval=interval
-        )
+        tool_kitchen.execute(sources=[stream_sphere_environmental], sink=stream_memory_kitchen, interval=interval,
+                             alignment_stream=None)
 
         tool_motion = channels.get_tool(
             name='component',
@@ -336,13 +306,9 @@ class HyperStreamQueryTests(unittest.TestCase):
                 key='motion'
             )
         )
-        
-        tool_motion.execute(
-            sources=[stream_memory_kitchen],
-            sink=stream_memory_motion,
-            alignment_stream=None,
-            interval=interval
-        )
+
+        tool_motion.execute(sources=[stream_memory_kitchen], sink=stream_memory_motion, interval=interval,
+                            alignment_stream=None)
 
         values = stream_memory_motion.window(interval).values()
         logging.debug(values)
@@ -360,15 +326,10 @@ class HyperStreamQueryTests(unittest.TestCase):
             )
         )
 
-        tool_sliding_apply.execute(
-            sources=[
-                stream_memory_sliding_window,
-                stream_memory_motion
-            ],
-            sink=stream_memory_m_kitchen_mean,
-            alignment_stream=None,
-            interval=interval
-        )
+        tool_sliding_apply.execute(sources=[
+            stream_memory_sliding_window,
+            stream_memory_motion
+        ], sink=stream_memory_m_kitchen_mean, interval=interval, alignment_stream=None)
         
         assert(stream_memory_m_kitchen_mean.window(interval).values() ==
                [0.0, 0.0, 0.0, 0.25, 0.25, 0.4, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0,
