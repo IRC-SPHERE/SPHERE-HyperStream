@@ -131,7 +131,7 @@ def run(house, selection, delete_existing_workflows=True, loglevel=logging.INFO)
 
 if __name__ == '__main__':
     from os import path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
 
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.technician_selection_parser(default_loglevel=logging.INFO)

@@ -23,7 +23,6 @@ from __future__ import print_function
 import arrow
 import logging
 import pandas as pd
-import pytz
 
 
 def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
@@ -95,7 +94,7 @@ def run(house, delete_existing_workflows=True, loglevel=logging.INFO):
 if __name__ == '__main__':
     import sys
     from os import path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
 
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.house_parser(default_loglevel=logging.INFO)

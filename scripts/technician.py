@@ -66,7 +66,7 @@ if __name__ == '__main__':
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
 
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.wearable_list_parser(default_loglevel=logging.INFO)
