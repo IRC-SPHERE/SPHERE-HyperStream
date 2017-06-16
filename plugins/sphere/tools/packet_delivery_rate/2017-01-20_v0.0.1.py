@@ -85,6 +85,7 @@ def test(msg, result, expected_result):
         return False
     return True
 
+
 def test_all():
     test("in order", get_pdr([11, 12, 13, 14]),  (4, 4, 1.0))
     test("mixed", get_pdr([11, 12, 14, 13]),  (4, 4, 1.0))
@@ -99,4 +100,4 @@ def test_all():
     test("with reboot two times", get_pdr([1000, 56, 5]),  (3, 3, 1.0))
     print("all tests done")
 
-test_all()
+# test_all()
