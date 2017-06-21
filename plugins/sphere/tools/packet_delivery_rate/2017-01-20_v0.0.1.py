@@ -99,4 +99,4 @@ def test_all():
     test("with reboot two times", get_pdr([1000, 56, 5]),  (3, 3, 1.0))
     print("all tests done")
 
-test_all()
+# test_all()
