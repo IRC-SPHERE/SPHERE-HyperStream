@@ -87,7 +87,7 @@ def create_workflow_meta_summariser(hyperstream,
         else:
             return hyperstream.workflow_manager.workflows[workflow_id]
 
-    D=M ####### TODO: REMOVE THIS TEMPORARY COMMAND SOON
+    # D=M ####### TODO: REMOVE THIS TEMPORARY COMMAND SOON
 
     nodes = (
         # ("imported_summaries",                      D, None),
@@ -103,12 +103,14 @@ def create_workflow_meta_summariser(hyperstream,
         ("env_per_uid_all_count",                   D, ["H.EnvSensors"]),
         ("h_envsensors_expected_status_during_1h",     M, ["H.EnvSensors"]),
         ("env_per_uid_status",                      D, ["H.EnvSensors"]),
+        ("env_status",                      D, ["H"]),
         # ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
         # ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
         ("rss_per_uid_aid_value_agg_count",         X, ["H.W","H.APs"]),
         ("rss_per_aid_all_count",                   D, ["H.APs"]),
         ("h_aps_expected_status_during_4h",     M, ["H.APs"]),
         ("rss_per_aid_status",                      D, ["H.APs"]),
+        ("rss_status",                      D, ["H"]),
         # ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
         # ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
         # ("acc_per_uid_magnitude_agg_perc",          X, ["H.W"]),
@@ -116,9 +118,11 @@ def create_workflow_meta_summariser(hyperstream,
         ("acc_per_uid_count",                       X, ["H.W"]),
         ("h_w_expected_status_during_4h",           M, ["H.W"]),
         ("acc_per_uid_status",                      D, ["H.W"]),
+        ("acc_status",                      D, ["H"]),
         ("vid_per_uid_counts_agg_total",            X, ["H.Cameras"]),
         ("h_cameras_expected_status_during_4h",     M, ["H.Cameras"]),
         ("vid_per_uid_status",                      D, ["H.Cameras"]),
+        ("vid_status",                      D, ["H"]),
         # ("vid_per_uid_2dcen_x_perc",                X, ["H.Cameras"]),
         # ("vid_per_uid_2dcen_x_hist",                X, ["H.Cameras"]),
         # ("vid_per_uid_2dcen_y_perc",                X, ["H.Cameras"]),
@@ -205,6 +209,14 @@ def create_workflow_meta_summariser(hyperstream,
         sources=[N["h_w_expected_status_during_4h"],N["acc_per_uid_count"]],
         sink=N["acc_per_uid_status"])
 
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="aggregate_into_dict_and_apply",
+            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='wearable')
+        ),
+        sources=[N["acc_per_uid_status"]],
+        sink=N["acc_status"])
+
     w.create_multi_output_factor(
         tool=hyperstream.channel_manager.get_tool(
             name="stream_broadcaster_from_stream",
@@ -221,6 +233,14 @@ def create_workflow_meta_summariser(hyperstream,
         ),
         sources=[N["h_cameras_expected_status_during_4h"],N["vid_per_uid_counts_agg_total"]],
         sink=N["vid_per_uid_status"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="aggregate_into_dict_and_apply",
+            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='camera')
+        ),
+        sources=[N["vid_per_uid_status"]],
+        sink=N["vid_status"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
@@ -249,6 +269,14 @@ def create_workflow_meta_summariser(hyperstream,
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
+            name="aggregate_into_dict_and_apply",
+            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='env_sensors')
+        ),
+        sources=[N["env_per_uid_status"]],
+        sink=N["env_status"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
             name="aggregate",
             parameters=dict(func=lambda x:sum(x),aggregation_meta_data='wearable')
         ),
@@ -271,6 +299,14 @@ def create_workflow_meta_summariser(hyperstream,
         ),
         sources=[N["h_aps_expected_status_during_4h"],N["rss_per_aid_all_count"]],
         sink=N["rss_per_aid_status"])
+
+    w.create_factor(
+        tool=hyperstream.channel_manager.get_tool(
+            name="aggregate_into_dict_and_apply",
+            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='access_point')
+        ),
+        sources=[N["rss_per_aid_status"]],
+        sink=N["rss_status"])
 
     w.create_factor(
         tool=hyperstream.channel_manager.get_tool(
