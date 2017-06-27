@@ -124,6 +124,10 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
     # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
     for timestamp, data in source.window(time_interval):
         house = data['house']
+        from six import string_types
+        import logging
+        if not isinstance(house, string_types):
+            logging.warn('Invalid data')
         identifier = 'house_{}'.format(house)
         if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
             hyperstream.plate_manager.meta_data_manager.insert(
@@ -156,8 +160,9 @@ def create_hypercat_parser(hyperstream, house, safe=True):
         else:
             return hyperstream.workflow_manager.workflows[workflow_id]
 
-    nodes = (("devices", SA, []),
-             ("hc_devices", S, ["H"])
+    nodes = (("devices",         SA, []),
+             ("device_mappings", SA, []),
+             ("hc_devices",      S,  ["H"])
              )
 
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
@@ -186,12 +191,27 @@ def create_hypercat_parser(hyperstream, house, safe=True):
         source = N["hc_devices"].streams.values()[0]
 
     sink = N["devices"].streams.values()[0]
+
+    # Here we temporarily remove the calculated intervals, so that the tool can see the documents
     ci = sink.calculated_intervals
     sink.calculated_intervals = TimeIntervals([])
 
     tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house=house))
     tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
 
+    # Restore the calculated intervals
+    sink.calculated_intervals = ci
+
+    sink = N["device_mappings"].streams.values()[0]
+
+    # Here we temporarily remove the calculated intervals, so that the tool can see the documents
+    ci = sink.calculated_intervals
+    sink.calculated_intervals = TimeIntervals([])
+
+    tool = hyperstream.channel_manager.get_tool(name="hypercat_uid_mapper", parameters=dict(house=house))
+    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+
+    # Restore the calculated intervals
     sink.calculated_intervals = ci
 
 
@@ -415,8 +435,11 @@ def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_1")
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_2")
 
-    from hyperstream import TimeInterval
-    time_interval = TimeInterval.up_to_now()
+    from hyperstream import TimeInterval, StreamNotFoundError, MultipleStreamsFoundError
+    try:
+        time_interval = hyperstream.channel_manager.sphere_assets.find_stream(name='devices').calculated_intervals[0]
+    except (StreamNotFoundError, MultipleStreamsFoundError, ValueError):
+        time_interval = TimeInterval.up_to_now()
 
     if house=="all":
         create_asset_splitter_0(hyperstream, house=None).execute(time_interval)
