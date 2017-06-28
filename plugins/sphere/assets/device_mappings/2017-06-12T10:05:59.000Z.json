@@ -1,0 +1,98 @@
+{
+    "house": {
+        "2100": {
+            "access_points": {
+                "b8:ae:ed:7e:7d:4d": {
+                    "location": "hall 1"
+                },
+                "b8:ae:ed:7f:00:e5": {
+                    "location": "kitchen 1"
+                },
+                "fd00::212:4b00:0:801": {
+                    "location": "hall 1"
+                },
+                "fd00::212:4b00:0:803": {
+                    "location": "bedroom 2"
+                },
+                "fd00::212:4b00:0:804": {
+                    "location": "living room 2"
+                },
+                "fd00::212:4b00:0:805": {
+                    "location": "kitchen 1"
+                },
+                "fd00::212:4b00:0:806": {
+                    "location": "bedroom 3"
+                },
+                "fd00::212:4b00:0:807": {
+                    "location": "bedroom 1"
+                }
+            },
+            "cameras": {
+                "b8aeed7e7d4d": {
+                    "location": "hall 1"
+                },
+                "b8aeed7f00e5": {
+                    "location": "kitchen 1"
+                }
+            },
+            "electricity_sensors": {
+                "00079": {
+                    "appliance": "food processor",
+                    "location": "kitchen 1"
+                },
+                "01458": {
+                    "appliance": "Kettle",
+                    "location": "kitchen 1"
+                },
+                "03049": {
+                    "appliance": "Mains",
+                    "location": "unknown 1"
+                }
+            },
+            "env_sensors": {
+                "fd00::212:4b00:0:803": {
+                    "location": "bedroom 2"
+                },
+                "fd00::212:4b00:0:804": {
+                    "location": "living room 2"
+                },
+                "fd00::212:4b00:0:805": {
+                    "location": "kitchen 1"
+                },
+                "fd00::212:4b00:0:806": {
+                    "location": "bedroom 3"
+                },
+                "fd00::212:4b00:0:807": {
+                    "location": "bedroom 1"
+                },
+                "fd00::212:4b00:0:881": {
+                    "location": "kitchen 1"
+                },
+                "fd00::212:4b00:0:882": {
+                    "location": "living room 2"
+                },
+                "fd00::212:4b00:0:883": {
+                    "location": "living room 1"
+                },
+                "fd00::212:4b00:0:884": {
+                    "location": "toilet 1"
+                },
+                "fd00::212:4b00:0:885": {
+                    "location": "bedroom 2"
+                },
+                "fd00::212:4b00:0:886": {
+                    "location": "bedroom 3"
+                },
+                "fd00::212:4b00:0:887": {
+                    "location": "bedroom 1"
+                }
+            },
+            "notes": "Auto-generated from HyperCat",
+            "water_sensors_dry": {
+                "fd00::212:4b00:0:880": {
+                    "location": "kitchen 1"
+                }
+            }
+        }
+    }
+}
