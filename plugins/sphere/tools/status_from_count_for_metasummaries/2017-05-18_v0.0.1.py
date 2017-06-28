@@ -28,14 +28,17 @@ from copy import deepcopy
 
 
 class StatusFromCountForMetasummaries(Tool):
-    def __init__(self):
-        super(StatusFromCountForMetasummaries, self).__init__()
+    def __init__(self,force_calculation=True):
+        super(StatusFromCountForMetasummaries, self).__init__(force_calculation=force_calculation)
 
     # noinspection PyCompatibility
     @check_input_stream_count(2)
     def _execute(self, sources, alignment_stream, interval):
         expected_status_stream = sources[0].window(interval, force_calculation=True)
-        counts_stream = (x for x in sources[1].window(interval, force_calculation=False))
+        counts_stream = (x for x in sources[1].window(interval, force_calculation=self.force_calculation))
+        counts_stream_docs = [x for x in sources[1].window(interval, force_calculation=self.force_calculation)]
+        counts_stream_docs = [x for x in sources[1].window(interval, force_calculation=self.force_calculation)]
+        counts_stream_docs = [x for x in sources[1].window(interval, force_calculation=self.force_calculation)]
         counts_doc = None
         for time,expected_status in expected_status_stream:
             res = expected_status.copy()

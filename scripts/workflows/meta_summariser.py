@@ -88,10 +88,12 @@ def create_workflow_meta_summariser(hyperstream,
             return hyperstream.workflow_manager.workflows[workflow_id]
 
     # D=M ####### TODO: REMOVE THIS TEMPORARY COMMAND SOON
+    D=M ####### TODO: REMOVE THIS TEMPORARY COMMAND SOON
 
     nodes = (
-        # ("imported_summaries",                      D, None),
-        # ("genie_events",                              D, ["H"]),
+        ("summaries_downloaded",                      D, ["H"]),
+        ("recording_status_changes",                              D, ["H"]),
+        ("user_triggered_deletions",                              D, ["H"]),
         # ("deployment_start_time",                     D, ["H"]),
         ("h_every_1h",                                  M, ["H"]),
         ("h_every_4h",                                  M, ["H"]),
@@ -217,112 +219,116 @@ def create_workflow_meta_summariser(hyperstream,
         sources=[N["acc_per_uid_status"]],
         sink=N["acc_status"])
 
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="stream_broadcaster_from_stream",
-            parameters=dict(func=lambda x:x)
-        ),
-        source=N["h_expected_status_during_4h"],
-        splitting_node=N["cameras_by_house"],
-        sink=N["h_cameras_expected_status_during_4h"])
+    # w.create_multi_output_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="stream_broadcaster_from_stream",
+    #         parameters=dict(func=lambda x:x)
+    #     ),
+    #     source=N["h_expected_status_during_4h"],
+    #     splitting_node=N["cameras_by_house"],
+    #     sink=N["h_cameras_expected_status_during_4h"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="status_from_count_for_metasummaries",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["h_cameras_expected_status_during_4h"],N["vid_per_uid_counts_agg_total"]],
+    #     sink=N["vid_per_uid_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate_into_dict_and_apply",
+    #         parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='camera')
+    #     ),
+    #     sources=[N["vid_per_uid_status"]],
+    #     sink=N["vid_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate",
+    #         parameters=dict(func=lambda x:sum(x),aggregation_meta_data='env_field')
+    #     ),
+    #     sources=[N["env_per_uid_field_agg_count"]],
+    #     sink=N["env_per_uid_all_count"])
+    #
+    # w.create_multi_output_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="stream_broadcaster_from_stream",
+    #         parameters=dict(func=lambda x:x, use_keys_not_values=True)
+    #     ),
+    #     source=N["h_expected_status_during_1h"],
+    #     splitting_node=N["env_sensors_by_house"],
+    #     sink=N["h_envsensors_expected_status_during_1h"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="status_from_count_for_metasummaries",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["h_envsensors_expected_status_during_1h"],N["env_per_uid_all_count"]],
+    #     sink=N["env_per_uid_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate_into_dict_and_apply",
+    #         parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='env_sensors')
+    #     ),
+    #     sources=[N["env_per_uid_status"]],
+    #     sink=N["env_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate",
+    #         parameters=dict(func=lambda x:sum(x),aggregation_meta_data='wearable')
+    #     ),
+    #     sources=[N["rss_per_uid_aid_value_agg_count"]],
+    #     sink=N["rss_per_aid_all_count"])
+    #
+    # w.create_multi_output_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="stream_broadcaster_from_stream",
+    #         parameters=dict(func=lambda x:x)
+    #     ),
+    #     source=N["h_expected_status_during_4h"],
+    #     splitting_node=N["access_points_by_house"],
+    #     sink=N["h_aps_expected_status_during_4h"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="status_from_count_for_metasummaries",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["h_aps_expected_status_during_4h"],N["rss_per_aid_all_count"]],
+    #     sink=N["rss_per_aid_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate_into_dict_and_apply",
+    #         parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='access_point')
+    #     ),
+    #     sources=[N["rss_per_aid_status"]],
+    #     sink=N["rss_status"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="aggregate",
+    #         parameters=dict(func=lambda x:sum(x),aggregation_meta_data='wearable')
+    #     ),
+    #     sources=[N["prediction_count"]],
+    #     sink=N["all_predictions"])
+    #
+    # w.create_factor(
+    #     tool=hyperstream.channel_manager.get_tool(
+    #         name="status_from_count_for_metasummaries",
+    #         parameters=dict()
+    #     ),
+    #     sources=[N["h_expected_status_during_4h"],N["all_predictions"]],
+    #     sink=N["prediction_status"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="status_from_count_for_metasummaries",
-            parameters=dict()
-        ),
-        sources=[N["h_cameras_expected_status_during_4h"],N["vid_per_uid_counts_agg_total"]],
-        sink=N["vid_per_uid_status"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate_into_dict_and_apply",
-            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='camera')
-        ),
-        sources=[N["vid_per_uid_status"]],
-        sink=N["vid_status"])
+########################################### END
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate",
-            parameters=dict(func=lambda x:sum(x),aggregation_meta_data='env_field')
-        ),
-        sources=[N["env_per_uid_field_agg_count"]],
-        sink=N["env_per_uid_all_count"])
-
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="stream_broadcaster_from_stream",
-            parameters=dict(func=lambda x:x, use_keys_not_values=True)
-        ),
-        source=N["h_expected_status_during_1h"],
-        splitting_node=N["env_sensors_by_house"],
-        sink=N["h_envsensors_expected_status_during_1h"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="status_from_count_for_metasummaries",
-            parameters=dict()
-        ),
-        sources=[N["h_envsensors_expected_status_during_1h"],N["env_per_uid_all_count"]],
-        sink=N["env_per_uid_status"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate_into_dict_and_apply",
-            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='env_sensors')
-        ),
-        sources=[N["env_per_uid_status"]],
-        sink=N["env_status"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate",
-            parameters=dict(func=lambda x:sum(x),aggregation_meta_data='wearable')
-        ),
-        sources=[N["rss_per_uid_aid_value_agg_count"]],
-        sink=N["rss_per_aid_all_count"])
-
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="stream_broadcaster_from_stream",
-            parameters=dict(func=lambda x:x)
-        ),
-        source=N["h_expected_status_during_4h"],
-        splitting_node=N["access_points_by_house"],
-        sink=N["h_aps_expected_status_during_4h"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="status_from_count_for_metasummaries",
-            parameters=dict()
-        ),
-        sources=[N["h_aps_expected_status_during_4h"],N["rss_per_aid_all_count"]],
-        sink=N["rss_per_aid_status"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate_into_dict_and_apply",
-            parameters=dict(func=lambda x: 0+x['data'],aggregation_meta_data='access_point')
-        ),
-        sources=[N["rss_per_aid_status"]],
-        sink=N["rss_status"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="aggregate",
-            parameters=dict(func=lambda x:sum(x),aggregation_meta_data='wearable')
-        ),
-        sources=[N["prediction_count"]],
-        sink=N["all_predictions"])
-
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="status_from_count_for_metasummaries",
-            parameters=dict()
-        ),
-        sources=[N["h_expected_status_during_4h"],N["all_predictions"]],
-        sink=N["prediction_status"])
 
     # w.create_multi_output_factor(
     #     tool=hyperstream.channel_manager.get_tool(
