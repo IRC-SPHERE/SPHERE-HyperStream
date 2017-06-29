@@ -67,11 +67,14 @@ class HypercatUidMapper(Tool):
             assets['house'][house] = defaultdict(dict)
             assets['house'][house]['notes'] = "Auto-generated from HyperCat"
 
-            def add_device(device_type_readable):
+            def add_device(device_type_readable, device=None, root_gateway=False):
                 if device_type_readable:
                     d = {'location': location}
                     if appliance:
                         d['appliance'] = appliance
+                    if device is not None:
+                        d['device'] = device
+                        d['root_gateway'] = root_gateway
                     assets['house'][house][device_type_readable][uid] = d
 
             for item in hypercat_items:
@@ -101,18 +104,18 @@ class HypercatUidMapper(Tool):
                     add_device('electricity_sensors')
 
                 elif device_type == u'SPG2_F' or description == u'Sphere Gateway':
-                    add_device('access_points')
+                    add_device('access_points', device="gateway")
                     # Also use as environmental sensor
                     add_device('env_sensors')
 
                 elif device_type == u'SPG2_BR' or description == u'Root Sphere Gateway':
-                    add_device('access_points')
+                    add_device('access_points', device="gateway", root_gateway=True)
 
                 elif device_type == u'Intel NUC VIDEO' or description == u'Motion Detector':
                     add_device('cameras')
                     # Also use as access point with modified uid
                     uid = ':'.join([uid[0:2], uid[2:4], uid[4:6], uid[6:8], uid[8:10], uid[10:12]])
-                    add_device('access_points')
+                    add_device('access_points', device="videonuc")
 
                 elif device_type == u'Intel NUC HOME' or description == u'Home Gateway':
                     pass

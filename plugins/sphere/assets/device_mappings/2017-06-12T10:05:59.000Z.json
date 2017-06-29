@@ -3,28 +3,44 @@
         "2100": {
             "access_points": {
                 "b8:ae:ed:7e:7d:4d": {
-                    "location": "hall 1"
+                    "device": "videonuc",
+                    "location": "hall 1",
+                    "root_gateway": false
                 },
                 "b8:ae:ed:7f:00:e5": {
-                    "location": "kitchen 1"
+                    "device": "videonuc",
+                    "location": "kitchen 1",
+                    "root_gateway": false
                 },
                 "fd00::212:4b00:0:801": {
-                    "location": "hall 1"
+                    "device": "gateway",
+                    "location": "hall 1",
+                    "root_gateway": true
                 },
                 "fd00::212:4b00:0:803": {
-                    "location": "bedroom 2"
+                    "device": "gateway",
+                    "location": "bedroom 2",
+                    "root_gateway": false
                 },
                 "fd00::212:4b00:0:804": {
-                    "location": "living room 2"
+                    "device": "gateway",
+                    "location": "living room 2",
+                    "root_gateway": false
                 },
                 "fd00::212:4b00:0:805": {
-                    "location": "kitchen 1"
+                    "device": "gateway",
+                    "location": "kitchen 1",
+                    "root_gateway": false
                 },
                 "fd00::212:4b00:0:806": {
-                    "location": "bedroom 3"
+                    "device": "gateway",
+                    "location": "bedroom 3",
+                    "root_gateway": false
                 },
                 "fd00::212:4b00:0:807": {
-                    "location": "bedroom 1"
+                    "device": "gateway",
+                    "location": "bedroom 1",
+                    "root_gateway": false
                 }
             },
             "cameras": {
