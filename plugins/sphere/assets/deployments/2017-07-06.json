@@ -1,0 +1,37 @@
+{
+    "house": {
+        "1193": {
+            "deployment_date": "2017-03-24"
+        },
+        "2100": {
+            "deployment_date": "2017-06-14"
+        },
+        "2642": {
+            "deployment_date": "2017-05-10"
+        },
+        "2680": {
+            "deployment_date": "2017-06-16"
+        },
+        "3007": {
+            "deployment_date": "2017-04-21"
+        },
+        "3010": {
+            "deployment_date": "2017-06-09"
+        },
+        "3610": {
+            "deployment_date": "2017-06-23"
+        },
+        "4510": {
+            "deployment_date": "2017-06-21"
+        },
+        "6755": {
+            "deployment_date": "2017-06-28"
+        },
+        "7130": {
+            "deployment_date": "2017-05-15"
+        },
+        "9655": {
+            "deployment_date": "2017-07-03"
+        }
+    }
+}
