@@ -24,8 +24,19 @@ from mongoengine.context_managers import switch_db
 from pymongo.errors import InvalidDocument
 
 from hyperstream.channels import DatabaseChannel
+from hyperstream.models import StreamInstanceModel
 from hyperstream import StreamInstance
-from hyperstream.models import SummaryInstanceModel
+
+
+class SummaryInstanceModel(StreamInstanceModel):
+    meta = {
+        'collection': 'summaries',
+        'indexes': [
+            {'fields': ['stream_id']},
+            {'fields': ['stream_id', 'datetime'], 'unique': True}
+        ],
+        'ordering': ['datetime']
+    }
 
 
 class SummaryChannel(DatabaseChannel):
