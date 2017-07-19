@@ -72,9 +72,9 @@ if __name__ == '__main__':
     import sys
     from os import path
 
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    sys.path.append(path)
+    sys.path.insert(0, path)
 
     def signal_handler(signal, frame):
         sys.exit(0)

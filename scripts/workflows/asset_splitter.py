@@ -63,10 +63,7 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
 
     # First create the plate values for the node
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element="house", filters=filters, use_value_instead_of_key=False)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element="house", filters=filters, use_value_instead_of_key=False),
         source=w.create_node("devices", SA, []),
         output_plate=dict(
             plate_id="H",
@@ -85,8 +82,8 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
 def create_hypercat_dumps_parser(hyperstream, safe=True):
     from hyperstream.time_interval import TimeInterval, TimeIntervals, MIN_DATE
 
+    # noinspection PyPep8Naming
     SA = hyperstream.channel_manager.sphere_assets
-    S = hyperstream.channel_manager.sphere
 
     workflow_id = "hypercat_dumps_reader"
     try:
@@ -106,6 +103,7 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
              ("hypercat_dumps", SA, [])
              )
 
+    # noinspection PyPep8Naming
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
 
     time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
@@ -116,8 +114,8 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
     ci = sink.calculated_intervals
     sink.calculated_intervals = TimeIntervals([])
 
-    tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house="all"))
-    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+    hyperstream.plugins.sphere.tools.hypercat_parser(house="all").execute(
+        sources=[source, sink], sink=sink, interval=time_interval)
 
     sink.calculated_intervals = ci
 
@@ -137,7 +135,9 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
 def create_hypercat_parser(hyperstream, house, safe=True):
     from hyperstream.time_interval import TimeInterval, TimeIntervals, MIN_DATE
 
+    # noinspection PyPep8Naming
     SA = hyperstream.channel_manager.sphere_assets
+    # noinspection PyPep8Naming
     S = hyperstream.channel_manager.sphere
 
     # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
@@ -165,14 +165,14 @@ def create_hypercat_parser(hyperstream, house, safe=True):
              ("hc_devices",      S,  ["H"])
              )
 
+    # noinspection PyPep8Naming
     N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
 
     time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
     # time_interval = TimeInterval.up_to_now()
 
-    w.create_multi_output_factor(tool=hyperstream.channel_manager.get_tool(
-            name="sphere",
-            parameters=dict(modality="hypercat", default_house=house)),
+    w.create_multi_output_factor(
+        tool=hyperstream.plugins.sphere.tools.sphere(modality="hypercat", default_house=house),
         source=None,
         splitting_node=None,
         sink=N["hc_devices"])
@@ -196,8 +196,8 @@ def create_hypercat_parser(hyperstream, house, safe=True):
     ci = sink.calculated_intervals
     sink.calculated_intervals = TimeIntervals([])
 
-    tool = hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict(house=house))
-    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+    hyperstream.plugins.sphere.tools.hypercat_parser(house=house).execute(
+        sources=[source, sink], sink=sink, interval=time_interval)
 
     # Restore the calculated intervals
     sink.calculated_intervals = ci
@@ -256,60 +256,42 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
 
     # Now populate the node
     w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_splitter",
-            parameters=dict(element="house", filters=house)
-        ),
+        tool=hyperstream.tools.asset_splitter(element="house", filters=house),
         source=N["devices"],
         splitting_node=None,
         sink=N["devices_by_house"]
     )
 
     w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key="env_sensors")
-        ),
+        tool=hyperstream.tools.component(key="env_sensors"),
         sources=[N["devices_by_house"]],
         alignment_node=None,
         sink=N["env_sensors_by_house"]
     )
 
     w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key="access_points")
-        ),
+        tool=hyperstream.tools.component(key="access_points"),
         sources=[N["devices_by_house"]],
         alignment_node=None,
         sink=N["access_points_by_house"]
     )
 
     w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key="wearables")
-        ),
+        tool=hyperstream.tools.component(key="wearables"),
         sources=[N["devices_by_house"]],
         alignment_node=None,
         sink=N["wearables_by_house"]
     )
 
     w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key="cameras")
-        ),
+        tool=hyperstream.tools.component(key="cameras"),
         sources=[N["devices_by_house"]],
         alignment_node=None,
         sink=N["cameras_by_house"]
     )
 
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element=None, use_value_instead_of_key=False)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
         source=N["env_sensors_by_house"],
         output_plate=dict(
             plate_id="H.EnvSensors",
@@ -321,10 +303,7 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
     )
 
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element=None, use_value_instead_of_key=True)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
         source=N["access_points_by_house"],
         output_plate=dict(
             plate_id="H.APs",
@@ -336,10 +315,7 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
     )
 
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element=None, use_value_instead_of_key=True)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
         source=N["wearables_by_house"],
         output_plate=dict(
             plate_id="H.W",
@@ -351,10 +327,7 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
     )
 
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element=None, use_value_instead_of_key=True)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
         source=N["cameras_by_house"],
         output_plate=dict(
             plate_id="H.Cameras",
@@ -398,20 +371,14 @@ def create_asset_splitter_2(hyperstream, safe=True):
     A.purge_node("fields_by_env_sensor")
 
     w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_splitter",
-            parameters=dict()
-        ),
+        tool=hyperstream.tools.asset_splitter(),
         source=N["env_sensors_by_house"],
         splitting_node=None,
         sink=N["fields_by_env_sensor"]
     )
 
     w.create_node_creation_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="asset_plate_generator",
-            parameters=dict(element=None, use_value_instead_of_key=False)
-        ),
+        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
         source=N["fields_by_env_sensor"],
         output_plate=dict(
             plate_id="H.EnvSensors.Fields",
@@ -428,7 +395,7 @@ def create_asset_splitter_2(hyperstream, safe=True):
 def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     if delete_existing_workflows:
         hyperstream.workflow_manager.delete_workflow("sphere_asset_splitter_0")
-        if house=="all":
+        if house == "all":
             hyperstream.workflow_manager.delete_workflow("hypercat_dumps_reader")
         else:
             hyperstream.workflow_manager.delete_workflow("hypercat_reader")
@@ -441,10 +408,10 @@ def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
     except (StreamNotFoundError, MultipleStreamsFoundError, ValueError):
         time_interval = TimeInterval.up_to_now()
 
-    if house=="all":
+    if house == "all":
         create_asset_splitter_0(hyperstream, house=None).execute(time_interval)
         create_hypercat_dumps_parser(hyperstream)
-        create_asset_splitter_0(hyperstream, house=None,safe=False).execute(time_interval)
+        create_asset_splitter_0(hyperstream, house=None, safe=False).execute(time_interval)
         create_asset_splitter_1(hyperstream, house=None).execute(time_interval)
     else:
         create_asset_splitter_0(hyperstream, house=house).execute(time_interval)

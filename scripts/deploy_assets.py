@@ -32,7 +32,7 @@ def run(house, loglevel=logging.INFO):
 
 
 if __name__ == '__main__':
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
 
     from plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.wearable_list_parser(default_loglevel=logging.INFO)
