@@ -52,6 +52,10 @@ class HypercatUidMapper(Tool):
     def _execute(self, sources, alignment_stream, interval):
         items = sources[0].window(interval, force_calculation=True).items()
 
+        if not items:
+            logging.warn("Hypercat data not found for house {}".format(self.house))
+            return
+
         # TODO: Update the last element of the existing assets stream
         assets = deepcopy(sources[1].window(interval).last().value)
 

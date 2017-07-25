@@ -126,6 +126,7 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
 
 
 def create_hypercat_parser(hyperstream, house, safe=True):
+    from hyperstream import StreamId
     from hyperstream.time_interval import TimeInterval, TimeIntervals, MIN_DATE
 
     # noinspection PyPep8Naming
@@ -175,9 +176,9 @@ def create_hypercat_parser(hyperstream, house, safe=True):
         w.execute(time_interval)
 
         try:
-            source = S.streams[S.non_empty_streams.keys()[0]]
+            source = S[StreamId(name="hc_devices", meta_data=(('house', house),))]
         except IndexError:
-            source = N["hc_devices"].streams.values()[0]
+            source = N["hc_devices"].streams[(('house', house), )]
 
         sink = N["devices"].streams.values()[0]
 
@@ -331,49 +332,45 @@ def create_asset_splitter_2(hyperstream, safe=True):
 
     A = hyperstream.channel_manager.assets
 
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Asset Splitter 2",
             owner="MK",
             description="Creates the sub-sub-plates (level 2 in the hierarchy)",
-            online=False)
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            online=False,
+            safe=safe
+    ) as w:
 
-    nodes = (
-        ("env_sensors_by_house",                    A, ["H"]),
-        ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
-    )
+        nodes = (
+            ("env_sensors_by_house",                    A, ["H"]),
+            ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
+        )
 
-    # Create all of the nodes
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        # Create all of the nodes
+        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
 
-    A.purge_node("fields_by_env_sensor")
+        A.purge_node("fields_by_env_sensor")
 
-    w.create_multi_output_factor(
-        tool=hyperstream.tools.asset_splitter(),
-        source=N["env_sensors_by_house"],
-        splitting_node=None,
-        sink=N["fields_by_env_sensor"]
-    )
+        w.create_multi_output_factor(
+            tool=hyperstream.tools.asset_splitter(),
+            source=N["env_sensors_by_house"],
+            splitting_node=None,
+            sink=N["fields_by_env_sensor"]
+        )
 
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
-        source=N["fields_by_env_sensor"],
-        output_plate=dict(
-            plate_id="H.EnvSensors.Fields",
-            meta_data_id="env_field",
-            description="All fields in each environmental sensor",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
+            source=N["fields_by_env_sensor"],
+            output_plate=dict(
+                plate_id="H.EnvSensors.Fields",
+                meta_data_id="env_field",
+                description="All fields in each environmental sensor",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    return w
+        return w
 
 
 def split_sphere_assets(hyperstream, house, delete_existing_workflows=True):
