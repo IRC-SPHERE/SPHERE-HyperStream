@@ -29,98 +29,92 @@ def create_workflow_list_wearable_sync_events(hyperstream, house, safe=True):
 
     # Create a simple one step workflow for querying
     workflow_id = "list_wearable_sync_events"
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="list multi-tap events which potentially synchronise with the annotating sound recorder",
             owner="MK",
-            description="list multi-tap events which potentially synchronise with the annotating sound recorder"
-            )
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            description="list multi-tap events which potentially synchronise with the annotating sound recorder",
+            safe=safe
+            ) as w:
 
-    nodes = (
-        ("wearables_by_house", A, ["H"]),
-        ("acc_raw",     S, ["H"]),
-        ("acc_per_uid", S, ["H.W"]),
-        ("acc_per_uid_acclist", S, ["H.W"]),
-        ("acc_per_uid_magnitude", D, ["H.W"]),
-        ("acc_per_uid_windows", S, ["H.W"]),
-        ("acc_per_uid_magnitude_agg", S, ["H.W"]),
-        ("acc_per_uid_magnitude_agg_5_taps", D, ["H.W"]),
-        ("experiments_list",        M, ["H"]),                    # Current annotation data in 2s windows
-        ("experiments_dataframe",   M, ["H"]),                    # Current annotation data in 2s windows
-    )
+        nodes = (
+            ("wearables_by_house",               A, ["H"]),
+            ("acc_raw",                          S, ["H"]),
+            ("acc_per_uid",                      S, ["H.W"]),
+            ("acc_per_uid_acclist",              S, ["H.W"]),
+            ("acc_per_uid_magnitude",            D, ["H.W"]),
+            ("acc_per_uid_windows",              S, ["H.W"]),
+            ("acc_per_uid_magnitude_agg",        S, ["H.W"]),
+            ("acc_per_uid_magnitude_agg_5_taps", D, ["H.W"]),
+            ("experiments_list",                 M, ["H"]),  # Current annotation data in 2s windows
+            ("experiments_dataframe",            M, ["H"]),  # Current annotation data in 2s windows
+        )
 
-    # Create all of the nodes
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        # Create all of the nodes
+        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
+                 for stream_name, channel, plate_ids in nodes)
 
-    w.create_multi_output_factor(
-       tool=hyperstream.channel_manager.get_tool(
-           name="sphere",
-           parameters=dict(modality="wearable",elements={"xl"})
-       ),
-       source=None,
-       splitting_node=None,
-       sink=N["acc_raw"])
+        w.create_multi_output_factor(
+           tool=hyperstream.channel_manager.get_tool(
+               name="sphere",
+               parameters=dict(modality="wearable", elements={"xl"})
+           ),
+           source=None,
+           splitting_node=None,
+           sink=N["acc_raw"])
 
-    w.create_multi_output_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="splitter_from_stream",
-            parameters=dict(element="uid")
-        ),
-        source=N["acc_raw"],
-        splitting_node=N["wearables_by_house"],
-        sink=N["acc_per_uid"])
+        w.create_multi_output_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="splitter_from_stream",
+                parameters=dict(element="uid")
+            ),
+            source=N["acc_raw"],
+            splitting_node=N["wearables_by_house"],
+            sink=N["acc_per_uid"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="component",
-            parameters=dict(key='wearable-xl1')
-        ),
-        sources=[N["acc_per_uid"]],
-        sink=N["acc_per_uid_acclist"])
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="component",
+                parameters=dict(key='wearable-xl1')
+            ),
+            sources=[N["acc_per_uid"]],
+            sink=N["acc_per_uid_acclist"])
 
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="calc_acc_magnitude",
+                parameters=dict()
+            ),
+            sources=[N["acc_per_uid_acclist"]],
+            sink=N["acc_per_uid_magnitude"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="calc_acc_magnitude",
-            parameters=dict()
-        ),
-        sources=[N["acc_per_uid_acclist"]],
-        sink=N["acc_per_uid_magnitude"])
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="sliding_window",
+                # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
+                parameters=dict(lower=-8, upper=0.0, increment=1)
+            ),
+            sources=None,
+            sink=N["acc_per_uid_windows"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="sliding_window",
-            # parameters=dict(lower=-3600.0, upper=0.0, increment=3600.0)
-            parameters=dict(lower=-8, upper=0.0, increment=1)
-        ),
-        sources=None,
-        sink=N["acc_per_uid_windows"])
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="sliding_listify",
+                parameters=dict(include_time=True)
+            ),
+            sources=[N["acc_per_uid_windows"], N["acc_per_uid_magnitude"]],
+            sink=N["acc_per_uid_magnitude_agg"])
 
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="sliding_listify",
-            parameters=dict(include_time=True)
-        ),
-        sources=[N["acc_per_uid_windows"], N["acc_per_uid_magnitude"]],
-        sink=N["acc_per_uid_magnitude_agg"])
+        # now need to find the 5 taps.
+        # tap: magnitude above 2.0 and higher than neighbours
+        # find all 4 sec intervals with at least 3 taps and no taps in the surrounding 3 sec
+        # print them out
+        w.create_factor(
+            tool=hyperstream.channel_manager.get_tool(
+                name="detect_5_taps",
+                parameters=dict()
+            ),
+            sources=[N["acc_per_uid_magnitude_agg"]],
+            sink=N["acc_per_uid_magnitude_agg_5_taps"])
 
-    # now need to find the 5 taps.
-    # tap: magnitude above 2.0 and higher than neighbours
-    # find all 4 sec intervals with at least 3 taps and no taps in the surrounding 3 sec
-    # print them out
-    w.create_factor(
-        tool=hyperstream.channel_manager.get_tool(
-            name="detect_5_taps",
-            parameters=dict()
-        ),
-        sources=[N["acc_per_uid_magnitude_agg"]],
-        sink=N["acc_per_uid_magnitude_agg_5_taps"])
-
-
-    return w
+        return w
