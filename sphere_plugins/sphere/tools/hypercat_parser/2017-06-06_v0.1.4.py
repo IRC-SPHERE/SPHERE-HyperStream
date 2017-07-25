@@ -58,7 +58,7 @@ class HypercatParser(Tool):
         # TODO: Update the last element of the existing assets stream
         assets = deepcopy(sources[1].window(interval).last().value)
 
-        if self.house=="all":
+        if self.house == "all":
             assets_timestamp = items[-1].timestamp
         else:
             assets_timestamp = items[0].timestamp

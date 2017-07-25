@@ -46,37 +46,33 @@ def create_asset_splitter_0(hyperstream, house, safe=True):
     A = hyperstream.channel_manager.assets
     SA = hyperstream.channel_manager.sphere_assets
 
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Asset Splitter 0",
             owner="MK",
             description="Create the house plate (level 0 in the hierarchy)",
-            online=False)
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            online=False,
+            safe=safe) as w:
 
-    filters = (house,) if house else None
+        filters = (house,) if house else None
 
-    # First create the plate values for the node
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element="house", filters=filters, use_value_instead_of_key=False),
-        source=w.create_node("devices", SA, []),
-        output_plate=dict(
-            plate_id="H",
-            meta_data_id="house",
-            description="All houses",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        # First create the plate values for the node
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(
+                element="house", filters=filters, use_value_instead_of_key=False),
+            source=w.create_node("devices", SA, []),
+            output_plate=dict(
+                plate_id="H",
+                meta_data_id="house",
+                description="All houses",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    A.purge_node("devices")
+        A.purge_node("devices")
 
-    return w
+        return w
 
 
 def create_hypercat_dumps_parser(hyperstream, safe=True):
@@ -86,50 +82,47 @@ def create_hypercat_dumps_parser(hyperstream, safe=True):
     SA = hyperstream.channel_manager.sphere_assets
 
     workflow_id = "hypercat_dumps_reader"
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="HyperCat Dumps Reader",
             owner="MK",
             description="Read the hypercat dumps about houses, and dump into the assets stream",
-            online=False)
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            online=False,
+            safe=safe) as w:
 
-    nodes = (("devices", SA, []),
-             ("hypercat_dumps", SA, [])
-             )
+        nodes = (("devices", SA, []),
+                 ("hypercat_dumps", SA, [])
+                 )
 
-    # noinspection PyPep8Naming
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        # noinspection PyPep8Naming
+        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
+                 for stream_name, channel, plate_ids in nodes)
 
-    time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
-    # time_interval = TimeInterval.up_to_now()
+        time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
+        # time_interval = TimeInterval.up_to_now()
 
-    source = N["hypercat_dumps"].streams.values()[0]
-    sink = N["devices"].streams.values()[0]
-    ci = sink.calculated_intervals
-    sink.calculated_intervals = TimeIntervals([])
+        source = N["hypercat_dumps"].streams.values()[0]
+        sink = N["devices"].streams.values()[0]
+        ci = sink.calculated_intervals
+        sink.calculated_intervals = TimeIntervals([])
 
-    hyperstream.plugins.sphere.tools.hypercat_parser(house="all").execute(
-        sources=[source, sink], sink=sink, interval=time_interval)
+        hyperstream.plugins.sphere.tools.hypercat_parser(house="all").execute(
+            sources=[source, sink], sink=sink, interval=time_interval)
 
-    sink.calculated_intervals = ci
+        sink.calculated_intervals = ci
 
-    # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
-    for timestamp, data in source.window(time_interval):
-        house = data['house']
-        from six import string_types
-        import logging
-        if not isinstance(house, string_types):
-            logging.warn('Invalid data')
-        identifier = 'house_{}'.format(house)
-        if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
-            hyperstream.plate_manager.meta_data_manager.insert(
-                tag='house', identifier=identifier, parent='root', data=house)
+        # Make sure this house exists in the meta data:
+        # workaround for the fact that the meta data hasn't yet been created
+        for timestamp, data in source.window(time_interval):
+            house = data['house']
+            from six import string_types
+            import logging
+            if not isinstance(house, string_types):
+                logging.warn('Invalid data')
+            identifier = 'house_{}'.format(house)
+            if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
+                hyperstream.plate_manager.meta_data_manager.insert(
+                    tag='house', identifier=identifier, parent='root', data=house)
 
 
 def create_hypercat_parser(hyperstream, house, safe=True):
@@ -147,72 +140,68 @@ def create_hypercat_parser(hyperstream, house, safe=True):
             tag='house', identifier=identifier, parent='root', data=house)
 
     workflow_id = "hypercat_reader"
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="HyperCat Reader",
             owner="MK",
             description="Read the hypercat, and dump into the assets stream",
-            online=False)
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            online=False,
+            safe=safe) as w:
 
-    nodes = (("devices",         SA, []),
-             ("device_mappings", SA, []),
-             ("hc_devices",      S,  ["H"])
-             )
+        nodes = (("devices",         SA, []),
+                 ("device_mappings", SA, []),
+                 ("hc_devices",      S,  ["H"])
+                 )
 
-    # noinspection PyPep8Naming
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        # noinspection PyPep8Naming
+        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
+                 for stream_name, channel, plate_ids in nodes)
 
-    time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
-    # time_interval = TimeInterval.up_to_now()
+        time_interval = TimeInterval(MIN_DATE, SA.up_to_timestamp)
+        # time_interval = TimeInterval.up_to_now()
 
-    w.create_multi_output_factor(
-        tool=hyperstream.plugins.sphere.tools.sphere(modality="hypercat", default_house=house),
-        source=None,
-        splitting_node=None,
-        sink=N["hc_devices"])
+        w.create_multi_output_factor(
+            tool=hyperstream.plugins.sphere.tools.sphere(modality="hypercat", default_house=house),
+            source=None,
+            splitting_node=None,
+            sink=N["hc_devices"])
 
-    # w.create_factor(
-    #     tool=hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict()),
-    #     sources=[N["hc_devices"]],
-    #     sink=N["devices"]
-    # )
+        # w.create_factor(
+        #     tool=hyperstream.channel_manager.get_tool(name="hypercat_parser", parameters=dict()),
+        #     sources=[N["hc_devices"]],
+        #     sink=N["devices"]
+        # )
 
-    w.execute(time_interval)
+        w.execute(time_interval)
 
-    try:
-        source = S.streams[S.non_empty_streams.keys()[0]]
-    except IndexError:
-        source = N["hc_devices"].streams.values()[0]
+        try:
+            source = S.streams[S.non_empty_streams.keys()[0]]
+        except IndexError:
+            source = N["hc_devices"].streams.values()[0]
 
-    sink = N["devices"].streams.values()[0]
+        sink = N["devices"].streams.values()[0]
 
-    # Here we temporarily remove the calculated intervals, so that the tool can see the documents
-    ci = sink.calculated_intervals
-    sink.calculated_intervals = TimeIntervals([])
+        # Here we temporarily remove the calculated intervals, so that the tool can see the documents
+        ci = sink.calculated_intervals
+        sink.calculated_intervals = TimeIntervals([])
 
-    hyperstream.plugins.sphere.tools.hypercat_parser(house=house).execute(
-        sources=[source, sink], sink=sink, interval=time_interval)
+        hyperstream.plugins.sphere.tools.hypercat_parser(house=house).execute(
+            sources=[source, sink], sink=sink, interval=time_interval)
 
-    # Restore the calculated intervals
-    sink.calculated_intervals = ci
+        # Restore the calculated intervals
+        sink.calculated_intervals = ci
 
-    sink = N["device_mappings"].streams.values()[0]
+        sink = N["device_mappings"].streams.values()[0]
 
-    # Here we temporarily remove the calculated intervals, so that the tool can see the documents
-    ci = sink.calculated_intervals
-    sink.calculated_intervals = TimeIntervals([])
+        # Here we temporarily remove the calculated intervals, so that the tool can see the documents
+        ci = sink.calculated_intervals
+        sink.calculated_intervals = TimeIntervals([])
 
-    tool = hyperstream.channel_manager.get_tool(name="hypercat_uid_mapper", parameters=dict(house=house))
-    tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
+        tool = hyperstream.channel_manager.get_tool(name="hypercat_uid_mapper", parameters=dict(house=house))
+        tool.execute(sources=[source, sink], sink=sink, alignment_stream=None, interval=time_interval)
 
-    # Restore the calculated intervals
-    sink.calculated_intervals = ci
+        # Restore the calculated intervals
+        sink.calculated_intervals = ci
 
 
 # noinspection PyPep8Naming
@@ -222,123 +211,118 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
     SA = hyperstream.channel_manager.sphere_assets
     A = hyperstream.channel_manager.assets
 
-    try:
-        w = hyperstream.create_workflow(
+    with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Asset Splitter 1",
             owner="MK",
             description="Splits the assets into separate streams on house plate and creates sub-plates "
                         "(level 1 in the hierarchy)",
-            online=False)
-    except KeyError as e:
-        if safe:
-            raise e
-        else:
-            return hyperstream.workflow_manager.workflows[workflow_id]
+            online=False,
+            safe=safe) as w:
 
-    nodes = (
-        ("devices",                                 SA, []),
-        ("devices_by_house",                        A, ["H"]),
-        ("wearables_by_house",                      A, ["H"]),
-        ("access_points_by_house",                  A, ["H"]),
-        ("cameras_by_house",                        A, ["H"]),
-        ("env_sensors_by_house",                    A, ["H"])
-    )
+        nodes = (
+            ("devices",                                 SA, []),
+            ("devices_by_house",                        A, ["H"]),
+            ("wearables_by_house",                      A, ["H"]),
+            ("access_points_by_house",                  A, ["H"]),
+            ("cameras_by_house",                        A, ["H"]),
+            ("env_sensors_by_house",                    A, ["H"])
+        )
 
-    # Create all of the nodes
-    N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        # Create all of the nodes
+        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
 
-    A.purge_node("devices_by_house")
-    A.purge_node("wearables_by_house")
-    A.purge_node("access_points_by_house")
-    A.purge_node("cameras_by_house")
-    A.purge_node("env_sensors_by_house")
+        A.purge_node("devices_by_house")
+        A.purge_node("wearables_by_house")
+        A.purge_node("access_points_by_house")
+        A.purge_node("cameras_by_house")
+        A.purge_node("env_sensors_by_house")
 
-    # Now populate the node
-    w.create_multi_output_factor(
-        tool=hyperstream.tools.asset_splitter(element="house", filters=house),
-        source=N["devices"],
-        splitting_node=None,
-        sink=N["devices_by_house"]
-    )
+        # Now populate the node
+        w.create_multi_output_factor(
+            tool=hyperstream.tools.asset_splitter(element="house", filters=house),
+            source=N["devices"],
+            splitting_node=None,
+            sink=N["devices_by_house"]
+        )
 
-    w.create_factor(
-        tool=hyperstream.tools.component(key="env_sensors"),
-        sources=[N["devices_by_house"]],
-        alignment_node=None,
-        sink=N["env_sensors_by_house"]
-    )
+        w.create_factor(
+            tool=hyperstream.tools.component(key="env_sensors"),
+            sources=[N["devices_by_house"]],
+            alignment_node=None,
+            sink=N["env_sensors_by_house"]
+        )
 
-    w.create_factor(
-        tool=hyperstream.tools.component(key="access_points"),
-        sources=[N["devices_by_house"]],
-        alignment_node=None,
-        sink=N["access_points_by_house"]
-    )
+        w.create_factor(
+            tool=hyperstream.tools.component(key="access_points"),
+            sources=[N["devices_by_house"]],
+            alignment_node=None,
+            sink=N["access_points_by_house"]
+        )
 
-    w.create_factor(
-        tool=hyperstream.tools.component(key="wearables"),
-        sources=[N["devices_by_house"]],
-        alignment_node=None,
-        sink=N["wearables_by_house"]
-    )
+        w.create_factor(
+            tool=hyperstream.tools.component(key="wearables"),
+            sources=[N["devices_by_house"]],
+            alignment_node=None,
+            sink=N["wearables_by_house"]
+        )
 
-    w.create_factor(
-        tool=hyperstream.tools.component(key="cameras"),
-        sources=[N["devices_by_house"]],
-        alignment_node=None,
-        sink=N["cameras_by_house"]
-    )
+        w.create_factor(
+            tool=hyperstream.tools.component(key="cameras"),
+            sources=[N["devices_by_house"]],
+            alignment_node=None,
+            sink=N["cameras_by_house"]
+        )
 
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
-        source=N["env_sensors_by_house"],
-        output_plate=dict(
-            plate_id="H.EnvSensors",
-            meta_data_id="env_sensors",
-            description="All environmental sensors in each house",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=False),
+            source=N["env_sensors_by_house"],
+            output_plate=dict(
+                plate_id="H.EnvSensors",
+                meta_data_id="env_sensors",
+                description="All environmental sensors in each house",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
-        source=N["access_points_by_house"],
-        output_plate=dict(
-            plate_id="H.APs",
-            meta_data_id="access_point",
-            description="All access points in each house",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
+            source=N["access_points_by_house"],
+            output_plate=dict(
+                plate_id="H.APs",
+                meta_data_id="access_point",
+                description="All access points in each house",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
-        source=N["wearables_by_house"],
-        output_plate=dict(
-            plate_id="H.W",
-            meta_data_id="wearable",
-            description="All wearables in each house",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
+            source=N["wearables_by_house"],
+            output_plate=dict(
+                plate_id="H.W",
+                meta_data_id="wearable",
+                description="All wearables in each house",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    w.create_node_creation_factor(
-        tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
-        source=N["cameras_by_house"],
-        output_plate=dict(
-            plate_id="H.Cameras",
-            meta_data_id="camera",
-            description="All cameras in each house",
-            use_provided_values=False
-        ),
-        plate_manager=hyperstream.plate_manager
-    )
+        w.create_node_creation_factor(
+            tool=hyperstream.tools.asset_plate_generator(element=None, use_value_instead_of_key=True),
+            source=N["cameras_by_house"],
+            output_plate=dict(
+                plate_id="H.Cameras",
+                meta_data_id="camera",
+                description="All cameras in each house",
+                use_provided_values=False
+            ),
+            plate_manager=hyperstream.plate_manager
+        )
 
-    return w
+        return w
 
 
 # noinspection PyPep8Naming
