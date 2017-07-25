@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
 
-    from plugins.sphere.utils import ArgumentParser
+    from sphere_plugins.sphere.utils import ArgumentParser
     args = ArgumentParser.wearable_list_parser(default_loglevel=logging.INFO)
 
     delete_existing_workflows = True

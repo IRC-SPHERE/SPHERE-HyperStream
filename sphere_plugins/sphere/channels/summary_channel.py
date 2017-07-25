@@ -21,14 +21,21 @@
 import logging
 from mongoengine.errors import NotUniqueError, InvalidDocumentError
 from mongoengine.context_managers import switch_db
+from mongoengine import Document, EmbeddedDocumentField, StringField, DateTimeField, DynamicField
 from pymongo.errors import InvalidDocument
 
 from hyperstream.channels import DatabaseChannel
-from hyperstream.models import StreamInstanceModel
+from hyperstream.models import StreamIdField
 from hyperstream import StreamInstance
 
 
-class SummaryInstanceModel(StreamInstanceModel):
+class SummaryInstanceModel(Document):
+    stream_id = EmbeddedDocumentField(document_type=StreamIdField, required=True)
+    stream_type = StringField(required=False, min_length=1, max_length=512)
+    datetime = DateTimeField(required=True)
+    # tool_version = StringField(required=True, min_length=1, max_length=512)
+    value = DynamicField(required=True)
+
     meta = {
         'collection': 'summaries',
         'indexes': [

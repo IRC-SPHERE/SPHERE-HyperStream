@@ -18,25 +18,3 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-import logging
-import sys
-from os import path
-
-
-def run(house, loglevel=logging.INFO):
-    from hyperstream import HyperStream
-    from workflows.asset_splitter import split_sphere_assets
-
-    hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
-    split_sphere_assets(hyperstream, house=house)
-
-
-if __name__ == '__main__':
-    sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
-
-    from sphere_plugins.sphere.utils import ArgumentParser
-    args = ArgumentParser.wearable_list_parser(default_loglevel=logging.INFO)
-
-    delete_existing_workflows = True
-
-    run(args.house, args.loglevel)

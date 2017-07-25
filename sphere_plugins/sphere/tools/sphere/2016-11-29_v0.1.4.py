@@ -20,18 +20,27 @@
 
 from hyperstream.stream import StreamInstance, StreamMetaInstance
 from hyperstream.tool import MultiOutputTool
-from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
+from sphere_plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
 
 from copy import deepcopy
 
 
-class Sphere(MultiOutputTool):
-    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None, dedupe=False,
-                 default_house='1'):
-        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys,
-                                     annotators=annotators, dedupe=dedupe, default_house=default_house)
+def reformat(doc):
+    doc = deepcopy(doc)
+    dt = doc.pop('datetime')
+    if 'hid' in doc and doc['hid'] is not None:
+        house_id = doc.pop('hid')
+    else:
+        house_id = '1'
+    return StreamMetaInstance(stream_instance=StreamInstance(dt, doc), meta_data=('house', house_id))
 
-    def _execute(self, source, splitting_stream, interval, output_plate):
+
+class Sphere(MultiOutputTool):
+    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None, dedupe=False):
+        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys,
+                                     annotators=annotators, dedupe=dedupe)
+
+    def _execute(self, source, splitting_stream, interval, meta_data_id, output_plate_values):
         if source is not None:
             raise ValueError("Sphere tool does not expect an input source")
         window = SphereExperiment(interval, self.annotators) if self.annotators else SphereDataWindow(interval)
@@ -41,7 +50,7 @@ class Sphere(MultiOutputTool):
             previous = None
             for instance in source.get_data(self.elements, self.filters, self.rename_keys):
                 if previous:
-                    current = self.reformat(instance)
+                    current = reformat(instance)
                     if current.stream_instance.timestamp == previous.stream_instance.timestamp:
                         if current.meta_data != previous.meta_data:
                             raise ValueError("Incompatible meta data")
@@ -57,20 +66,9 @@ class Sphere(MultiOutputTool):
                         previous = current
                         yield tmp
                 else:
-                    previous = self.reformat(instance)
+                    previous = reformat(instance)
             if previous:
                 yield previous
         else:
             for instance in source.get_data(self.elements, self.filters, self.rename_keys):
-                yield self.reformat(instance)
-
-    def reformat(self, doc):
-        doc = deepcopy(doc)
-        dt = doc.pop('datetime')
-        if 'hid' in doc and doc['hid'] is not None:
-            house_id = doc.pop('hid')
-            meta_data = ('house', house_id)
-        else:
-            house_id = self.default_house
-            meta_data = ('house', house_id)
-        return StreamMetaInstance(stream_instance=StreamInstance(dt, doc), meta_data=meta_data)
+                yield reformat(instance)

@@ -18,34 +18,29 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 
-from hyperstream.stream import StreamInstance, StreamMetaInstance
-from hyperstream.tool import MultiOutputTool
-from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
+from hyperstream.tool import Tool, check_input_stream_count
+from hyperstream.stream import StreamInstance
+
+from sphere_plugins.sphere.channels.sphere_channel import SphereDataWindow
 
 
 def reformat(doc):
-    dt = doc.pop('datetime')
-    if 'house_id' in doc:
-        house_id = doc.pop('house_id')
-    else:
-        house_id = '1'
-    return StreamMetaInstance(stream_instance=StreamInstance(dt, doc), meta_data=('house', house_id))
+    dt = doc['datetime']
+    del doc['datetime']
+    
+    return StreamInstance(dt, doc)
 
 
-class Sphere(MultiOutputTool):
-    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None):
-        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys,
-                                     annotators=annotators)
+class Sphere(Tool):
+    def __init__(self, modality, elements=None, filters=None, rename_keys=False):
+        super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys)
         self.modality = modality
         self.elements = elements
         self.filters = filters
         self.rename_keys = rename_keys
-        self.annotators = annotators
     
-    def _execute(self, source, splitting_stream, interval, output_plate):
-        if source is not None:
-            raise ValueError("Sphere tool does not expect an input source")
-        window = SphereExperiment(interval, self.annotators) if self.annotators else SphereDataWindow(interval)
+    @check_input_stream_count(0)
+    def _execute(self, sources, alignment_stream, interval):
+        window = SphereDataWindow(interval)
         source = window.modalities[self.modality]
-        result = map(reformat, source.get_data(self.elements, self.filters, self.rename_keys))
-        return result
+        yield map(reformat, source.get_data(self.elements, self.filters, self.rename_keys))

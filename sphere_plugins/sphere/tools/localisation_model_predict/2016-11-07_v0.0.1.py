@@ -22,8 +22,8 @@
 from hyperstream.stream import StreamInstance
 from hyperstream.tool import Tool, check_input_stream_count
 from hyperstream.time_interval import TimeInterval, MIN_DATE
-from plugins.sphere.utils import FillZeros
-from plugins.sphere.utils import deserialise_json_pipeline
+from sphere_plugins.sphere.utils import FillZeros
+from sphere_plugins.sphere.utils import deserialise_json_pipeline
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.feature_extraction import DictVectorizer

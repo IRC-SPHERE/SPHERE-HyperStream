@@ -20,55 +20,32 @@
 
 from hyperstream.stream import StreamInstance, StreamMetaInstance
 from hyperstream.tool import MultiOutputTool
-from plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
-
-from copy import deepcopy
+from sphere_plugins.sphere.channels.sphere_channel import SphereDataWindow, SphereExperiment
 
 
 def reformat(doc):
-    doc = deepcopy(doc)
     dt = doc.pop('datetime')
-    if 'hid' in doc and doc['hid'] is not None:
-        house_id = doc.pop('hid')
+    if 'house_id' in doc:
+        house_id = doc.pop('house_id')
     else:
         house_id = '1'
     return StreamMetaInstance(stream_instance=StreamInstance(dt, doc), meta_data=('house', house_id))
 
 
 class Sphere(MultiOutputTool):
-    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None, dedupe=False):
+    def __init__(self, modality, elements=None, filters=None, rename_keys=False, annotators=None):
         super(Sphere, self).__init__(modality=modality, elements=elements, filters=filters, rename_keys=rename_keys,
-                                     annotators=annotators, dedupe=dedupe)
+                                     annotators=annotators)
+        self.modality = modality
+        self.elements = elements
+        self.filters = filters
+        self.rename_keys = rename_keys
+        self.annotators = annotators
 
-    def _execute(self, source, splitting_stream, interval, output_plate):
+    def _execute(self, source, splitting_stream, interval, meta_data_id, output_plate_values):
         if source is not None:
             raise ValueError("Sphere tool does not expect an input source")
         window = SphereExperiment(interval, self.annotators) if self.annotators else SphereDataWindow(interval)
         source = window.modalities[self.modality]
-
-        if self.dedupe:
-            previous = None
-            for instance in source.get_data(self.elements, self.filters, self.rename_keys):
-                if previous:
-                    current = reformat(instance)
-                    if current.stream_instance.timestamp == previous.stream_instance.timestamp:
-                        if current.meta_data != previous.meta_data:
-                            raise ValueError("Incompatible meta data")
-                        # Try to reconcile the two items
-                        for k, v in current.stream_instance.value.items():
-                            if k in previous.stream_instance.value:
-                                if v != previous.stream_instance.value[k]:
-                                    raise ValueError("De-duplication failed")
-                            else:
-                                previous.stream_instance.value[k] = v
-                    else:
-                        tmp = previous
-                        previous = current
-                        yield tmp
-                else:
-                    previous = reformat(instance)
-            if previous:
-                yield previous
-        else:
-            for instance in source.get_data(self.elements, self.filters, self.rename_keys):
-                yield reformat(instance)
+        result = map(reformat, source.get_data(self.elements, self.filters, self.rename_keys))
+        return result

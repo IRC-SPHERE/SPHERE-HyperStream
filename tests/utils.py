@@ -22,7 +22,7 @@ import os
 from datetime import datetime, timedelta
 
 from hyperstream import HyperStream, UTC, StreamId
-from plugins.sphere.utils.sphere_helpers import PredefinedTools, scripted_experiments
+from sphere_plugins.sphere.utils.sphere_helpers import PredefinedTools, scripted_experiments
 from sphere_connector_package.sphere_connector import SphereConnector
 from scripts.workflows.asset_splitter import split_sphere_assets
 

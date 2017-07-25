@@ -22,7 +22,7 @@
 
 from hyperstream.stream import StreamInstance
 from hyperstream.tool import Tool, check_input_stream_count
-from hyperstream.utils import utcnow, reconstruct_interval
+from hyperstream.utils import reconstruct_interval
 
 import numpy as np
 
@@ -37,7 +37,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import PredefinedSplit
 from sklearn import metrics
 
-from plugins.sphere.utils import FillZeros, serialise_dict, serialise_pipeline
+from sphere_plugins.sphere.utils import FillZeros, serialise_dict, serialise_pipeline
+from sphere_plugins.sphere.utils import RoomRssiHMM
 
 
 def predefined_train_test_split(data, labels, folds, workflow, label_encoder):
@@ -108,6 +109,8 @@ class LocalisationModelLearn(Tool):
             classifier = LinearDiscriminantAnalysis()
         elif classifier_name == "svm":
             classifier = OneVsRestClassifier(LinearSVC())
+        elif classifier_name == "room_rssi_hmm":
+            classifier = RoomRssiHMM()
         else:
             raise NotImplementedError("Unknown classifier type {}".format(classifier_name))
 
@@ -134,14 +137,18 @@ class LocalisationModelLearn(Tool):
         
         label_encoder = LabelEncoder()
         train_y_trans = label_encoder.fit_transform(train_y)
-        
+
+        nan_value = self.nan_value
+        if classifier_name == "room_rssi_hmm":
+            nan_value = np.nan
         param_dict = {
             'vectorisation': DictVectorizer(sparse=False),
-            'fill_missing': FillZeros(self.nan_value),
+            'fill_missing': FillZeros(nan_value),
             'classifier': classifier,
         }
-        
-        clf = Pipeline([(kk, param_dict[kk]) for kk in ('vectorisation', 'fill_missing', 'classifier')])
+        steps = ('vectorisation', 'fill_missing', 'classifier')
+
+        clf = Pipeline([(kk, param_dict[kk]) for kk in steps])
         clf.fit(train_x, train_y_trans)
         
         clf_serialised = serialise_pipeline(clf)
