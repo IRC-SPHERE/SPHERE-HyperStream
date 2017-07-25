@@ -25,6 +25,7 @@ def run(house, wearables, delete_existing_workflows=True, loglevel=logging.INFO)
     from hyperstream import HyperStream, TimeInterval, StreamNotFoundError
     from workflows.asset_splitter import split_sphere_assets
     from workflows.deploy_localisation_model import create_workflow_localisation_predict
+    # from workflows.deploy_localisation_model_new_api import create_workflow_localisation_predict
 
     hyperstream = HyperStream(loglevel=loglevel, file_logger=None)
     D = hyperstream.channel_manager.mongo
