@@ -43,41 +43,41 @@ def create_workflow_localisation_predict(hs, house, experiment_ids, safe=True):
             safe=safe) as w:
 
         nodes = (
-            ("rss_raw",                                 S, ["H"]),
-            ("location_prediction",                     D, ["H", "LocalisationModels"]),
-            ("location_prediction_lda",                 M, ["H"]),
-            ("every_2s",                                M, ["H.W"]),
-            ("rss_per_uid",                             M, ["H.W"]),
-            ("rss_per_uid_2s",                          M, ["H.W"]),
-            ("location_prediction_models_broadcasted",  M, ["H.W"]),
-            ("predicted_locations_broadcasted",         D, ["H.W"]),
-            ("wearables_by_house",                      A, ["H"]),
-            ("access_points_by_house",                  A, ["H"])
+            ("rss_raw",                                 S, [houses]),
+            ("location_prediction",                     D, [houses, models]),
+            ("location_prediction_lda",                 M, [houses]),
+            ("every_2s",                                M, [wearables]),
+            ("rss_per_uid",                             M, [wearables]),
+            ("rss_per_uid_2s",                          M, [wearables]),
+            ("location_prediction_models_broadcasted",  M, [wearables]),
+            ("predicted_locations_broadcasted",         D, [wearables]),
+            ("wearables_by_house",                      A, [houses]),
+            ("access_points_by_house",                  A, [houses])
         )
 
         # Create all of the nodes
         N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
                  for stream_name, channel, plate_ids in nodes)
 
-        def component_wise_max(init_value=None, id_field='aid', value_field='wearable-rss'):
-            if init_value is None:
-                init_value = {}
-
-            def func(data):
-                result = init_value.copy()
-                for (time, value) in data:
-                    if value[id_field] in result:
-                        result[value[id_field]] = max(result[value[id_field]], value[value_field])
-                    else:
-                        result[value[id_field]] = value[value_field]
-                return result
-
-            return func
-
         for house in houses:
             N["rss_raw"][house] = sp.factors.sphere(source=None, modality="wearable", elements={"rss"})
 
             for wearable in wearables[house]:
+                def component_wise_max(init_value=None, id_field='aid', value_field='wearable-rss'):
+                    if init_value is None:
+                        init_value = {}
+
+                    def max_func(data):
+                        result = init_value.copy()
+                        for (time, value) in data:
+                            if value[id_field] in result:
+                                result[value[id_field]] = max(result[value[id_field]], value[value_field])
+                            else:
+                                result[value[id_field]] = value[value_field]
+                        return result
+
+                    return max_func
+
                 N["rss_per_uid"][house][wearable] = hs.factors.splitter_from_stream(
                     source=N["rss_raw"], splitting_node=N["wearables_by_house"], element="uid")
 
@@ -85,7 +85,7 @@ def create_workflow_localisation_predict(hs, house, experiment_ids, safe=True):
                     sources=None, lower=-2.0, upper=0.0, increment=2.0)
 
                 N["rss_per_uid_2s"][house][wearable] = hs.factors.sliding_apply(
-                    sources=[N["every_2s"], N["rss_per_uid"]], func=component_wise_max())
+                    sources=[N["every_2s"2], N["rss_per_uid"]], func=component_wise_max())
 
             N["location_prediction_lda"][house] = hs.factors.index_of(
                 sources=[N["location_prediction"]], selector_meta_data="localisation_model", index="lda")

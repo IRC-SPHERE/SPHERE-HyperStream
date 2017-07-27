@@ -73,31 +73,34 @@ def create_workflow_lda_localisation_model_learner(hyperstream, house, experimen
         D = hyperstream.channel_manager.mongo
         A = hyperstream.channel_manager.assets
 
+        houses = hyperstream.plate_manager.plates["H"]
+        selected_experiments = hyperstream.plate_manager.plates["H.SelectedLocalisationExperiment"]
+        models = hyperstream.plate_manager.plates["LocalisationModels"]
+
         model_names = ("lda", )  # "svm")
         create_localisation_model_plate(hyperstream, model_names)
 
         nodes = (
-            ("experiments_list",                        M, ["H"]),  # Current annotation data in 2s windows
-            # ("experiments_dataframe",                   M, ["H"]),  # Current annotation data in 2s windows
-            ("experiments_mapping",                     M, ["H"]),  # Current annotation data in 2s windows
-            ("rss_raw",                                 S, ["H"]),  # Raw RSS data
-            ("rss_time",                                S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
-            ("annotation_raw_locations",                S, ["H"]),  # Raw annotation data
-            ("annotation_time",                         S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
-            ("every_2s",                                S, ["H.SelectedLocalisationExperiment"]),  # sliding windows one every minute
-            ("annotation_state_location",               S, ["H.SelectedLocalisationExperiment"]),  # Annotation data in 2s windows
-            ("annotation_state_2s_windows",             S, ["H.SelectedLocalisationExperiment"]),
-            ("rss_2s",                                  S, ["H.SelectedLocalisationExperiment"]),  # max(RSS) per AP in past 2s of RSS
-            ("merged_2s",                               S, ["H.SelectedLocalisationExperiment"]),  # rss_2s with annotation_state_2s
-            ("merged_2s_flat_" + experiment_ids_str,    S, ["H"]),  # flattened version of merged_2s
-            ("merged_2s_split_" + experiment_ids_str,   S, ["H", "LocalisationModels"]),
-            ("location_prediction",                     D, ["H", "LocalisationModels"]),
-            ("experiments_selected",                    A, ["H"])
+            ("experiments_list",                        M, [houses]),  # Current annotation data in 2s windows
+            # ("experiments_dataframe",                   M, [houses]),  # Current annotation data in 2s windows
+            ("experiments_mapping",                     M, [houses]),  # Current annotation data in 2s windows
+            ("rss_raw",                                 S, [houses]),  # Raw RSS data
+            ("rss_time",                                S, [selected_experiments]),  # RSS data split by experiment
+            ("annotation_raw_locations",                S, [houses]),  # Raw annotation data
+            ("annotation_time",                         S, [selected_experiments]),  # RSS data split by experiment
+            ("every_2s",                                S, [selected_experiments]),  # sliding windows one every minute
+            ("annotation_state_location",               S, [selected_experiments]),  # Annotation data in 2s windows
+            ("annotation_state_2s_windows",             S, [selected_experiments]),
+            ("rss_2s",                                  S, [selected_experiments]),  # max(RSS) per AP in past 2s of RSS
+            ("merged_2s",                               S, [selected_experiments]),  # rss_2s with annotation_state_2s
+            ("merged_2s_flat_" + experiment_ids_str,    S, [houses]),  # flattened version of merged_2s
+            ("merged_2s_split_" + experiment_ids_str,   S, [houses, models]),
+            ("location_prediction",                     D, [houses, models]),
+            ("experiments_selected",                    A, [houses])
         )
 
         # Create all of the nodes
-        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
-                 for stream_name, channel, plate_ids in nodes)
+        N = dict((stream_name, w.create_node(stream_name, channel, plates)) for stream_name, channel, plates in nodes)
 
         # TODO: I've moved this outside of the workflow creation, since we want the asset to be written within the
         # time interval of the workflow calculation.

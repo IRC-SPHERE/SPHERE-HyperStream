@@ -27,6 +27,10 @@ def create_workflow_rssi_distributions_per_room(hyperstream, house, experiment_i
     # Create a simple one step workflow for querying
     workflow_id = "rssi_distributions_per_room_" + experiment_ids_str
 
+    houses = hyperstream.plate_manager.plates["H"]
+    selected_experiments = hyperstream.plate_manager.plates["H.SelectedLocalisationExperiment"]
+    models = hyperstream.plate_manager.plates["LocalisationModels"]
+
     with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="RSSI distributions per room",
@@ -43,22 +47,22 @@ def create_workflow_rssi_distributions_per_room(hyperstream, house, experiment_i
         A = hyperstream.channel_manager.assets
 
         nodes = (
-            ("experiments_list",            M, ["H"]),  # Current annotation data in 2s windows
-            ("experiments_mapping",         M, ["H"]),  # Current annotation data in 2s windows
-            ("rss_raw",                     S, ["H"]),  # Raw RSS data
-            ("rss_time",                    S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
-            ("annotation_raw_locations",    S, ["H"]),  # Raw annotation data
-            ("annotation_time",             S, ["H.SelectedLocalisationExperiment"]),  # RSS data split by experiment
-            ("every_2s",                    M, ["H.SelectedLocalisationExperiment"]),  # sliding windows one every minute
-            ("annotation_state_location",   M, ["H.SelectedLocalisationExperiment"]),  # Annotation data in 2s windows
-            ("annotation_state_2s_windows", M, ["H.SelectedLocalisationExperiment"]),
-            ("rss_2s",                      M, ["H.SelectedLocalisationExperiment"]),  # max(RSS) per AP in past 2s of RSS
-            ("merged_2s",                   M, ["H.SelectedLocalisationExperiment"]),  # rss_2s with annotation_state_2s
-            ("merged_2s_flat_"+experiment_ids_str,              M, ["H"]),                                 # flattened version of merged_2s
-            ("dataframe_"+experiment_ids_str,                   M, ["H"]),
-            ("csv_string_"+experiment_ids_str,                   M, ["H"]),
-            ("pdf_"+experiment_ids_str,                   M, ["H"]),
-            ("experiments_selected",        A, ["H"])
+            ("experiments_list",                        M, [houses]),  # Current annotation data in 2s windows
+            ("experiments_mapping",                     M, [houses]),  # Current annotation data in 2s windows
+            ("rss_raw",                                 S, [houses]),  # Raw RSS data
+            ("rss_time",                                S, [selected_experiments]),  # RSS data split by experiment
+            ("annotation_raw_locations",                S, [houses]),                # Raw annotation data
+            ("annotation_time",                         S, [selected_experiments]),  # RSS data split by experiment
+            ("every_2s",                                M, [selected_experiments]),  # sliding windows one every minute
+            ("annotation_state_location",               M, [selected_experiments]),  # Annotation data in 2s windows
+            ("annotation_state_2s_windows",             M, [selected_experiments]),
+            ("rss_2s",                                  M, [selected_experiments]),  # max(RSS) per AP in past 2s of RSS
+            ("merged_2s",                               M, [selected_experiments]),  # rss_2s with annotation_state_2s
+            ("merged_2s_flat_"+experiment_ids_str,      M, [houses]),                # flattened version of merged_2s
+            ("dataframe_"+experiment_ids_str,           M, [houses]),
+            ("csv_string_"+experiment_ids_str,          M, [houses]),
+            ("pdf_"+experiment_ids_str,                 M, [houses]),
+            ("experiments_selected",                    A, [houses])
         )
 
         # Create all of the nodes

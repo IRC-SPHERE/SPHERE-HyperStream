@@ -30,6 +30,14 @@ def create_workflow_summaries_to_csv(hyperstream, safe=True):
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
 
+    houses = hyperstream.plate_manager.plates["H"]
+    env_sensors = hyperstream.plate_manager.plates["H.EnvSensors"]
+    env_sensors_fields = hyperstream.plate_manager.plates["H.EnvSensors.Fields"]
+    wearables = hyperstream.plate_manager.plates["H.W"]
+    access_points = hyperstream.plate_manager.plates["H.APs"]
+    wearable_coords3d = hyperstream.plate_manager.plates["H.W.Coords3d"]
+    cameras = hyperstream.plate_manager.plates["H.Cameras"]
+
     with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Summaries to csv",
@@ -40,57 +48,57 @@ def create_workflow_summaries_to_csv(hyperstream, safe=True):
             ) as w:
 
         nodes = (
-            ("env_per_uid_field_agg_perc",              X, ["H.EnvSensors.Fields"]),
-            ("env_per_uid_field_agg_hist",              X, ["H.EnvSensors.Fields"]),
-            ("rss_per_uid_aid_value_agg_perc",          X, ["H.W","H.APs"]),
-            ("rss_per_uid_aid_value_agg_hist",          X, ["H.W","H.APs"]),
-            ("acc_per_uid_acclist_coord_agg_perc",      X, ["H.W.Coords3d"]),
-            ("acc_per_uid_acclist_coord_agg_hist",      X, ["H.W.Coords3d"]),
-            ("vid_per_uid_2dcen_x_perc",                X, ["H.Cameras"]),
-            ("vid_per_uid_2dcen_x_hist",                X, ["H.Cameras"]),
-            ("vid_per_uid_2dcen_y_perc",                X, ["H.Cameras"]),
-            ("vid_per_uid_2dcen_y_hist",                X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_left_perc",              X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_left_hist",              X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_top_perc",               X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_top_hist",               X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_right_perc",             X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_right_hist",             X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_bottom_perc",            X, ["H.Cameras"]),
-            ("vid_per_uid_2dbb_bottom_hist",            X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_left_perc",              X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_left_hist",              X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_top_perc",               X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_top_hist",               X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_front_perc",             X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_front_hist",             X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_right_perc",             X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_right_hist",             X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_bottom_perc",            X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_bottom_hist",            X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_back_perc",              X, ["H.Cameras"]),
-            ("vid_per_uid_3dbb_back_hist",              X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_x_perc",                X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_x_hist",                X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_y_perc",                X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_y_hist",                X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_z_perc",                X, ["H.Cameras"]),
-            ("vid_per_uid_3dcen_z_hist",                X, ["H.Cameras"]),
-            ("vid_per_uid_activity_hist",               X, ["H.Cameras"]),
-            ("vid_per_uid_intensity_hist",              X, ["H.Cameras"]),
-            ("vid_per_uid_userid_hist",                 X, ["H.Cameras"]),
-            ("prediction_mean",                         X, ["H.W"]),
-            ("prediction_map_hist",                     X, ["H.W"]),
-            ("env_sensors_by_house",                    A, ["H"]),
-            ("fields_by_env_sensor",                    A, ["H.EnvSensors"]),
-            ("cameras_by_house",                        A, ["H"]),
-            ("wearables_by_house",                      A, ["H"]),
-            ("access_points_by_house",                  A, ["H"]),
-            ("percentiles_csv",                         M, ["H"])
+            ("env_per_uid_field_agg_perc",              X, [env_sensors_fields]),
+            ("env_per_uid_field_agg_hist",              X, [env_sensors_fields]),
+            ("rss_per_uid_aid_value_agg_perc",          X, [wearables, access_points]),
+            ("rss_per_uid_aid_value_agg_hist",          X, [wearables, access_points]),
+            ("acc_per_uid_acclist_coord_agg_perc",      X, [wearable_coords3d]),
+            ("acc_per_uid_acclist_coord_agg_hist",      X, [wearable_coords3d]),
+            ("vid_per_uid_2dcen_x_perc",                X, [cameras]),
+            ("vid_per_uid_2dcen_x_hist",                X, [cameras]),
+            ("vid_per_uid_2dcen_y_perc",                X, [cameras]),
+            ("vid_per_uid_2dcen_y_hist",                X, [cameras]),
+            ("vid_per_uid_2dbb_left_perc",              X, [cameras]),
+            ("vid_per_uid_2dbb_left_hist",              X, [cameras]),
+            ("vid_per_uid_2dbb_top_perc",               X, [cameras]),
+            ("vid_per_uid_2dbb_top_hist",               X, [cameras]),
+            ("vid_per_uid_2dbb_right_perc",             X, [cameras]),
+            ("vid_per_uid_2dbb_right_hist",             X, [cameras]),
+            ("vid_per_uid_2dbb_bottom_perc",            X, [cameras]),
+            ("vid_per_uid_2dbb_bottom_hist",            X, [cameras]),
+            ("vid_per_uid_3dbb_left_perc",              X, [cameras]),
+            ("vid_per_uid_3dbb_left_hist",              X, [cameras]),
+            ("vid_per_uid_3dbb_top_perc",               X, [cameras]),
+            ("vid_per_uid_3dbb_top_hist",               X, [cameras]),
+            ("vid_per_uid_3dbb_front_perc",             X, [cameras]),
+            ("vid_per_uid_3dbb_front_hist",             X, [cameras]),
+            ("vid_per_uid_3dbb_right_perc",             X, [cameras]),
+            ("vid_per_uid_3dbb_right_hist",             X, [cameras]),
+            ("vid_per_uid_3dbb_bottom_perc",            X, [cameras]),
+            ("vid_per_uid_3dbb_bottom_hist",            X, [cameras]),
+            ("vid_per_uid_3dbb_back_perc",              X, [cameras]),
+            ("vid_per_uid_3dbb_back_hist",              X, [cameras]),
+            ("vid_per_uid_3dcen_x_perc",                X, [cameras]),
+            ("vid_per_uid_3dcen_x_hist",                X, [cameras]),
+            ("vid_per_uid_3dcen_y_perc",                X, [cameras]),
+            ("vid_per_uid_3dcen_y_hist",                X, [cameras]),
+            ("vid_per_uid_3dcen_z_perc",                X, [cameras]),
+            ("vid_per_uid_3dcen_z_hist",                X, [cameras]),
+            ("vid_per_uid_activity_hist",               X, [cameras]),
+            ("vid_per_uid_intensity_hist",              X, [cameras]),
+            ("vid_per_uid_userid_hist",                 X, [cameras]),
+            ("prediction_mean",                         X, [wearables]),
+            ("prediction_map_hist",                     X, [wearables]),
+            ("env_sensors_by_house",                    A, [houses]),
+            ("fields_by_env_sensor",                    A, [env_sensors]),
+            ("cameras_by_house",                        A, [houses]),
+            ("wearables_by_house",                      A, [houses]),
+            ("access_points_by_house",                  A, [houses]),
+            ("percentiles_csv",                         M, [houses])
         )
 
         # Create all of the nodes
-        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids)) for stream_name, channel, plate_ids in nodes)
+        N = dict((stream_name, w.create_node(stream_name, channel, plates)) for stream_name, channel, plates in nodes)
 
         percentile_nodes = [
             "env_per_uid_field_agg_perc",

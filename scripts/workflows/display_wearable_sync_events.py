@@ -27,6 +27,9 @@ def create_workflow_list_wearable_sync_events(hyperstream, house, safe=True):
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
 
+    houses = hyperstream.plate_manager.plates["H"]
+    wearables = hyperstream.plate_manager.plates["H.W"]
+
     # Create a simple one step workflow for querying
     workflow_id = "list_wearable_sync_events"
     with hyperstream.create_workflow(
@@ -38,16 +41,16 @@ def create_workflow_list_wearable_sync_events(hyperstream, house, safe=True):
             ) as w:
 
         nodes = (
-            ("wearables_by_house",               A, ["H"]),
-            ("acc_raw",                          S, ["H"]),
-            ("acc_per_uid",                      S, ["H.W"]),
-            ("acc_per_uid_acclist",              S, ["H.W"]),
-            ("acc_per_uid_magnitude",            D, ["H.W"]),
-            ("acc_per_uid_windows",              S, ["H.W"]),
-            ("acc_per_uid_magnitude_agg",        S, ["H.W"]),
-            ("acc_per_uid_magnitude_agg_5_taps", D, ["H.W"]),
-            ("experiments_list",                 M, ["H"]),  # Current annotation data in 2s windows
-            ("experiments_dataframe",            M, ["H"]),  # Current annotation data in 2s windows
+            ("wearables_by_house",               A, [houses]),
+            ("acc_raw",                          S, [houses]),
+            ("acc_per_uid",                      S, [wearables]),
+            ("acc_per_uid_acclist",              S, [wearables]),
+            ("acc_per_uid_magnitude",            D, [wearables]),
+            ("acc_per_uid_windows",              S, [wearables]),
+            ("acc_per_uid_magnitude_agg",        S, [wearables]),
+            ("acc_per_uid_magnitude_agg_5_taps", D, [wearables]),
+            ("experiments_list",                 M, [houses]),  # Current annotation data in 2s windows
+            ("experiments_dataframe",            M, [houses]),  # Current annotation data in 2s windows
         )
 
         # Create all of the nodes

@@ -26,6 +26,8 @@ def create_workflow_list_technicians_walkarounds(hyperstream, house, safe=True):
     T = hyperstream.channel_manager.tools
     D = hyperstream.channel_manager.mongo
 
+    houses = hyperstream.plate_manager.plates["H"]
+
     # Create a simple one step workflow for querying
     workflow_id = "list_technicians_walkarounds"
     with hyperstream.create_workflow(
@@ -38,9 +40,9 @@ def create_workflow_list_technicians_walkarounds(hyperstream, house, safe=True):
             safe=safe) as w:
 
         nodes = (
-            ("annotations_raw",         S, ["H"]),                    # Raw annotation data
-            ("experiments_list",        M, ["H"]),                    # Current annotation data in 2s windows
-            ("experiments_dataframe",   M, ["H"]),                    # Current annotation data in 2s windows
+            ("annotations_raw",         S, [houses]),                    # Raw annotation data
+            ("experiments_list",        M, [houses]),                    # Current annotation data in 2s windows
+            ("experiments_dataframe",   M, [houses]),                    # Current annotation data in 2s windows
         )
 
         # Create all of the nodes

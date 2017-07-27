@@ -28,6 +28,11 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
     M = hyperstream.channel_manager.memory
     A = hyperstream.channel_manager.assets
 
+    houses = hyperstream.plate_manager.plates["H"]
+    wearables = hyperstream.plate_manager.plates["H.W"]
+    models = hyperstream.plate_manager.plates["LocalisationModels"]
+
+
     with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Live Predictions",
@@ -37,21 +42,20 @@ def create_workflow_localisation_predict(hyperstream, house, experiment_ids, saf
             safe=safe) as w:
 
         nodes = (
-            ("rss_raw",                                 S, ["H"]),
-            ("location_prediction",                     D, ["H", "LocalisationModels"]),
-            ("location_prediction_lda",                 M, ["H"]),
-            ("every_2s",                                M, ["H.W"]),
-            ("rss_per_uid",                             M, ["H.W"]),
-            ("rss_per_uid_2s",                          M, ["H.W"]),
-            ("location_prediction_models_broadcasted",  M, ["H.W"]),
-            ("predicted_locations_broadcasted",         D, ["H.W"]),
-            ("wearables_by_house",                      A, ["H"]),
-            ("access_points_by_house",                  A, ["H"])
+            ("rss_raw",                                 S, [houses]),
+            ("location_prediction",                     D, [houses, models]),
+            ("location_prediction_lda",                 M, [houses]),
+            ("every_2s",                                M, [wearables]),
+            ("rss_per_uid",                             M, [wearables]),
+            ("rss_per_uid_2s",                          M, [wearables]),
+            ("location_prediction_models_broadcasted",  M, [wearables]),
+            ("predicted_locations_broadcasted",         D, [wearables]),
+            ("wearables_by_house",                      A, [houses]),
+            ("access_points_by_house",                  A, [houses])
         )
 
         # Create all of the nodes
-        N = dict((stream_name, w.create_node(stream_name, channel, plate_ids))
-                 for stream_name, channel, plate_ids in nodes)
+        N = dict((stream_name, w.create_node(stream_name, channel, plates)) for stream_name, channel, plates in nodes)
 
         w.create_multi_output_factor(
             tool=hyperstream.channel_manager.get_tool(

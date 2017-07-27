@@ -134,6 +134,8 @@ def create_hypercat_parser(hyperstream, house, safe=True):
     # noinspection PyPep8Naming
     S = hyperstream.channel_manager.sphere
 
+    houses = hyperstream.plate_manager.plates["H"]
+
     # Make sure this house exists in the meta data: workaround for the fact that the meta data hasn't yet been created
     identifier = 'house_{}'.format(house)
     if not hyperstream.plate_manager.meta_data_manager.contains(identifier):
@@ -151,7 +153,7 @@ def create_hypercat_parser(hyperstream, house, safe=True):
 
         nodes = (("devices",         SA, []),
                  ("device_mappings", SA, []),
-                 ("hc_devices",      S,  ["H"])
+                 ("hc_devices",      S,  [houses])
                  )
 
         # noinspection PyPep8Naming
@@ -212,6 +214,8 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
     SA = hyperstream.channel_manager.sphere_assets
     A = hyperstream.channel_manager.assets
 
+    houses = hyperstream.plate_manager.plates["H"]
+
     with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Asset Splitter 1",
@@ -223,11 +227,11 @@ def create_asset_splitter_1(hyperstream, house, safe=True):
 
         nodes = (
             ("devices",                                 SA, []),
-            ("devices_by_house",                        A, ["H"]),
-            ("wearables_by_house",                      A, ["H"]),
-            ("access_points_by_house",                  A, ["H"]),
-            ("cameras_by_house",                        A, ["H"]),
-            ("env_sensors_by_house",                    A, ["H"])
+            ("devices_by_house",                        A, [houses]),
+            ("wearables_by_house",                      A, [houses]),
+            ("access_points_by_house",                  A, [houses]),
+            ("cameras_by_house",                        A, [houses]),
+            ("env_sensors_by_house",                    A, [houses])
         )
 
         # Create all of the nodes
@@ -332,6 +336,9 @@ def create_asset_splitter_2(hyperstream, safe=True):
 
     A = hyperstream.channel_manager.assets
 
+    houses = hyperstream.plate_manager.plates["H"]
+    env_sensors = hyperstream.plate_manager.plates["H.EnvSensors"]
+
     with hyperstream.create_workflow(
             workflow_id=workflow_id,
             name="Asset Splitter 2",
@@ -342,8 +349,8 @@ def create_asset_splitter_2(hyperstream, safe=True):
     ) as w:
 
         nodes = (
-            ("env_sensors_by_house",                    A, ["H"]),
-            ("fields_by_env_sensor",                    A, ["H.EnvSensors"])
+            ("env_sensors_by_house",                    A, [houses]),
+            ("fields_by_env_sensor",                    A, [env_sensors])
         )
 
         # Create all of the nodes
