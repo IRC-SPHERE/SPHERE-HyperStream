@@ -21,7 +21,7 @@
 from hyperstream.utils import utcnow
 from hyperstream import StreamId, StreamInstance
 
-def create_workflow_room_level_activities(hyperstream, name, house, safe=True):
+def create_workflow_room_level_activities(hyperstream, name, safe=True):
 
     workflow_id = name
 

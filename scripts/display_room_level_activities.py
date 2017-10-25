@@ -41,8 +41,8 @@ if __name__ == '__main__':
     hs = HyperStream(loglevel=20, file_logger=None)
     M = hs.channel_manager.memory
 
-    workflow_id0 = "sitting_standing_per_room"
-display_room_display
+    workflow_id0 = "aggregated_room_level_activities"
+
     time_interval = TimeInterval(datetime(2017, 7, 21, 00, 00, 0).replace(tzinfo=UTC),
                           datetime(2017, 8, 30, 00, 00, 0).replace(tzinfo=UTC))
 
@@ -51,7 +51,7 @@ display_room_display
     try:
         w0 = hs.workflow_manager.workflows[workflow_id0]
     except:
-        w0 = create_workflow_sit_stand_per_room(hs, workflow_id0, 3007)
+        w0 = create_workflow_room_level_activities(hs, workflow_id)
 
     w0.execute(time_interval)
 
