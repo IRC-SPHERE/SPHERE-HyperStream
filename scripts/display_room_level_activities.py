@@ -41,15 +41,15 @@ if __name__ == '__main__':
     hs = HyperStream(loglevel=20, file_logger=None)
     M = hs.channel_manager.memory
 
-    workflow_id0 = "aggregated_room_level_activities"
+    workflow_id = "aggregated_room_level_activities"
 
     time_interval = TimeInterval(datetime(2017, 7, 21, 00, 00, 0).replace(tzinfo=UTC),
                           datetime(2017, 8, 30, 00, 00, 0).replace(tzinfo=UTC))
 
 
-    hs.workflow_manager.delete_workflow(workflow_id0)
+    hs.workflow_manager.delete_workflow(workflow_id)
     try:
-        w0 = hs.workflow_manager.workflows[workflow_id0]
+        w0 = hs.workflow_manager.workflows[workflow_id]
     except:
         w0 = create_workflow_room_level_activities(hs, workflow_id)
 
