@@ -61,7 +61,7 @@ def create_workflow_room_level_activities(hyperstream, name, safe=True):
         w.create_multi_output_factor(
             tool=hyperstream.channel_manager.get_tool(
                 name="sphere",
-                parameters=dict(modality="video")
+                parameters=dict(modality="video", elements={"uid","Activity"})
             ),
             source=None,
             splitting_node=None,

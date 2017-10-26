@@ -125,7 +125,7 @@ class SphereChannel(MemoryChannel):
                     # Deal with the duplicate error by adding microseconds to the time until we succeed
                     # logging.debug(e.message)
                     doc = StreamInstance(
-                        timestamp=document_collection.timestamp + timedelta(microseconds=1),
+                        timestamp=document_collection.timestamp + timedelta(microseconds=1000),
                         # timestamp=document_collection.timestamp + timedelta(microseconds=1000),
                         # MK used 1000 here when storing derived streams later back to mongo
                         # TODO: come up with a better solution
