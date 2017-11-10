@@ -27,8 +27,8 @@ try:
     from bson_connector import BsonConnector, DataWindow, Experiment, ExperimentConfig
 except ImportError:
     # noinspection PyUnresolvedReferences
-    from bson_connector_package.bson_connector import BsonConnector
-    from bson_connector_package.timewindows import Experiment, ExperimentConfig, DataWindow
+    from sphere_bson_connector_package.bson_connector import BsonConnector
+    from sphere_bson_connector_package.timewindows import Experiment, ExperimentConfig, DataWindow
 
 from hyperstream.channels.memory_channel import MemoryChannel
 from hyperstream import TimeIntervals, TimeInterval, StreamInstance
