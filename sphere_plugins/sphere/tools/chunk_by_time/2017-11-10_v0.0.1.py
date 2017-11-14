@@ -46,7 +46,7 @@ class ChunkByTime(Tool):
         for time, inter in sources[0].window(interval, force_calculation=True):
             collection = list()
             for t,items in get_chunk(sources[1].window(interval, force_calculation=True), inter):
-                collection = [i[self.element] for i in items if self.element in i.keys()]
+                collection = [i[self.element] for i in items if self.element in i.keys() and len(i[self.element]) > 0]
             if len(collection) > 0:
                 yield StreamInstance(inter.end, collection)
 

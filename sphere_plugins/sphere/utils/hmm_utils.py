@@ -25,7 +25,11 @@ from hmmlearn.hmm import _BaseHMM, _validate_covars
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_X_y
 from sklearn.utils.multiclass import type_of_target
-from sklearn.utils.fixes import bincount
+
+try:
+    from sklearn.utils.fixes import bincount
+except:
+    from numpy import bincount
 
 ### MK: the following has been first copied from hmm.GaussianHMM?? of hmmlearn and then modified
 # TODO: Eliminate unnecessary ingredients
