@@ -1,0 +1,40 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=5f4dd6cee9a329f5f5947212eb86bf87124b11ad494bd48e678215be29133947
+
+language: python
+
+python:
+  - "2.7"
+  
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  
+sudo: required
+
+# request addons
+addons:
+  apt:
+    packages:
+      - mosquitto
+
+# request services
+services:
+  - mongodb
+  - docker
+  - mosquitto
+  - rabbitmq
+
+before_script:
+  - docker run -dti -p 1883:1883 -p 9001:9001 toke/mosquitto
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+
+# command to run tests
+script:
+  - pytest # or py.test for Python versions 3.5 and below
+
+after_script:
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
