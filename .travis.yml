@@ -9,15 +9,16 @@ python:
   
 # command to install dependencies
 install:
+  - pip install -U git+git://github.com/IRC-SPHERE/HyperStream.git#egg=hyperstream
   - pip install -r requirements.txt
   
 sudo: required
 
 # request addons
-addons:
-  apt:
-    packages:
-      - mosquitto
+# addons:
+#   apt:
+#     packages:
+#       - mosquitto
 
 # request services
 services:
